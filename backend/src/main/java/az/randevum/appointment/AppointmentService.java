@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -54,6 +55,8 @@ public class AppointmentService {
     static final int PER_MINUTE = 10;
     static final int PER_DAY = 20;
     static final int ALTERNATIVES = 6;
+    /** Longest range the panel appointment lists return at once. */
+    static final int MAX_RANGE_DAYS = 62;
 
     private static final String OVERLAP_CONSTRAINT = "appointments_no_overlap";
     private static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
@@ -202,9 +205,16 @@ public class AppointmentService {
     }
 
     /** A provider's schedule between two dates, inclusive, for the panel. */
+    /** Appointments of one provider, or of every provider when {@code providerId} is null (admin). */
     public List<ProviderAppointmentView> forProvider(Long providerId, LocalDate from, LocalDate to) {
-        return read(() -> appointments
-                .findForProvider(providerId, instant(from, LocalTime.MIDNIGHT), instant(to.plusDays(1), LocalTime.MIDNIGHT))
+        if (to.isBefore(from) || ChronoUnit.DAYS.between(from, to) > MAX_RANGE_DAYS) {
+            throw new BusinessRuleException("Tarix aralığı 0-" + MAX_RANGE_DAYS + " gün olmalıdır");
+        }
+        Instant start = instant(from, LocalTime.MIDNIGHT);
+        Instant end = instant(to.plusDays(1), LocalTime.MIDNIGHT);
+        return read(() -> (providerId == null
+                        ? appointments.findAllInRange(start, end)
+                        : appointments.findForProvider(providerId, start, end))
                 .stream()
                 .map(a -> new ProviderAppointmentView(view(a), a.getCustomer().getFullName(), a.getCustomer().getPhone()))
                 .toList());

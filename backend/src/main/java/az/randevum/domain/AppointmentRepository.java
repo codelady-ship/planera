@@ -51,4 +51,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             where a.provider.id = :providerId and a.startsAt < :to and a.endsAt > :from
             order by a.startsAt""")
     List<Appointment> findForProvider(Long providerId, Instant from, Instant to);
+
+    /** Every provider's appointments in [from, to), for the admin panel and stats (#39, #41). */
+    @Query("""
+            select a from Appointment a join fetch a.customer join fetch a.service join fetch a.provider
+            where a.startsAt < :to and a.endsAt > :from
+            order by a.startsAt""")
+    List<Appointment> findAllInRange(Instant from, Instant to);
 }

@@ -25,6 +25,9 @@ spring:
 randevum:
   jwt:
     secret: ${JWT_SECRET:} # at least 32 bytes in production; empty = random key per start
+  cors:
+    # Comma-separated; empty = no cross-origin browser calls (the site uses its own /api/backend gateway).
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
 
 server:
   port: ${PORT:8080}

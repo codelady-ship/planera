@@ -20,6 +20,7 @@ import az.randevum.provider.ServiceOfferingService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import az.randevum.stats.StatsService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ class JwtSecurityTest {
     @MockitoBean ServiceOfferingService services;
     @MockitoBean AvailabilityService availability;
     @MockitoBean AppointmentService appointments;
+    @MockitoBean StatsService stats;
 
     private String token(String email, String role, Instant expiresAt) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
