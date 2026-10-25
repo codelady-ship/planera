@@ -1,4 +1,4 @@
-# Local stack: PostgreSQL and backend.
+# Local stack: PostgreSQL, Redis and backend.
 #   docker compose up --build
 # Backend API: http://localhost:8080
 # PostgreSQL is published on host port 5433 so it does not clash with a local
@@ -21,16 +21,29 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build: ./backend
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/randevum
       SPRING_DATASOURCE_USERNAME: randevum
       SPRING_DATASOURCE_PASSWORD: randevum
+      REDIS_URL: redis://redis:6379
     ports:
       - "8080:8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 volumes:
