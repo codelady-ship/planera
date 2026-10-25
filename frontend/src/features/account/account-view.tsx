@@ -40,7 +40,7 @@ export function AccountView() {
         {user && <p className="text-muted-foreground">{user.fullName}</p>}
       </div>
       <Tabs value={tab} onValueChange={(value) => setTab(String(value))}>
-        <TabsList className="w-full overflow-x-auto sm:w-auto">
+        <TabsList className="w-full overflow-x-auto overflow-y-hidden sm:w-auto">
           {SCOPES.map((s) => (
             <TabsTrigger key={s.value} value={s.value}>
               {s.label}

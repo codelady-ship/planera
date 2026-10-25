@@ -111,3 +111,34 @@ export interface Appointment {
   note: string | null
   cancellable: boolean
 }
+
+/** An appointment as the panel sees it, with who booked it. */
+export interface PanelAppointment {
+  appointment: Appointment
+  customerName: string
+  customerPhone: string | null
+}
+
+export interface TimeOff {
+  id: number
+  startsOn: string
+  endsOn: string
+  reason: string | null
+}
+
+export interface AvailabilityView {
+  slotStepMinutes: number
+  weekly: DaySchedule[]
+  timeOff: TimeOff[]
+}
+
+export interface Stats {
+  today: string
+  weekStart: string
+  todayCount: number
+  weekCount: number
+  weekRevenue: number
+  cancellationRate: number
+  week: { date: string; count: number }[]
+  popularServices: { name: string; count: number }[]
+}

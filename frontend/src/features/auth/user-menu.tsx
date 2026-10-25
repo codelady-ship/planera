@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CircleUser, LogOut } from 'lucide-react'
+import { CircleUser, LayoutDashboard, LogOut } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -42,6 +42,12 @@ export function UserMenu({ stacked = false }: { stacked?: boolean }) {
 
   return (
     <div className={cn('flex gap-2', stacked ? 'flex-col' : 'items-center')}>
+      {user.role !== 'CUSTOMER' && (
+        <Link href="/panel" className={cn(link, 'gap-2')}>
+          <LayoutDashboard aria-hidden className="size-4" />
+          Panel
+        </Link>
+      )}
       <Link href="/account" className={cn(link, 'gap-2')}>
         <CircleUser aria-hidden className="size-4" />
         {user.fullName.split(' ')[0]}
