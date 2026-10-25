@@ -1,5 +1,6 @@
 import 'server-only'
 import { cacheLife, cacheTag } from 'next/cache'
+import { todayInBaku } from '@/lib/dates'
 import { ApiUnavailableError, getPublic } from './server'
 import type { Category, Page, ProviderDetail, ProviderSummary } from './types'
 
@@ -64,4 +65,27 @@ export async function searchProviders(
   const page = await getPublic<Page<ProviderSummary>>(`/api/providers?${query}`)
   if (!page) throw new ApiUnavailableError()
   return page
+}
+
+/**
+ * The best rated providers for the home page, with today's Baku date for
+ * the "next free time" label; empty during an outage.
+ */
+export async function getTopProviders(): Promise<{
+  providers: ProviderSummary[]
+  today: string
+}> {
+  'use cache'
+  cacheTag('providers')
+  const today = todayInBaku()
+  try {
+    const page = await getPublic<Page<ProviderSummary>>(
+      '/api/providers?sort=rating&size=4',
+    )
+    cacheLife('minutes')
+    return { providers: page?.content ?? [], today }
+  } catch {
+    cacheLife('seconds')
+    return { providers: [], today }
+  }
 }

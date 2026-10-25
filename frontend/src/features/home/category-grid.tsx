@@ -8,9 +8,9 @@ import {
   Stethoscope,
   type LucideIcon,
 } from 'lucide-react'
-import { CATEGORIES, type CategorySlug } from './mock-data'
+import type { Category } from '@/lib/api/types'
 
-const ICONS: Record<CategorySlug, LucideIcon> = {
+const ICONS: Record<string, LucideIcon> = {
   gozellik: Scissors,
   saglamliq: Stethoscope,
   tehsil: GraduationCap,
@@ -19,15 +19,16 @@ const ICONS: Record<CategorySlug, LucideIcon> = {
   diger: LayoutGrid,
 }
 
-export function CategoryGrid() {
+export function CategoryGrid({ categories }: { categories: Category[] }) {
+  if (categories.length === 0) return null
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
       <h2 className="text-2xl font-semibold tracking-tight">
         Populyar kateqoriyalar
       </h2>
       <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-        {CATEGORIES.map((category) => {
-          const Icon = ICONS[category.slug]
+        {categories.map((category) => {
+          const Icon = ICONS[category.slug] ?? LayoutGrid
           return (
             <li key={category.slug}>
               <Link

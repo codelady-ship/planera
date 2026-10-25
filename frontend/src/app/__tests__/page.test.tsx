@@ -1,8 +1,16 @@
 import { render, screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
-import Home from '../page'
+import { expect, test, vi } from 'vitest'
+import { CategoryGrid } from '@/features/home/category-grid'
 
-test('renders the home page sections', () => {
+// The catalog sections are async Server Components; their data comes from
+// the API and is tested through the components themselves.
+vi.mock('@/lib/api/catalog', () => ({
+  getCategories: async () => [],
+  getTopProviders: async () => ({ providers: [], today: '2026-10-25' }),
+}))
+
+test('renders the static home page sections', async () => {
+  const { default: Home } = await import('../page')
   render(<Home />)
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
     /randevunu bir neçə kliklə/,
@@ -11,12 +19,28 @@ test('renders the home page sections', () => {
   expect(screen.getByText('Vaxtını seç, rahatlığını yaşa.')).toBeInTheDocument()
   expect(screen.getByRole('search')).toBeInTheDocument()
   expect(
+    screen.getByRole('heading', { name: 'Necə işləyir?' }),
+  ).toBeInTheDocument()
+})
+
+test('lists the categories from the API with their provider counts', () => {
+  render(
+    <CategoryGrid
+      categories={[
+        {
+          slug: 'gozellik',
+          name: 'Gözəllik və baxım',
+          description: 'Bərbər, salon',
+          providerCount: 3,
+        },
+      ]}
+    />,
+  )
+  expect(
     screen.getByRole('heading', { name: 'Populyar kateqoriyalar' }),
   ).toBeInTheDocument()
   expect(
-    screen.getAllByRole('link', { name: 'Randevu götür' }).length,
-  ).toBeGreaterThan(0)
-  expect(
-    screen.getByRole('heading', { name: 'Necə işləyir?' }),
-  ).toBeInTheDocument()
+    screen.getByRole('link', { name: /Gözəllik və baxım/ }),
+  ).toHaveAttribute('href', '/search?category=gozellik')
+  expect(screen.getByText('3 mütəxəssis')).toBeInTheDocument()
 })
