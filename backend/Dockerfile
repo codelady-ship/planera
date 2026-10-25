@@ -13,5 +13,7 @@ WORKDIR /app
 RUN useradd --system --uid 10001 randevum
 COPY --from=build /app/build/libs/*.jar app.jar
 USER randevum
+# Size the heap from the container limit (Render free plan has 512 MB).
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+UseSerialGC"
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

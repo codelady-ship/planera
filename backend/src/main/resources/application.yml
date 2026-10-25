@@ -2,7 +2,8 @@ spring:
   application:
     name: randevum-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/randevum}
+    # Render passes host/port/name separately (render.yaml); a full JDBC URL still wins.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:randevum}}
     username: ${SPRING_DATASOURCE_USERNAME:randevum}
     password: ${SPRING_DATASOURCE_PASSWORD:randevum}
   jpa:

@@ -53,6 +53,18 @@ curl https://start.spring.io/starter.zip -d type=gradle-project -d language=java
 
 ## Deploy
 
+### Frontend (Vercel)
+
 - **Production:** https://randevum-seven.vercel.app
 - Vercel layihəsi `randevum`, Root Directory: `frontend`, Node 22.
 - `main`-ə hər merge avtomatik production deploy edir; hər PR öz preview linkini alır.
+
+### Backend (Render, Docker)
+
+`render.yaml` Blueprint üç servis yaradır: `randevum-api` (`backend/Dockerfile`), `randevum-db` (PostgreSQL 16) və `randevum-redis` (Key Value).
+
+1. https://render.com - GitHub ilə daxil ol.
+2. New -> Blueprint -> `codelady-ship/randevum` reposunu seç -> Apply.
+3. Yoxlama: `https://<servis>.onrender.com/api/health`.
+
+Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq); pulsuz PostgreSQL 30 gün sonra bitir, uzunmüddətli üçün Neon (#48) - onda `SPRING_DATASOURCE_URL` dəyişənini Neon-un JDBC URL-i ilə ver. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.

@@ -1,0 +1,59 @@
+# Render Blueprint (#49): backend API (Docker), PostgreSQL and Key Value (Redis).
+# Render dashboard -> New -> Blueprint -> pick this repo; it creates all three.
+services:
+  - type: web
+    name: randevum-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /actuator/health
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - backend/**
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo
+      - key: DB_HOST
+        fromDatabase:
+          name: randevum-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: randevum-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: randevum-db
+          property: database
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: randevum-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: randevum-db
+          property: password
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: randevum-redis
+          property: connectionString
+
+  - type: keyvalue
+    name: randevum-redis
+    plan: free
+    region: frankfurt
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: [] # internal network only
+
+databases:
+  - name: randevum-db
+    plan: free
+    region: frankfurt
+    databaseName: randevum
+    user: randevum
+    postgresMajorVersion: '16'
+    ipAllowList: [] # internal network only
