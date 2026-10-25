@@ -8,7 +8,7 @@ Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 
 1. Issue seçilir, branch açılır: `feat/<issue>-qisa-ad`
 2. PR açılır, təsvirdə `Closes #<issue>`
-3. CI yaşıl olduqdan sonra squash merge
+3. CI yaşıl olduqdan sonra merge (merge commit, stacked PR-lar üçün)
 4. Günün sonunda milestone bağlanır
 
 ## 7 günlük plan

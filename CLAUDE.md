@@ -70,7 +70,7 @@ qatında, həm də verilənlər bazası səviyyəsində (constraint) alınır.
 ## İş Axını
 
 - Hər iş GitHub issue ilə başlayır; branch adı `feat/<issue>-qisa-ad`.
-- PR təsvirində `Closes #<issue>` olur, CI yaşıl olduqdan sonra squash merge.
+- PR təsvirində `Closes #<issue>` olur, CI yaşıl olduqdan sonra merge (merge commit, stacked PR-lar üçün).
 - Layihə 7 gündə hazırlanır: hər gün bir milestone (`Gün N`) bağlanır və `main` Vercel-ə deploy olunur. Plan: BACKLOG.md.
 
 ## Mobil və Bildirişlər (yol xəritəsi)
