@@ -25,6 +25,11 @@ public class ApiExceptionHandler {
         return problem(HttpStatus.CONFLICT, e.getMessage());
     }
 
+    @ExceptionHandler(BusinessRuleException.class)
+    ProblemDetail businessRule(BusinessRuleException e) {
+        return problem(HttpStatus.UNPROCESSABLE_CONTENT, e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail invalid(MethodArgumentNotValidException e) {
         Map<String, String> errors = new LinkedHashMap<>();

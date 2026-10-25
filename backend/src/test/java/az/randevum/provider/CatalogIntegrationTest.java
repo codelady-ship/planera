@@ -11,6 +11,7 @@ import az.randevum.provider.ProviderDtos.ProviderSummary;
 import az.randevum.provider.ProviderDtos.ServiceRequest;
 import az.randevum.provider.ProviderDtos.ServiceView;
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -82,6 +83,7 @@ class CatalogIntegrationTest {
         assertThat(detail.services()).extracting(ServiceView::name).first().isEqualTo("Müayinə");
         assertThat(detail.schedule()).hasSize(7);
         assertThat(detail.schedule().get(0).intervals()).hasSize(2); // Monday with lunch break
+        assertThat(detail.schedule().get(0).intervals().getFirst().start()).isEqualTo(LocalTime.of(9, 0)); // no time zone shift
         assertThat(detail.schedule().get(6).intervals()).isEmpty(); // Sunday off
     }
 

@@ -2,10 +2,15 @@ package az.randevum.domain;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TimeOffRepository extends JpaRepository<TimeOff, Long> {
+
+    List<TimeOff> findByProviderIdOrderByStartsOnAsc(Long providerId);
+
+    Optional<TimeOff> findByIdAndProviderId(Long id, Long providerId);
 
     @Query("""
             select t from TimeOff t

@@ -8,12 +8,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:randevum}
   jpa:
     open-in-view: false
+    # No hibernate.jdbc.time_zone: it shifts local time/date columns (working
+    # hours) by the JVM offset. Instants are timestamptz and need no conversion.
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        jdbc:
-          time_zone: Asia/Baku
   flyway:
     enabled: true
     locations: classpath:db/migration

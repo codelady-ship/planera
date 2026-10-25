@@ -50,7 +50,7 @@ public class ProviderService {
                 p.getPhone(),
                 p.getCancellationHours(),
                 activeServices(p),
-                schedule(p));
+                schedule(rules.findByProviderIdOrderByDayOfWeekAscStartTimeAsc(p.getId())));
     }
 
     public List<ServiceView> services(String slug) {
@@ -68,9 +68,9 @@ public class ProviderService {
                 .toList();
     }
 
-    private List<DaySchedule> schedule(ProviderProfile p) {
-        Map<DayOfWeek, List<Interval>> byDay = rules.findByProviderIdOrderByDayOfWeekAscStartTimeAsc(p.getId())
-                .stream()
+    /** Groups weekly rules into Monday..Sunday; a day without rules is a day off. */
+    public static List<DaySchedule> schedule(List<AvailabilityRule> weekly) {
+        Map<DayOfWeek, List<Interval>> byDay = weekly.stream()
                 .collect(Collectors.groupingBy(
                         AvailabilityRule::getDayOfWeek,
                         Collectors.mapping(r -> new Interval(r.getStartTime(), r.getEndTime()), Collectors.toList())));
