@@ -1,5 +1,6 @@
-# Render Blueprint (#49): backend API (Docker), PostgreSQL and Key Value (Redis).
-# Render dashboard -> New -> Blueprint -> pick this repo; it creates all three.
+# Render Blueprint (#49, #48): backend API (Docker) and Key Value (Redis).
+# PostgreSQL lives on Neon (free, no expiry); its connection details are
+# entered in the Render dashboard (sync: false), never committed.
 services:
   - type: web
     name: randevum-api
@@ -18,26 +19,14 @@ services:
         value: demo
       - key: JWT_SECRET
         generateValue: true # random secret, stays the same across deploys
-      - key: DB_HOST
-        fromDatabase:
-          name: randevum-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: randevum-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: randevum-db
-          property: database
+      # Neon -> Connect -> direct connection (not the -pooler host):
+      # jdbc:postgresql://<host>/<database>?sslmode=require
+      - key: SPRING_DATASOURCE_URL
+        sync: false
       - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: randevum-db
-          property: user
+        sync: false
       - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: randevum-db
-          property: password
+        sync: false
       - key: REDIS_URL
         fromService:
           type: keyvalue
@@ -49,13 +38,4 @@ services:
     plan: free
     region: frankfurt
     maxmemoryPolicy: allkeys-lru
-    ipAllowList: [] # internal network only
-
-databases:
-  - name: randevum-db
-    plan: free
-    region: frankfurt
-    databaseName: randevum
-    user: randevum
-    postgresMajorVersion: '16'
     ipAllowList: [] # internal network only

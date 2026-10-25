@@ -71,16 +71,19 @@ Bütün demo hesabların şifrəsi: `Randevum123`
 
 ### Backend (Render, Docker)
 
-`render.yaml` Blueprint üç servis yaradır: `randevum-api` (`backend/Dockerfile`), `randevum-db` (PostgreSQL 16) və `randevum-redis` (Key Value).
+`render.yaml` Blueprint iki servis yaradır: `randevum-api` (`backend/Dockerfile`) və `randevum-redis` (Key Value). PostgreSQL 16 bazası Neon-dadır (pulsuz, silinmir, Frankfurt).
 
 1. https://render.com - GitHub ilə daxil ol.
 2. New -> Blueprint -> `codelady-ship/randevum` reposunu seç -> Apply.
-3. Yoxlama: `https://<servis>.onrender.com/api/health`.
+3. Render -> `randevum-api` -> Environment: Neon -> Connect bölməsindən (birbaşa bağlantı, `-pooler` olmayan host):
+   - `SPRING_DATASOURCE_URL` = `jdbc:postgresql://<host>/<database>?sslmode=require`
+   - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
+4. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
 - **Production API:** https://randevum-api-uu30.onrender.com
 - Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
 
-Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq); pulsuz PostgreSQL 30 gün sonra bitir, uzunmüddətli üçün Neon (#48) - onda `SPRING_DATASOURCE_URL` dəyişənini Neon-un JDBC URL-i ilə ver. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
+Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Neon pulsuz planında ayda 100 CU-saat var; API boş bağlantıları 2 dəqiqəyə bağlayır ki, baza yata bilsin. Backup: Neon pulsuz planda bazanı son saatların istənilən anına qaytarmağa (restore) imkan verir; daha uzun saxlama ödənişli plandadır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
 
 ## Təhlükəsizlik (OWASP əsas yoxlamaları)
 
