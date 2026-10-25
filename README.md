@@ -1,5 +1,7 @@
 # Randevum
 
+**Canlı sayt:** https://randevum-seven.vercel.app
+
 Universal onlayn randevu platforması: xidmət göstərəni tap, boş saatı seç,
 randevunu bir neçə kliklə götür.
 
@@ -40,5 +42,6 @@ curl https://start.spring.io/starter.zip -d type=gradle-project -d language=java
 
 ## Deploy
 
-`frontend/` Vercel-ə qoşulub (Root Directory: `frontend`). `main`-ə hər merge
-avtomatik production deploy edir.
+- **Production:** https://randevum-seven.vercel.app
+- Vercel layihəsi `randevum`, Root Directory: `frontend`, Node 22.
+- `main`-ə hər merge avtomatik production deploy edir; hər PR öz preview linkini alır.
