@@ -45,7 +45,6 @@ export const SEARCH_KEYS = [
   'category',
   'city',
   'maxPrice',
-  'minRating',
   'sort',
   'page',
 ] as const
