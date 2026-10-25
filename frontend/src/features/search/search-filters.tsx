@@ -104,19 +104,6 @@ export function SearchFilters({ categories }: { categories: Category[] }) {
         </select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="f-rating">Reytinq</Label>
-        <select
-          id="f-rating"
-          className={SELECT}
-          value={params.get('minRating') ?? ''}
-          onChange={(e) => update('minRating', e.target.value)}
-        >
-          <option value="">İstənilən</option>
-          <option value="4.5">4.5 və yuxarı</option>
-          <option value="4.8">4.8 və yuxarı</option>
-        </select>
-      </div>
-      <div className="flex flex-col gap-2">
         <Label htmlFor="f-sort">Sıralama</Label>
         <select
           id="f-sort"

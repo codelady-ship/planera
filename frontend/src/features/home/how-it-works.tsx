@@ -1,4 +1,11 @@
-import { CalendarCheck, Clock, Search, type LucideIcon } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowRight,
+  CalendarCheck,
+  Clock,
+  Search,
+  type LucideIcon,
+} from 'lucide-react'
 
 const STEPS: { icon: LucideIcon; title: string; text: string }[] = [
   {
@@ -36,9 +43,21 @@ export function HowItWorks() {
                 <span className="text-sm text-primary-foreground/60">
                   Addım {i + 1}
                 </span>
+                {i < STEPS.length - 1 && (
+                  <ArrowRight
+                    aria-hidden
+                    className="ml-auto hidden size-6 text-brand-teal md:block"
+                  />
+                )}
               </span>
               <h3 className="text-lg font-medium">{step.title}</h3>
               <p className="text-primary-foreground/70">{step.text}</p>
+              {i < STEPS.length - 1 && (
+                <ArrowDown
+                  aria-hidden
+                  className="ml-2 size-6 text-brand-teal md:hidden"
+                />
+              )}
             </li>
           ))}
         </ol>
