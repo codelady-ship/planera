@@ -32,7 +32,7 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
 
 **Backend** (`/backend`)
 
-- Java 21 + Spring Boot 3.x (Web, Data JPA, Security, Validation)
+- Java 21 + Spring Boot 4.x (WebMVC, Data JPA, Security, Validation, Actuator)
 - PostgreSQL 16 + Flyway miqrasiyaları
 - JWT (access/refresh), rollar: `ADMIN`, `PROVIDER`, `CUSTOMER`
 - JUnit 5 + Testcontainers
