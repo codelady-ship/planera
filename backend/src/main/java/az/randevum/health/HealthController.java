@@ -1,4 +1,4 @@
-package az.randevu.health;
+package az.randevum.health;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
@@ -19,7 +19,7 @@ public class HealthController {
 
     @GetMapping
     public HealthResponse health() {
-        return new HealthResponse("UP", "randevu-api", OffsetDateTime.now(clock));
+        return new HealthResponse("UP", "randevum-api", OffsetDateTime.now(clock));
     }
 
     public record HealthResponse(String status, String service, OffsetDateTime time) {}

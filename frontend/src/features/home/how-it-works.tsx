@@ -30,7 +30,7 @@ export function HowItWorks() {
           {STEPS.map((step, i) => (
             <li key={step.title} className="flex flex-col gap-3">
               <span className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-lg bg-cta text-cta-foreground">
+                <span className="grid size-10 place-items-center rounded-lg bg-brand-teal text-brand-navy">
                   <step.icon className="size-5" aria-hidden />
                 </span>
                 <span className="text-sm text-primary-foreground/60">

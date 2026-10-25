@@ -1,4 +1,4 @@
-package az.randevu;
+package az.randevum;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
-class RandevuApplicationTests {
+class RandevumApplicationTests {
 
     @Test
     void contextLoads() {}

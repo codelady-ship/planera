@@ -31,6 +31,8 @@
   --color-cta-foreground: var(--cta-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-navy: var(--brand-navy);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -52,92 +54,95 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* randevu design tokens (docs/DESIGN.md).
-   Light: sand surface #F7F6F3, white cards, ink #111111 text.
-   CTA: coral #FF6B35 with BLACK text (white fails contrast on it).
-   Success / confirmed status: forest #1F7A4D with white text.
-   No gradients, no purple-blue mixes. */
+/* Randevum design tokens (docs/DESIGN.md), taken from the logo.
+   Light: mist surface #F4F7FB, white cards, ink #0F1B33 text.
+   Primary: navy #072968. CTA: blue #1D5FE0. Both carry white text.
+   Teal #00C3BD is decorative only (navy text on it); confirmed status uses
+   teal-dark #00807C with white text. The logo keeps its gradient; the UI
+   uses flat colors only. */
 :root {
   --brand-white: #ffffff;
-  --brand-ink: #111111;
-  --brand-sand: #f7f6f3;
-  --brand-coral: #ff6b35;
-  --brand-forest: #1f7a4d;
+  --brand-ink: #0f1b33;
+  --brand-mist: #f4f7fb;
+  --brand-navy: #072968;
+  --brand-blue: #1d5fe0;
+  --brand-teal: #00c3bd;
+  --brand-teal-dark: #00807c;
 
-  --background: var(--brand-sand);
+  --background: var(--brand-mist);
   --foreground: var(--brand-ink);
   --card: var(--brand-white);
   --card-foreground: var(--brand-ink);
   --popover: var(--brand-white);
   --popover-foreground: var(--brand-ink);
-  --primary: var(--brand-ink);
+  --primary: var(--brand-navy);
   --primary-foreground: var(--brand-white);
-  --secondary: #efede8;
-  --secondary-foreground: var(--brand-ink);
-  --muted: #efede8;
-  --muted-foreground: #5f5d58;
-  --accent: #efede8;
-  --accent-foreground: var(--brand-ink);
-  --cta: var(--brand-coral);
-  --cta-foreground: #000000;
-  --success: var(--brand-forest);
+  --secondary: #e8eef7;
+  --secondary-foreground: var(--brand-navy);
+  --muted: #e8eef7;
+  --muted-foreground: #4f5d75;
+  --accent: #e8eef7;
+  --accent-foreground: var(--brand-navy);
+  --cta: var(--brand-blue);
+  --cta-foreground: var(--brand-white);
+  --success: var(--brand-teal-dark);
   --success-foreground: var(--brand-white);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #e4e1da;
-  --input: #e4e1da;
-  --ring: var(--brand-coral);
-  --chart-1: var(--brand-ink);
-  --chart-2: var(--brand-coral);
-  --chart-3: var(--brand-forest);
-  --chart-4: #8a8780;
-  --chart-5: #c9c5bc;
+  --border: #dbe3ef;
+  --input: #dbe3ef;
+  --ring: var(--brand-blue);
+  --chart-1: var(--brand-navy);
+  --chart-2: var(--brand-blue);
+  --chart-3: var(--brand-teal);
+  --chart-4: #7a8aa6;
+  --chart-5: #c3cddd;
   --radius: 0.75rem;
   --sidebar: var(--brand-white);
   --sidebar-foreground: var(--brand-ink);
-  --sidebar-primary: var(--brand-ink);
+  --sidebar-primary: var(--brand-navy);
   --sidebar-primary-foreground: var(--brand-white);
-  --sidebar-accent: var(--brand-sand);
-  --sidebar-accent-foreground: var(--brand-ink);
-  --sidebar-border: #e4e1da;
-  --sidebar-ring: var(--brand-coral);
+  --sidebar-accent: var(--brand-mist);
+  --sidebar-accent-foreground: var(--brand-navy);
+  --sidebar-border: #dbe3ef;
+  --sidebar-ring: var(--brand-blue);
 }
 
 .dark {
-  --background: #0d0d0d;
-  --foreground: #fafafa;
-  --card: #171717;
-  --card-foreground: #fafafa;
-  --popover: #171717;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #111111;
-  --secondary: #262626;
-  --secondary-foreground: #fafafa;
-  --muted: #262626;
-  --muted-foreground: #a3a3a3;
-  --accent: #262626;
-  --accent-foreground: #fafafa;
-  --cta: var(--brand-coral);
+  --background: #050f26;
+  --foreground: #f4f7fb;
+  --card: #0b1a3d;
+  --card-foreground: #f4f7fb;
+  --popover: #0b1a3d;
+  --popover-foreground: #f4f7fb;
+  --primary: #f4f7fb;
+  --primary-foreground: var(--brand-navy);
+  --secondary: #152a57;
+  --secondary-foreground: #f4f7fb;
+  --muted: #152a57;
+  --muted-foreground: #a9b6cc;
+  --accent: #152a57;
+  --accent-foreground: #f4f7fb;
+  --cta: #3b7bff;
   --cta-foreground: #000000;
-  --success: #2e9e66;
+  --success: var(--brand-teal);
   --success-foreground: #000000;
   --destructive: oklch(0.704 0.191 22.216);
   --border: rgb(255 255 255 / 10%);
   --input: rgb(255 255 255 / 15%);
-  --ring: var(--brand-coral);
-  --chart-1: #fafafa;
-  --chart-2: var(--brand-coral);
-  --chart-3: #2e9e66;
-  --chart-4: #737373;
-  --chart-5: #404040;
-  --sidebar: #171717;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #fafafa;
-  --sidebar-primary-foreground: #111111;
-  --sidebar-accent: #262626;
-  --sidebar-accent-foreground: #fafafa;
+  --ring: var(--brand-teal);
+  --chart-1: #f4f7fb;
+  --chart-2: #3b7bff;
+  --chart-3: var(--brand-teal);
+  --chart-4: #7a8aa6;
+  --chart-5: #2b4170;
+  --sidebar: #0b1a3d;
+  --sidebar-foreground: #f4f7fb;
+  --sidebar-primary: #f4f7fb;
+  --sidebar-primary-foreground: var(--brand-navy);
+  --sidebar-accent: #152a57;
+  --sidebar-accent-foreground: #f4f7fb;
   --sidebar-border: rgb(255 255 255 / 10%);
-  --sidebar-ring: var(--brand-coral);
+  --sidebar-ring: var(--brand-teal);
 }
 
 @layer base {

@@ -1,6 +1,6 @@
-# randevu
+# Randevum
 
-Universal onlayn randevu platforması. Müştəri xidmət göstərəni (bərbər, həkim,
+Universal onlayn randevu platforması və şəxsi gündəlik asistenti. Şüar: "Vaxtını seç, rahatlığını yaşa." Müştəri xidmət göstərəni (bərbər, həkim,
 müəllim, konsultant və s.) tapır, xidməti seçir, yalnız boş saatlar arasından
 vaxt götürür və randevunu öz kabinetindən idarə edir. Xidmət göstərən və admin
 öz paneldə xidmətləri, iş qrafikini və randevuları idarə edir.
@@ -17,8 +17,9 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
   YALNIZ `lucide-react` ikonları. `scripts/check-no-emoji.mjs` CI-da yoxlayır.
 - **UI kitabxanası: shadcn/ui** (`base-nova` stili, Base UI əsasında). Əvvəlcə shadcn komponenti,
   qarşılığı yoxdursa custom komponent.
-- **Qradient və bənövşəyi-mavi qarışıqları qadağandır.**
+- **UI-da qradient və bənövşəyi-mavi qarışıqları qadağandır.** Qradient yalnız loqonun özündədir (`docs/brand`); düymə, fon və kartlar düz rəngdir.
 - **İnterfeys dili: Azərbaycan dili.** Qiymətlər AZN, vaxt zonası `Asia/Baku`.
+- **Brend:** ad həmişə `Randevum` (böyük R ilə). Loqo və ikonlar: `docs/brand`, `frontend/public/brand`.
 - Mobil-first: hər səhifə 360px enində rahat işləməlidir.
 - Dizayn tokenləri və rəng palitrası: [docs/DESIGN.md](./docs/DESIGN.md).
 
@@ -46,7 +47,7 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
 ## Repo Strukturu
 
 ```
-randevu/
+randevum/
 ├── frontend/          # Next.js tətbiqi (müştəri saytı + admin panel)
 ├── backend/           # Spring Boot API
 ├── docs/              # DESIGN.md və digər sənədlər
@@ -71,3 +72,12 @@ qatında, həm də verilənlər bazası səviyyəsində (constraint) alınır.
 - Hər iş GitHub issue ilə başlayır; branch adı `feat/<issue>-qisa-ad`.
 - PR təsvirində `Closes #<issue>` olur, CI yaşıl olduqdan sonra squash merge.
 - Hər həftə bir milestone (`Həftə N`) bağlanır və `main` Vercel-ə deploy olunur.
+
+## Mobil və Bildirişlər (yol xəritəsi)
+
+- Həftə 10: PWA (quraşdırılan sayt) + Web Push xatırlatmaları
+- Həftə 11: şəxsi qeydlər: əvvəl təqvimdən tarix, sonra saat seçilir (danışıqdan
+  tarix/saat təxmin edilmir), sonra qeyd yazılır və ya səslə deyilir (Web Speech
+  API, `az-AZ`, səs yalnız mətnə çevrilir); seçilmiş vaxtda alarm və bildiriş
+- Həftə 12: Capacitor ilə Android/iOS tətbiqi: lokal bildirişlər, əsl alarm,
+  Siri / Google Assistant qısayolları

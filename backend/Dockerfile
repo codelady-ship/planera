@@ -10,8 +10,8 @@ RUN ./gradlew bootJar --no-daemon -x test
 # Runtime stage: JRE only, non-root user.
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-RUN useradd --system --uid 10001 randevu
+RUN useradd --system --uid 10001 randevum
 COPY --from=build /app/build/libs/*.jar app.jar
-USER randevu
+USER randevum
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

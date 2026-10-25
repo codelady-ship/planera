@@ -1,19 +1,31 @@
 # Dizayn Sistemi
 
-Sadə, müasir, mobil-first interfeys. Qradient yoxdur, bənövşəyi-mavi qarışığı
-yoxdur, emoji yoxdur (ikonlar: `lucide-react`).
+Sadə, müasir, mobil-first interfeys. UI-da qradient yoxdur, bənövşəyi-mavi
+qarışığı yoxdur, emoji yoxdur (ikonlar: `lucide-react`).
 
-## Rəng palitrası
+## Brend
+
+- Ad: **Randevum**. Şüar: **Vaxtını seç, rahatlığını yaşa.**
+- Fayllar: `docs/brand/` (mənbə və kəsilmiş variantlar), `frontend/public/brand/`.
+  - `randevum-logo.png` — wordmark + şüar (footer, sənədlər)
+  - `randevum-wordmark.png` — yalnız wordmark (header)
+  - `randevum-mark.png` — saatlı R (favicon, tətbiq ikonu, PWA)
+- Loqodakı göy-firuzəyi qradient yalnız loqonun özündə qalır. UI elementləri
+  aşağıdakı düz rənglərdən istifadə edir.
+
+## Rəng palitrası (loqodan)
 
 | Token | Dəyər | İstifadə |
 |---|---|---|
-| `--brand-white` | `#FFFFFF` | Kartlar, açıq fon |
-| `--brand-ink` | `#111111` | Əsas mətn, primary düymə |
-| `--brand-sand` | `#F7F6F3` | Səhifə fonu, hero |
-| `--brand-coral` | `#FF6B35` | Vurğu / CTA ("Randevu götür"), üzərində mətn qara |
-| `--brand-forest` | `#1F7A4D` | Uğur / təsdiqlənmiş status, üzərində mətn ağ |
+| `--brand-navy` | `#072968` | Primary düymə, başlıqlar, tünd bölmələr; üzərində mətn ağ |
+| `--brand-blue` | `#1D5FE0` | CTA ("Randevu götür", "Axtar"); üzərində mətn ağ |
+| `--brand-teal` | `#00C3BD` | Dekorativ vurğu, ikon fonları; üzərində mətn navy |
+| `--brand-teal-dark` | `#00807C` | Uğur / təsdiqlənmiş status; üzərində mətn ağ |
+| `--brand-ink` | `#0F1B33` | Əsas mətn |
+| `--brand-mist` | `#F4F7FB` | Səhifə fonu |
+| `--brand-white` | `#FFFFFF` | Kartlar |
 
-Status rəngləri: gözləyir — ink, təsdiqlənib — forest, ləğv edilib — destructive.
+Status rəngləri: gözləyir — navy, təsdiqlənib — teal-dark, ləğv edilib — destructive.
 
 ## Tipoqrafiya
 

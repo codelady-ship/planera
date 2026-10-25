@@ -7,6 +7,8 @@ test('renders the home page sections', () => {
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
     /randevunu bir neçə kliklə/,
   )
+  expect(screen.getByRole('img', { name: 'Randevum' })).toBeInTheDocument()
+  expect(screen.getByText('Vaxtını seç, rahatlığını yaşa.')).toBeInTheDocument()
   expect(screen.getByRole('search')).toBeInTheDocument()
   expect(
     screen.getByRole('heading', { name: 'Populyar kateqoriyalar' }),

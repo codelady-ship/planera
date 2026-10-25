@@ -14,9 +14,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'randevu - Onlayn randevu platforması',
-    template: '%s | randevu',
+    default: 'Randevum - Vaxtını seç, rahatlığını yaşa',
+    template: '%s | Randevum',
   },
+  applicationName: 'Randevum',
   description:
     'Bərbər, həkim, müəllim və digər xidmətlər üçün boş saatı seçin və randevunu bir neçə kliklə götürün.',
 }

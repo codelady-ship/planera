@@ -1,8 +1,8 @@
-# randevu - Backlog
+# Randevum - Backlog
 
-GitHub Issues əsaslı backlog: **11 Epic** və **40 Sub-issue** (native parent/sub-issue iyerarxiyası). Hər həftə bir milestone bağlanır və `main` Vercel-ə deploy olunur.
+GitHub Issues əsaslı backlog: **14 Epic** və **53 Sub-issue** (native parent/sub-issue iyerarxiyası). Hər həftə bir milestone bağlanır və `main` Vercel-ə deploy olunur.
 
-Repo: [codelady-ship/randevu](https://github.com/codelady-ship/randevu/issues)
+Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 
 ## İş axını
 
@@ -15,17 +15,20 @@ Repo: [codelady-ship/randevu](https://github.com/codelady-ship/randevu/issues)
 
 | Epic | Issue | Həftə | Sub-issue | Labels |
 |---|---|---|---|---|
-| 1. Layihə Təməli və Dizayn Sistemi | [#1](https://github.com/codelady-ship/randevu/issues/1) | 1 | 5 | epic, frontend, backend, design, devops |
-| 2. Verilənlər Bazası və Entity Qatı | [#7](https://github.com/codelady-ship/randevu/issues/7) | 2 | 4 | epic, backend, database |
-| 3. Kateqoriya, Xidmət Göstərən və Xidmət API-ləri | [#12](https://github.com/codelady-ship/randevu/issues/12) | 2 | 3 | epic, backend |
-| 4. İş Qrafiki və Boş Vaxtların Hesablanması | [#16](https://github.com/codelady-ship/randevu/issues/16) | 3 | 3 | epic, backend, booking |
-| 5. Randevu Yaratma, Dəyişmə və Ləğv | [#20](https://github.com/codelady-ship/randevu/issues/20) | 3 | 3 | epic, backend, booking |
-| 6. Autentifikasiya və Rollar (RBAC) | [#24](https://github.com/codelady-ship/randevu/issues/24) | 4 | 3 | epic, auth, backend, frontend |
-| 7. Müştəri Səhifələri | [#28](https://github.com/codelady-ship/randevu/issues/28) | 5 | 4 | epic, frontend, design |
-| 8. İnteqrasiya, Testlər və Təhlükəsizlik | [#33](https://github.com/codelady-ship/randevu/issues/33) | 6 | 3 | epic, frontend, backend |
-| 9. Admin və Provider Paneli | [#37](https://github.com/codelady-ship/randevu/issues/37) | 7 | 4 | epic, admin-panel, frontend, backend |
-| 10. Rəylər, Bildirişlər və Gözləmə Siyahısı | [#42](https://github.com/codelady-ship/randevu/issues/42) | 8 | 4 | epic, backend, frontend |
-| 11. Production Deploy | [#47](https://github.com/codelady-ship/randevu/issues/47) | 9 | 4 | epic, devops |
+| 1. Layihə Təməli və Dizayn Sistemi | [#1](https://github.com/codelady-ship/randevum/issues/1) | 1 | 6 | epic, frontend, backend, design, devops |
+| 2. Verilənlər Bazası və Entity Qatı | [#7](https://github.com/codelady-ship/randevum/issues/7) | 2 | 4 | epic, backend, database |
+| 3. Kateqoriya, Xidmət Göstərən və Xidmət API-ləri | [#12](https://github.com/codelady-ship/randevum/issues/12) | 2 | 3 | epic, backend |
+| 4. İş Qrafiki və Boş Vaxtların Hesablanması | [#16](https://github.com/codelady-ship/randevum/issues/16) | 3 | 3 | epic, backend, booking |
+| 5. Randevu Yaratma, Dəyişmə və Ləğv | [#20](https://github.com/codelady-ship/randevum/issues/20) | 3 | 3 | epic, backend, booking |
+| 6. Autentifikasiya və Rollar (RBAC) | [#24](https://github.com/codelady-ship/randevum/issues/24) | 4 | 3 | epic, auth, backend, frontend |
+| 7. Müştəri Səhifələri | [#28](https://github.com/codelady-ship/randevum/issues/28) | 5 | 4 | epic, frontend, design |
+| 8. İnteqrasiya, Testlər və Təhlükəsizlik | [#33](https://github.com/codelady-ship/randevum/issues/33) | 6 | 3 | epic, frontend, backend |
+| 9. Admin və Provider Paneli | [#37](https://github.com/codelady-ship/randevum/issues/37) | 7 | 4 | epic, admin-panel, frontend, backend |
+| 10. Rəylər, Bildirişlər və Gözləmə Siyahısı | [#42](https://github.com/codelady-ship/randevum/issues/42) | 8 | 4 | epic, backend, frontend |
+| 11. Production Deploy | [#47](https://github.com/codelady-ship/randevum/issues/47) | 9 | 4 | epic, devops |
+| 12. PWA və Push Bildirişləri | [#53](https://github.com/codelady-ship/randevum/issues/53) | 10 | 4 | epic, frontend, backend |
+| 13. Şəxsi Qeydlər və Səsli Asistent | [#58](https://github.com/codelady-ship/randevum/issues/58) | 11 | 4 | epic, frontend, backend |
+| 14. Mobil Tətbiq: Capacitor, Alarm və Siri | [#63](https://github.com/codelady-ship/randevum/issues/63) | 12 | 4 | epic, frontend, devops |
 
 ## Detallı Backlog
 
@@ -38,6 +41,7 @@ Repo: [codelady-ship/randevu](https://github.com/codelady-ship/randevu/issues)
 | #4 | 1.3 Ana səhifə (mock data ilə) | frontend, design |
 | #5 | 1.4 Spring Boot backend skeleti | backend |
 | #6 | 1.5 Vercel deploy (frontend) | devops, frontend |
+| #52 | 1.6 Randevum brendi: ad, loqo, ikonlar və rəng palitrası | frontend, design |
 
 ### EPIC 2 - Verilənlər Bazası və Entity Qatı (#7 · Həftə 2)
 
@@ -123,3 +127,31 @@ Repo: [codelady-ship/randevu](https://github.com/codelady-ship/randevu/issues)
 | #49 | 11.2 Backend deploy (Render / Railway, Docker) | devops, backend |
 | #50 | 11.3 Vercel production konfiqurasiyası | devops, frontend |
 | #51 | 11.4 Sənədləşmə və demo | devops |
+
+
+### EPIC 12 - PWA və Push Bildirişləri (#53 · Həftə 10)
+
+| # | Sub-issue | Labels |
+|---|---|---|
+| #54 | 12.1 PWA: manifest, service worker və quraşdırma | frontend |
+| #55 | 12.2 Web Push: VAPID, abunəlik və göndərmə servisi | backend, frontend |
+| #56 | 12.3 Randevu xatırlatmaları (scheduler) | backend, booking |
+| #57 | 12.4 Bildiriş ayarları | frontend |
+
+### EPIC 13 - Şəxsi Qeydlər və Səsli Asistent (#58 · Həftə 11)
+
+| # | Sub-issue | Labels |
+|---|---|---|
+| #59 | 13.1 Şəxsi qeydlər (PersonalReminder) API | backend, database |
+| #60 | 13.2 Yeni qeyd axını: təqvim, sonra saat seçimi | frontend |
+| #61 | 13.3 Qeyd: yazılı və ya səsli (danışıq yalnız mətnə çevrilir) | frontend, design |
+| #62 | 13.4 Şəxsi qeyd vaxtında alarm və bildiriş | backend, frontend |
+
+### EPIC 14 - Mobil Tətbiq: Capacitor, Alarm və Siri (#63 · Həftə 12)
+
+| # | Sub-issue | Labels |
+|---|---|---|
+| #64 | 14.1 Capacitor qurulumu (Android və iOS) | frontend, devops |
+| #65 | 14.2 Lokal bildirişlər və əsl alarm | frontend |
+| #66 | 14.3 Siri və Google Assistant qısayolları | frontend |
+| #67 | 14.4 Mağazalara yayımlama | devops |
