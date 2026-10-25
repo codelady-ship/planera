@@ -50,4 +50,7 @@ public final class AppointmentDtos {
             BigDecimal price,
             String note,
             boolean cancellable) {}
+
+    /** What a provider sees: the appointment plus who booked it. */
+    public record ProviderAppointmentView(AppointmentView appointment, String customerName, String customerPhone) {}
 }

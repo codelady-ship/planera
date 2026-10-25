@@ -65,7 +65,7 @@ public class AppointmentController {
     @PatchMapping("/api/admin/appointments/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public AppointmentView changeStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
-        return appointments.changeStatus(id, request.status());
+        return appointments.changeStatus(null, id, request.status());
     }
 
     private static Actor actor(Authentication auth) {

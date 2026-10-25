@@ -20,6 +20,8 @@ public interface ProviderProfileRepository
 
     Optional<ProviderProfile> findByUserId(Long userId);
 
+    Optional<ProviderProfile> findByUserEmailIgnoreCase(String email);
+
     boolean existsBySlug(String slug);
 
     long countByCategoryIdAndActiveTrue(Long categoryId);

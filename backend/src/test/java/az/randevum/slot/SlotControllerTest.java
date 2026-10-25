@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.given;
 import az.randevum.availability.AvailabilityController;
 import az.randevum.availability.AvailabilityService;
 import az.randevum.common.BusinessRuleException;
+import az.randevum.config.JwtConfig;
 import az.randevum.config.SecurityConfig;
 import az.randevum.slot.SlotService.AvailableDatesView;
 import az.randevum.slot.SlotService.SlotsView;
@@ -26,7 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest({SlotController.class, AvailabilityController.class})
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtConfig.class})
 class SlotControllerTest {
 
     @Autowired MockMvcTester mvc;
@@ -63,7 +64,7 @@ class SlotControllerTest {
         assertThat(mvc.put().uri("/api/admin/providers/1/availability")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"rules\":[]}"))
-                .hasStatus(HttpStatus.FORBIDDEN);
+                .hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

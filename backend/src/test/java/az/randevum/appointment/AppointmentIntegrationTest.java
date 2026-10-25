@@ -9,7 +9,6 @@ import az.randevum.appointment.AppointmentDtos.AppointmentView;
 import az.randevum.appointment.AppointmentDtos.CreateRequest;
 import az.randevum.appointment.AppointmentDtos.Scope;
 import az.randevum.common.BusinessRuleException;
-import az.randevum.common.NotFoundException;
 import az.randevum.common.SlotTakenException;
 import az.randevum.config.TimeConfig;
 import az.randevum.domain.AppointmentRepository;
@@ -44,6 +43,7 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -213,23 +213,35 @@ class AppointmentIntegrationTest {
     }
 
     @Test
-    void othersAppointmentsLookMissing() {
+    void othersAppointmentsAreForbidden() {
         AppointmentView booked = book(TUESDAY, "12:00");
 
-        assertThatThrownBy(() -> service.get(STRANGER, booked.id())).isInstanceOf(NotFoundException.class);
-        assertThatThrownBy(() -> service.cancel(STRANGER, booked.id(), null)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.get(STRANGER, booked.id())).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> service.cancel(STRANGER, booked.id(), null)).isInstanceOf(AccessDeniedException.class);
         assertThat(service.mine(STRANGER, Scope.UPCOMING)).isEmpty();
+    }
+
+    @Test
+    void providerChangesOnlyItsOwnAppointments() {
+        AppointmentView booked = book(TUESDAY, "16:30");
+        Long otherProvider = providers.findBySlugAndActiveTrue("leyla-beauty").orElseThrow().getId();
+
+        assertThatThrownBy(() -> service.changeStatus(otherProvider, booked.id(), AppointmentStatus.CANCELLED))
+                .isInstanceOf(AccessDeniedException.class);
+        Long barber = providers.findBySlugAndActiveTrue("elvin-barber").orElseThrow().getId();
+        assertThat(service.forProvider(barber, TUESDAY, TUESDAY)).hasSize(1);
+        assertThat(service.forProvider(otherProvider, TUESDAY, TUESDAY)).isEmpty();
     }
 
     @Test
     void statusChangesFollowTheLifecycle() {
         AppointmentView booked = book(TUESDAY, "16:00");
 
-        assertThatThrownBy(() -> service.changeStatus(booked.id(), AppointmentStatus.COMPLETED))
+        assertThatThrownBy(() -> service.changeStatus(null, booked.id(), AppointmentStatus.COMPLETED))
                 .isInstanceOf(BusinessRuleException.class); // has not started yet
-        assertThat(service.changeStatus(booked.id(), AppointmentStatus.CANCELLED).status())
+        assertThat(service.changeStatus(null, booked.id(), AppointmentStatus.CANCELLED).status())
                 .isEqualTo(AppointmentStatus.CANCELLED);
-        assertThatThrownBy(() -> service.changeStatus(booked.id(), AppointmentStatus.CONFIRMED))
+        assertThatThrownBy(() -> service.changeStatus(null, booked.id(), AppointmentStatus.CONFIRMED))
                 .isInstanceOf(BusinessRuleException.class);
     }
 }

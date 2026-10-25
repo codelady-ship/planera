@@ -3,6 +3,7 @@ package az.randevum.appointment;
 import az.randevum.appointment.AppointmentDtos.Actor;
 import az.randevum.appointment.AppointmentDtos.AppointmentView;
 import az.randevum.appointment.AppointmentDtos.CreateRequest;
+import az.randevum.appointment.AppointmentDtos.ProviderAppointmentView;
 import az.randevum.appointment.AppointmentDtos.Scope;
 import az.randevum.common.BusinessRuleException;
 import az.randevum.common.NotFoundException;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -170,11 +172,17 @@ public class AppointmentService {
         return after;
     }
 
-    /** Admin (later also the provider, #26) moves an appointment along its lifecycle. */
-    public AppointmentView changeStatus(Long id, AppointmentStatus next) {
+    /**
+     * Moves an appointment along its lifecycle. {@code providerId} limits it to
+     * that provider's own appointments (403 otherwise); null means admin.
+     */
+    public AppointmentView changeStatus(Long providerId, Long id, AppointmentStatus next) {
         AppointmentView view = tx.execute(status -> {
             Appointment a = appointments.findById(id)
                     .orElseThrow(() -> new NotFoundException("Randevu tapılmadı: " + id));
+            if (providerId != null && !providerId.equals(a.getProvider().getId())) {
+                throw new AccessDeniedException("Bu randevu sizə aid deyil");
+            }
             if (!a.getStatus().canTransitionTo(next)) {
                 throw new BusinessRuleException("Status " + a.getStatus() + " -> " + next + " keçidinə icazə yoxdur");
             }
@@ -191,6 +199,15 @@ public class AppointmentService {
         });
         cache.evictDay(providerId(id), view.date());
         return view;
+    }
+
+    /** A provider's schedule between two dates, inclusive, for the panel. */
+    public List<ProviderAppointmentView> forProvider(Long providerId, LocalDate from, LocalDate to) {
+        return read(() -> appointments
+                .findForProvider(providerId, instant(from, LocalTime.MIDNIGHT), instant(to.plusDays(1), LocalTime.MIDNIGHT))
+                .stream()
+                .map(a -> new ProviderAppointmentView(view(a), a.getCustomer().getFullName(), a.getCustomer().getPhone()))
+                .toList());
     }
 
     // --- helpers -------------------------------------------------------------
@@ -247,11 +264,11 @@ public class AppointmentService {
         return clock.instant().isBefore(deadline);
     }
 
-    /** Someone else's appointment is reported as missing, not forbidden, so ids cannot be probed. */
+    /** Someone else's appointment is 403 (#26). */
     private Appointment owned(Actor actor, Long id) {
         Appointment a = appointments.findById(id).orElseThrow(() -> new NotFoundException("Randevu tapılmadı: " + id));
         if (!actor.admin() && !a.getCustomer().getEmail().equalsIgnoreCase(actor.email())) {
-            throw new NotFoundException("Randevu tapılmadı: " + id);
+            throw new AccessDeniedException("Bu randevu sizə aid deyil");
         }
         return a;
     }

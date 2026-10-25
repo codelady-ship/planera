@@ -82,3 +82,8 @@ begin
     update provider_profiles p
     set price_from = (select min(price) from service_offerings s where s.provider_id = p.id and s.active);
 end $$;
+
+-- Demo logins (#25): every demo account uses the password "Randevum123".
+create extension if not exists pgcrypto;
+update users set password_hash = crypt('Randevum123', gen_salt('bf', 10))
+where password_hash is null and email like '%@randevum.az';

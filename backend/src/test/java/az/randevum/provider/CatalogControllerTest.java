@@ -10,6 +10,7 @@ import az.randevum.category.CategoryDtos.CategoryView;
 import az.randevum.category.CategoryService;
 import az.randevum.common.NotFoundException;
 import az.randevum.common.PageResponse;
+import az.randevum.config.JwtConfig;
 import az.randevum.config.SecurityConfig;
 import az.randevum.provider.ProviderDtos.ProviderSummary;
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest({CategoryController.class, ProviderController.class})
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtConfig.class})
 class CatalogControllerTest {
 
     @Autowired MockMvcTester mvc;
@@ -77,7 +78,7 @@ class CatalogControllerTest {
     @Test
     void adminEndpointsRequireAuthentication() {
         assertThat(mvc.post().uri("/api/admin/categories").contentType(MediaType.APPLICATION_JSON).content("{}"))
-                .hasStatus(HttpStatus.FORBIDDEN);
+                .hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

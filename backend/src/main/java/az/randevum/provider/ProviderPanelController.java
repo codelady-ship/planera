@@ -1,0 +1,142 @@
+package az.randevum.provider;
+
+import az.randevum.appointment.AppointmentDtos.AppointmentView;
+import az.randevum.appointment.AppointmentDtos.ProviderAppointmentView;
+import az.randevum.appointment.AppointmentDtos.StatusRequest;
+import az.randevum.appointment.AppointmentService;
+import az.randevum.availability.AvailabilityDtos.AvailabilityView;
+import az.randevum.availability.AvailabilityDtos.TimeOffRequest;
+import az.randevum.availability.AvailabilityDtos.TimeOffView;
+import az.randevum.availability.AvailabilityDtos.WeeklyRequest;
+import az.randevum.availability.AvailabilityService;
+import az.randevum.common.BusinessRuleException;
+import az.randevum.common.NotFoundException;
+import az.randevum.domain.ProviderProfile;
+import az.randevum.domain.ProviderProfileRepository;
+import az.randevum.provider.ProviderDtos.ProviderDetail;
+import az.randevum.provider.ProviderDtos.ServiceRequest;
+import az.randevum.provider.ProviderDtos.ServiceView;
+import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * A provider's own panel (#26). The provider is resolved from the token's
+ * user, so a provider can never address another provider's data; admins use
+ * the {@code /api/admin} endpoints instead.
+ */
+@RestController
+@RequestMapping("/api/provider")
+@PreAuthorize("hasRole('PROVIDER')")
+public class ProviderPanelController {
+
+    /** Longest range the appointment list returns at once. */
+    static final int MAX_RANGE_DAYS = 62;
+
+    private final ProviderProfileRepository providers;
+    private final ProviderService catalog;
+    private final ServiceOfferingService services;
+    private final AvailabilityService availability;
+    private final AppointmentService appointments;
+
+    public ProviderPanelController(
+            ProviderProfileRepository providers,
+            ProviderService catalog,
+            ServiceOfferingService services,
+            AvailabilityService availability,
+            AppointmentService appointments) {
+        this.providers = providers;
+        this.catalog = catalog;
+        this.services = services;
+        this.availability = availability;
+        this.appointments = appointments;
+    }
+
+    @GetMapping("/me")
+    public ProviderDetail me(Authentication auth) {
+        return catalog.detail(self(auth).getSlug());
+    }
+
+    @GetMapping("/services")
+    public List<ServiceView> services(Authentication auth) {
+        return services.list(self(auth).getId());
+    }
+
+    @PostMapping("/services")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ServiceView createService(Authentication auth, @Valid @RequestBody ServiceRequest request) {
+        return services.create(self(auth).getId(), request);
+    }
+
+    @PutMapping("/services/{serviceId}")
+    public ServiceView updateService(
+            Authentication auth, @PathVariable Long serviceId, @Valid @RequestBody ServiceRequest request) {
+        return services.update(self(auth).getId(), serviceId, request);
+    }
+
+    @DeleteMapping("/services/{serviceId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteService(Authentication auth, @PathVariable Long serviceId) {
+        services.delete(self(auth).getId(), serviceId);
+    }
+
+    @GetMapping("/availability")
+    public AvailabilityView availability(Authentication auth) {
+        return availability.get(self(auth).getId());
+    }
+
+    @PutMapping("/availability")
+    public AvailabilityView replaceWeekly(Authentication auth, @Valid @RequestBody WeeklyRequest request) {
+        return availability.replaceWeekly(self(auth).getId(), request.rules());
+    }
+
+    @PostMapping("/time-off")
+    @ResponseStatus(HttpStatus.CREATED)
+    public TimeOffView addTimeOff(Authentication auth, @Valid @RequestBody TimeOffRequest request) {
+        return availability.addTimeOff(self(auth).getId(), request);
+    }
+
+    @DeleteMapping("/time-off/{timeOffId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTimeOff(Authentication auth, @PathVariable Long timeOffId) {
+        availability.deleteTimeOff(self(auth).getId(), timeOffId);
+    }
+
+    /** {@code GET /api/provider/appointments?from=2026-10-26&to=2026-11-01} */
+    @GetMapping("/appointments")
+    public List<ProviderAppointmentView> appointments(
+            Authentication auth,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        if (to.isBefore(from) || ChronoUnit.DAYS.between(from, to) > MAX_RANGE_DAYS) {
+            throw new BusinessRuleException("Tarix aralığı 0-" + MAX_RANGE_DAYS + " gün olmalıdır");
+        }
+        return appointments.forProvider(self(auth).getId(), from, to);
+    }
+
+    @PatchMapping("/appointments/{id}/status")
+    public AppointmentView changeStatus(Authentication auth, @PathVariable Long id, @Valid @RequestBody StatusRequest request) {
+        return appointments.changeStatus(self(auth).getId(), id, request.status());
+    }
+
+    private ProviderProfile self(Authentication auth) {
+        return providers.findByUserEmailIgnoreCase(auth.getName())
+                .orElseThrow(() -> new NotFoundException("Mütəxəssis profili tapılmadı"));
+    }
+}
