@@ -89,3 +89,20 @@ export function formatDuration(minutes: number): string {
   if (!h) return `${m} dəq`
   return m ? `${h} saat ${m} dəq` : `${h} saat`
 }
+
+export function addDays(date: string, delta: number): string {
+  const d = utc(date)
+  d.setUTCDate(d.getUTCDate() + delta)
+  return d.toISOString().slice(0, 10)
+}
+
+/** The Monday of the week that holds `date`. */
+export function weekStart(date: string): string {
+  return addDays(date, -((utc(date).getUTCDay() + 6) % 7))
+}
+
+/** "2026-10-27" -> "27 okt" */
+export function formatDateShort(date: string): string {
+  const d = utc(date)
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}`
+}

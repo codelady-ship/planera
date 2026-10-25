@@ -87,8 +87,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
         setMessage(problem.detail ?? 'Xəta baş verdi, yenidən cəhd edin.')
         return
       }
-      setSessionUser((body as { user: SessionUser }).user)
-      router.replace(next ?? '/account')
+      const user = (body as { user: SessionUser }).user
+      setSessionUser(user)
+      router.replace(next ?? (user.role === 'CUSTOMER' ? '/account' : '/panel'))
       router.refresh()
     } catch {
       setMessage('Serverə qoşulmaq olmadı. İnterneti yoxlayın.')
