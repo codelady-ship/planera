@@ -51,6 +51,16 @@ curl https://start.spring.io/starter.zip -d type=gradle-project -d language=java
   -d dependencies=web,data-jpa,postgresql,flyway,validation,security,actuator,testcontainers -o backend.zip
 ```
 
+## Demo hesablar
+
+Bütün demo hesabların şifrəsi: `Randevum123`
+
+| Rol | E-poçt |
+|---|---|
+| Admin | admin@randevum.az |
+| Müştəri | musteri@randevum.az |
+| Mütəxəssis | elvin-barber@randevum.az (və digər `<slug>@randevum.az`) |
+
 ## Deploy
 
 ### Frontend (Vercel)

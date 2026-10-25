@@ -22,6 +22,11 @@ public class ApiExceptionHandler {
         return problem(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    ProblemDetail unauthorized(UnauthorizedException e) {
+        return problem(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
     @ExceptionHandler(ConflictException.class)
     ProblemDetail conflict(ConflictException e) {
         ProblemDetail problem = problem(HttpStatus.CONFLICT, e.getMessage());

@@ -44,4 +44,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             where a.customer.id = :customerId and a.status = az.randevum.domain.AppointmentStatus.CANCELLED
             order by a.startsAt desc""")
     List<Appointment> findCancelled(Long customerId);
+
+    /** A provider's appointments in [from, to), every status, for the provider panel (#26). */
+    @Query("""
+            select a from Appointment a join fetch a.customer join fetch a.service join fetch a.provider
+            where a.provider.id = :providerId and a.startsAt < :to and a.endsAt > :from
+            order by a.startsAt""")
+    List<Appointment> findForProvider(Long providerId, Instant from, Instant to);
 }

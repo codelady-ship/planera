@@ -10,6 +10,7 @@ import az.randevum.appointment.AppointmentDtos.Scope;
 import az.randevum.common.BusinessRuleException;
 import az.randevum.common.SlotTakenException;
 import az.randevum.common.TooManyRequestsException;
+import az.randevum.config.JwtConfig;
 import az.randevum.config.SecurityConfig;
 import az.randevum.domain.AppointmentStatus;
 import java.time.Duration;
@@ -25,7 +26,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest(AppointmentController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtConfig.class})
 class AppointmentControllerTest {
 
     private static final String BOOKING = "{\"serviceId\":1,\"date\":\"2026-10-27\",\"time\":\"10:00\"}";
@@ -37,8 +38,8 @@ class AppointmentControllerTest {
     @Test
     void bookingRequiresAuthentication() {
         assertThat(mvc.post().uri("/api/appointments").contentType(MediaType.APPLICATION_JSON).content(BOOKING))
-                .hasStatus(HttpStatus.FORBIDDEN);
-        assertThat(mvc.get().uri("/api/me/appointments")).hasStatus(HttpStatus.FORBIDDEN);
+                .hasStatus(HttpStatus.UNAUTHORIZED);
+        assertThat(mvc.get().uri("/api/me/appointments")).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -98,7 +99,7 @@ class AppointmentControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void wrongTransitionIsA422() {
-        given(appointments.changeStatus(1L, AppointmentStatus.CONFIRMED))
+        given(appointments.changeStatus(null, 1L, AppointmentStatus.CONFIRMED))
                 .willThrow(new BusinessRuleException("Status CANCELLED -> CONFIRMED keçidinə icazə yoxdur"));
 
         assertThat(mvc.patch().uri("/api/admin/appointments/1/status")

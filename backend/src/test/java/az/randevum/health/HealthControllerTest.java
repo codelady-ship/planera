@@ -2,6 +2,7 @@ package az.randevum.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import az.randevum.config.JwtConfig;
 import az.randevum.config.SecurityConfig;
 import az.randevum.config.TimeConfig;
 import java.time.Clock;
@@ -16,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest(HealthController.class)
-@Import({SecurityConfig.class, HealthControllerTest.FixedClock.class})
+@Import({SecurityConfig.class, JwtConfig.class, HealthControllerTest.FixedClock.class})
 class HealthControllerTest {
 
     @Autowired
@@ -41,7 +42,7 @@ class HealthControllerTest {
 
     @Test
     void otherEndpointsRequireAuthentication() {
-        assertThat(mvc.get().uri("/api/appointments")).hasStatus(HttpStatus.FORBIDDEN);
+        assertThat(mvc.get().uri("/api/appointments")).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
     @TestConfiguration

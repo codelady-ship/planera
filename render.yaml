@@ -16,6 +16,8 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: demo
+      - key: JWT_SECRET
+        generateValue: true # random secret, stays the same across deploys
       - key: DB_HOST
         fromDatabase:
           name: randevum-db
