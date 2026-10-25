@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: randevu-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/randevu}
+    username: ${SPRING_DATASOURCE_USERNAME:randevu}
+    password: ${SPRING_DATASOURCE_PASSWORD:randevu}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Baku
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
