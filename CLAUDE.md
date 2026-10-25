@@ -78,6 +78,8 @@ qatında, həm də verilənlər bazası səviyyəsində (constraint) alınır.
 - Gün 6: PWA (quraşdırılan sayt) + Web Push xatırlatmaları
 - Gün 6: şəxsi qeydlər: əvvəl təqvimdən tarix, sonra saat seçilir (danışıqdan
   tarix/saat təxmin edilmir), sonra qeyd yazılır və ya səslə deyilir (Web Speech
-  API, `az-AZ`, səs yalnız mətnə çevrilir); seçilmiş vaxtda alarm və bildiriş
+  API, `az-AZ`, səs yalnız mətnə çevrilir); seçilmiş vaxtda alarm və bildiriş.
+  Alarm bir səs tonu ilə (kişi və ya qadın, ayarlarda seçilir) oxuyur: "Sizin
+  {saat} {tarix} tarixində qeydiniz var: {qeyd}". Qeydlər redaktə və silinə bilir.
 - Gün 7: Capacitor ilə Android tətbiqi (iOS build Mac tələb edir, v1.1): lokal bildirişlər, əsl alarm,
   Siri / Google Assistant qısayolları

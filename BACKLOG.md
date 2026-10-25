@@ -1,6 +1,6 @@
 # Randevum - Backlog
 
-GitHub Issues əsaslı backlog: **14 Epic** və **53 Sub-issue** (native parent/sub-issue iyerarxiyası). Layihə **7 gündə** hazırlanır (25-31 oktyabr 2026): hər gün bir milestone (`Gün 1` ... `Gün 7`) bağlanır və `main` Vercel-ə deploy olunur. Bir həftəyə sığmayan işlər `Sonra (v1.1)` milestone-undadır.
+GitHub Issues əsaslı backlog: **14 Epic** və **54 Sub-issue** (native parent/sub-issue iyerarxiyası). Layihə **7 gündə** hazırlanır (25-31 oktyabr 2026): hər gün bir milestone (`Gün 1` ... `Gün 7`) bağlanır və `main` Vercel-ə deploy olunur. Bir həftəyə sığmayan işlər `Sonra (v1.1)` milestone-undadır.
 
 Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 
@@ -40,7 +40,7 @@ Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 | 10. Rəylər, Bildirişlər və Gözləmə Siyahısı | [#42](https://github.com/codelady-ship/randevum/issues/42) | 6 | 4 | epic, backend, frontend |
 | 11. Production Deploy | [#47](https://github.com/codelady-ship/randevum/issues/47) | 5 | 4 | epic, devops |
 | 12. PWA və Push Bildirişləri | [#53](https://github.com/codelady-ship/randevum/issues/53) | 6 | 4 | epic, frontend, backend |
-| 13. Şəxsi Qeydlər və Səsli Asistent | [#58](https://github.com/codelady-ship/randevum/issues/58) | 6 | 4 | epic, frontend, backend |
+| 13. Şəxsi Qeydlər və Səsli Asistent | [#58](https://github.com/codelady-ship/randevum/issues/58) | 6 | 5 | epic, frontend, backend |
 | 14. Mobil Tətbiq: Capacitor, Alarm və Siri | [#63](https://github.com/codelady-ship/randevum/issues/63) | 7 | 4 | epic, frontend, devops |
 
 ## Detallı Backlog
@@ -158,7 +158,8 @@ Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 | #59 | 13.1 Şəxsi qeydlər (PersonalReminder) API | backend, database |
 | #60 | 13.2 Yeni qeyd axını: təqvim, sonra saat seçimi | frontend |
 | #61 | 13.3 Qeyd: yazılı və ya səsli (danışıq yalnız mətnə çevrilir) | frontend, design |
-| #62 | 13.4 Şəxsi qeyd vaxtında alarm və bildiriş | backend, frontend |
+| #62 | 13.4 Səsli alarm: kişi/qadın səsi ilə xatırlatma | backend, frontend |
+| #68 | 13.5 Gündəlik: qeydləri redaktə et və sil | frontend |
 
 ### EPIC 14 - Mobil Tətbiq: Capacitor, Alarm və Siri (#63 · Gün 7)
 
