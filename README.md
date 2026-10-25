@@ -77,4 +77,20 @@ Bütün demo hesabların şifrəsi: `Randevum123`
 2. New -> Blueprint -> `codelady-ship/randevum` reposunu seç -> Apply.
 3. Yoxlama: `https://<servis>.onrender.com/api/health`.
 
+- **Production API:** https://randevum-api-uu30.onrender.com
+- Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
+
 Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq); pulsuz PostgreSQL 30 gün sonra bitir, uzunmüddətli üçün Neon (#48) - onda `SPRING_DATASOURCE_URL` dəyişənini Neon-un JDBC URL-i ilə ver. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
+
+## Təhlükəsizlik (OWASP əsas yoxlamaları)
+
+| Risk | Necə qorunur |
+|---|---|
+| Broken Access Control | Hər endpoint-də rol yoxlaması (`@PreAuthorize`); mütəxəssis yalnız öz məlumatına çatır (profil tokendən tapılır), başqasının randevusu 403 qaytarır. |
+| Cryptographic Failures | Şifrələr BCrypt ilə; JWT HS256, açar ən azı 32 bayt (`JWT_SECRET`); tokenlər brauzerdə yalnız httpOnly cookie-də saxlanır. |
+| Injection | Bütün sorğular JPA parametrləri ilə; giriş məlumatı Bean Validation ilə yoxlanır (400 + sahə xətaları). |
+| Insecure Design | Eyni vaxta iki randevu həm service qatında (Redis lock), həm bazada (exclusion constraint) bloklanır. |
+| Security Misconfiguration | CORS default olaraq bağlıdır (`CORS_ALLOWED_ORIGINS`), Actuator-da yalnız `health` açıqdır, xətalar vahid ProblemDetail formatındadır (stack trace yoxdur). |
+| Identification and Authentication Failures | Login: e-poçt üzrə dəqiqədə 5 cəhd; access token 15 dəq, refresh token 14 gün və rotasiya olunur, təkrar istifadə olunan refresh token istifadəçinin bütün sessiyalarını ləğv edir. |
+| Rate limit | Randevu yaratma: müştəri üzrə dəqiqədə 10, gündə 20 (429 + `Retry-After`). |
+| Logging | Şifrə, token və şəxsi qeydlər loglanmır; secret-lər yalnız env dəyişənlərindədir, `.env*` git-ə düşmür. |

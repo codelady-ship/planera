@@ -4,13 +4,16 @@ import az.randevum.appointment.AppointmentDtos.Actor;
 import az.randevum.appointment.AppointmentDtos.AppointmentView;
 import az.randevum.appointment.AppointmentDtos.CancelRequest;
 import az.randevum.appointment.AppointmentDtos.CreateRequest;
+import az.randevum.appointment.AppointmentDtos.ProviderAppointmentView;
 import az.randevum.appointment.AppointmentDtos.RescheduleRequest;
 import az.randevum.appointment.AppointmentDtos.Scope;
 import az.randevum.appointment.AppointmentDtos.StatusRequest;
 import az.randevum.common.BusinessRuleException;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -60,6 +63,15 @@ public class AppointmentController {
     public AppointmentView reschedule(
             Authentication auth, @PathVariable Long id, @Valid @RequestBody RescheduleRequest request) {
         return appointments.reschedule(actor(auth), id, request.date(), request.time());
+    }
+
+    /** Every provider's appointments for the admin panel (#39). */
+    @GetMapping("/api/admin/appointments")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ProviderAppointmentView> all(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return appointments.forProvider(null, from, to);
     }
 
     @PatchMapping("/api/admin/appointments/{id}/status")

@@ -45,6 +45,17 @@ class HealthControllerTest {
         assertThat(mvc.get().uri("/api/appointments")).hasStatus(HttpStatus.UNAUTHORIZED);
     }
 
+    @Test
+    void crossOriginCallsAreRefusedByDefault() {
+        assertThat(mvc.get().uri("/api/health").header("Origin", "https://evil.example"))
+                .hasStatus(HttpStatus.FORBIDDEN);
+        assertThat(mvc.options()
+                        .uri("/api/health")
+                        .header("Origin", "https://evil.example")
+                        .header("Access-Control-Request-Method", "GET"))
+                .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
     @TestConfiguration
     static class FixedClock {
         @Bean

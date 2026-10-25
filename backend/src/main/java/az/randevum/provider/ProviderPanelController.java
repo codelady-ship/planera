@@ -9,16 +9,16 @@ import az.randevum.availability.AvailabilityDtos.TimeOffRequest;
 import az.randevum.availability.AvailabilityDtos.TimeOffView;
 import az.randevum.availability.AvailabilityDtos.WeeklyRequest;
 import az.randevum.availability.AvailabilityService;
-import az.randevum.common.BusinessRuleException;
 import az.randevum.common.NotFoundException;
 import az.randevum.domain.ProviderProfile;
 import az.randevum.domain.ProviderProfileRepository;
 import az.randevum.provider.ProviderDtos.ProviderDetail;
 import az.randevum.provider.ProviderDtos.ServiceRequest;
 import az.randevum.provider.ProviderDtos.ServiceView;
+import az.randevum.stats.StatsDtos.StatsView;
+import az.randevum.stats.StatsService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -46,26 +46,26 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('PROVIDER')")
 public class ProviderPanelController {
 
-    /** Longest range the appointment list returns at once. */
-    static final int MAX_RANGE_DAYS = 62;
-
     private final ProviderProfileRepository providers;
     private final ProviderService catalog;
     private final ServiceOfferingService services;
     private final AvailabilityService availability;
     private final AppointmentService appointments;
+    private final StatsService stats;
 
     public ProviderPanelController(
             ProviderProfileRepository providers,
             ProviderService catalog,
             ServiceOfferingService services,
             AvailabilityService availability,
-            AppointmentService appointments) {
+            AppointmentService appointments,
+            StatsService stats) {
         this.providers = providers;
         this.catalog = catalog;
         this.services = services;
         this.availability = availability;
         this.appointments = appointments;
+        this.stats = stats;
     }
 
     @GetMapping("/me")
@@ -124,15 +124,17 @@ public class ProviderPanelController {
             Authentication auth,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        if (to.isBefore(from) || ChronoUnit.DAYS.between(from, to) > MAX_RANGE_DAYS) {
-            throw new BusinessRuleException("Tarix aralığı 0-" + MAX_RANGE_DAYS + " gün olmalıdır");
-        }
         return appointments.forProvider(self(auth).getId(), from, to);
     }
 
     @PatchMapping("/appointments/{id}/status")
     public AppointmentView changeStatus(Authentication auth, @PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         return appointments.changeStatus(self(auth).getId(), id, request.status());
+    }
+
+    @GetMapping("/stats")
+    public StatsView stats(Authentication auth) {
+        return stats.stats(self(auth).getId());
     }
 
     private ProviderProfile self(Authentication auth) {

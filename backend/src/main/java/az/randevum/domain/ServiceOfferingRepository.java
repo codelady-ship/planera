@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering, Long> {
 
-    List<ServiceOffering> findByProviderIdOrderByPriceAsc(Long providerId);
-
     List<ServiceOffering> findByProviderIdAndActiveTrueOrderByPriceAsc(Long providerId);
 
     Optional<ServiceOffering> findByIdAndProviderId(Long id, Long providerId);

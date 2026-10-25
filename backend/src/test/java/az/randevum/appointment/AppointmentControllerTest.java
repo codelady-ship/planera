@@ -14,6 +14,7 @@ import az.randevum.config.JwtConfig;
 import az.randevum.config.SecurityConfig;
 import az.randevum.domain.AppointmentStatus;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,22 @@ class AppointmentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"COMPLETED\"}"))
                 .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(username = "musteri@randevum.az")
+    void onlyAdminsListEveryAppointment() {
+        assertThat(mvc.get().uri("/api/admin/appointments?from=2026-10-26&to=2026-11-01"))
+                .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void adminListsEveryProvider() {
+        given(appointments.forProvider(null, LocalDate.of(2026, 10, 26), LocalDate.of(2026, 11, 1)))
+                .willReturn(List.of());
+
+        assertThat(mvc.get().uri("/api/admin/appointments?from=2026-10-26&to=2026-11-01")).hasStatusOk();
     }
 
     @Test
