@@ -81,5 +81,7 @@ qatında, həm də verilənlər bazası səviyyəsində (constraint) alınır.
   API, `az-AZ`, səs yalnız mətnə çevrilir); seçilmiş vaxtda alarm və bildiriş.
   Alarm bir səs tonu ilə (kişi və ya qadın, ayarlarda seçilir) oxuyur: "Sizin
   {saat} {tarix} tarixində qeydiniz var: {qeyd}". Qeydlər redaktə və silinə bilir.
-- Gün 7: Capacitor ilə Android tətbiqi (iOS build Mac tələb edir, v1.1): lokal bildirişlər, əsl alarm,
-  Siri / Google Assistant qısayolları
+- Gün 7: Capacitor ilə **Android və iOS** tətbiqi (eyni kod): lokal bildirişlər,
+  əsl alarm, Siri / Google Assistant qısayolları. Mac olmadığı üçün iOS
+  GitHub Actions macOS runner-də build olunur; real iPhone-a qurmaq (TestFlight)
+  Apple Developer hesabı tələb edir. O vaxta qədər iPhone-da PWA işləyir.

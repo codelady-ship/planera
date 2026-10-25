@@ -21,7 +21,7 @@ Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 | 4 | 28 okt | Auth və müştəri səhifələri |
 | 5 | 29 okt | İnteqrasiya, admin panel və production deploy (Neon + Render) |
 | 6 | 30 okt | PWA, push bildirişlər, şəxsi qeydlər, rəylər |
-| 7 | 31 okt | Android tətbiqi (Capacitor), alarm, Siri/Assistant, sənədləşmə |
+| 7 | 31 okt | Android və iOS tətbiqi (Capacitor; iOS GitHub Actions macOS-da), alarm, Siri/Assistant, sənədləşmə |
 | Sonra | v1.1 | E-poçt bildirişləri (#43), gözləmə siyahısı (#45), sevimlilər (#46), mağazalara yayım (#67) |
 
 ## Epic Xülasəsi
@@ -165,7 +165,7 @@ Repo: [codelady-ship/randevum](https://github.com/codelady-ship/randevum/issues)
 
 | # | Sub-issue | Labels |
 |---|---|---|
-| #64 | 14.1 Capacitor qurulumu (Android və iOS) | frontend, devops |
+| #64 | 14.1 Capacitor qurulumu: Android və iOS | frontend, devops |
 | #65 | 14.2 Lokal bildirişlər və əsl alarm | frontend |
 | #66 | 14.3 Siri və Google Assistant qısayolları | frontend |
 | #67 | 14.4 Mağazalara yayımlama | devops |
