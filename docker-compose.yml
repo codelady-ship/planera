@@ -1,0 +1,37 @@
+# Local stack: PostgreSQL and backend.
+#   docker compose up --build
+# Backend API: http://localhost:8080
+# PostgreSQL is published on host port 5433 so it does not clash with a local
+# PostgreSQL installation. The frontend runs separately with `npm run dev`.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: randevu
+      POSTGRES_USER: randevu
+      POSTGRES_PASSWORD: randevu
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U randevu -d randevu"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/randevu
+      SPRING_DATASOURCE_USERNAME: randevu
+      SPRING_DATASOURCE_PASSWORD: randevu
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:

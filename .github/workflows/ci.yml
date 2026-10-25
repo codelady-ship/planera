@@ -1,0 +1,29 @@
+# CI: every pull request and every push to main is checked before merge.
+#   rules     - the project's no-emoji rule over every tracked file
+#   frontend  - lint, type check, tests and production build (Next.js)
+#   backend   - Gradle check (added with the Spring Boot skeleton)
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rules:
+    name: Project rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: No emoji in tracked files
+        run: git ls-files -z | xargs -0 node scripts/check-no-emoji.mjs
