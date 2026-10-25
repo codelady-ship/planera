@@ -51,11 +51,11 @@ begin
 
         -- Monday-Friday 09:00-13:00 and 14:00-18:00 (lunch break), Saturday 10:00-15:00.
         insert into availability_rules (provider_id, day_of_week, start_time, end_time)
-        select p_id, d, '09:00', '13:00' from generate_series(1, 5) d
+        select p_id, d, time '09:00', time '13:00' from generate_series(1, 5) d
         union all
-        select p_id, d, '14:00', '18:00' from generate_series(1, 5) d
+        select p_id, d, time '14:00', time '18:00' from generate_series(1, 5) d
         union all
-        select p_id, 6, '10:00', '15:00';
+        select p_id, 6, time '10:00', time '15:00';
     end loop;
 
     insert into service_offerings (provider_id, name, description, price, duration_minutes)

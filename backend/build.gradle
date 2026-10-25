@@ -42,3 +42,11 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Show the full cause chain (e.g. the PostgreSQL error) in CI logs.
+tasks.withType(Test).configureEach {
+    testLogging {
+        events 'failed', 'skipped'
+        exceptionFormat = 'full'
+    }
+}
