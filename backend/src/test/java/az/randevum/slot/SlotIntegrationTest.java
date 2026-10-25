@@ -12,6 +12,8 @@ import az.randevum.config.TimeConfig;
 import az.randevum.domain.ProviderProfileRepository;
 import az.randevum.domain.ServiceOffering;
 import az.randevum.domain.ServiceOfferingRepository;
+import az.randevum.redis.RedisSupport;
+import az.randevum.redis.SlotCache;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -33,7 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({TestcontainersConfiguration.class, SlotService.class, AvailabilityService.class, SlotIntegrationTest.FixedClock.class})
+@Import({TestcontainersConfiguration.class, SlotService.class, SlotCache.class, RedisSupport.class, AvailabilityService.class, SlotIntegrationTest.FixedClock.class})
 @ActiveProfiles("dev")
 class SlotIntegrationTest {
 

@@ -1,5 +1,6 @@
 package az.randevum.slot;
 
+import az.randevum.availability.AvailabilityService.AvailabilityChanged;
 import az.randevum.common.NotFoundException;
 import az.randevum.config.TimeConfig;
 import az.randevum.domain.Appointment;
@@ -12,6 +13,7 @@ import az.randevum.domain.ServiceOffering;
 import az.randevum.domain.ServiceOfferingRepository;
 import az.randevum.domain.TimeOff;
 import az.randevum.domain.TimeOffRepository;
+import az.randevum.redis.SlotCache;
 import az.randevum.slot.SlotCalculator.Busy;
 import az.randevum.slot.SlotCalculator.Window;
 import java.time.Clock;
@@ -25,11 +27,13 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * Free start times of a provider's service (#18, #19). Each request loads the
  * rules, days off and active appointments of the whole range with one query
- * each, then computes in memory.
+ * each, then computes in memory. The day view is cached in Redis for 60
+ * seconds (#77); booking checks always compute fresh.
  */
 @Service
 @Transactional(readOnly = true)
@@ -45,6 +49,7 @@ public class SlotService {
     private final AvailabilityRuleRepository rules;
     private final TimeOffRepository timeOff;
     private final AppointmentRepository appointments;
+    private final SlotCache cache;
     private final Clock clock;
 
     public SlotService(
@@ -53,12 +58,14 @@ public class SlotService {
             AvailabilityRuleRepository rules,
             TimeOffRepository timeOff,
             AppointmentRepository appointments,
+            SlotCache cache,
             Clock clock) {
         this.providers = providers;
         this.services = services;
         this.rules = rules;
         this.timeOff = timeOff;
         this.appointments = appointments;
+        this.cache = cache;
         this.clock = clock;
     }
 
@@ -68,10 +75,14 @@ public class SlotService {
 
     public SlotsView slots(String slug, Long serviceId, LocalDate date) {
         ServiceOffering service = activeService(slug, serviceId);
-        List<String> slots = freeStarts(service, date, date, null).getOrDefault(date)
-                .stream()
-                .map(HH_MM::format)
-                .toList();
+        Long providerId = service.getProvider().getId();
+        List<String> slots = cache.get(providerId, serviceId, date).orElseGet(() -> {
+            List<String> fresh = freeStarts(service, date, date, null).getOrDefault(date).stream()
+                    .map(HH_MM::format)
+                    .toList();
+            cache.put(providerId, serviceId, date, fresh);
+            return fresh;
+        });
         return new SlotsView(date, serviceId, service.getDurationMinutes(), slots);
     }
 
@@ -124,6 +135,11 @@ public class SlotService {
                     day, windows, service.getDurationMinutes(), provider.getSlotStepMinutes(), busy, now, TimeConfig.BAKU)));
         }
         return new DayRange(days);
+    }
+
+    @TransactionalEventListener(fallbackExecution = true)
+    void onAvailabilityChanged(AvailabilityChanged event) {
+        cache.evictProvider(event.providerId());
     }
 
     /** The active service, which must belong to the active provider {@code slug}. */

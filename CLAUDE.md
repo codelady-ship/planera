@@ -35,13 +35,14 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
 
 - Java 21 + Spring Boot 4.x (WebMVC, Data JPA, Security, Validation, Actuator)
 - PostgreSQL 16 + Flyway miqrasiyaları
+- Redis 7: boş saat keşi, kilidlər, rate limit (Redis düşəndə API keşsiz işləyir)
 - JWT (access/refresh), rollar: `ADMIN`, `PROVIDER`, `CUSTOMER`
 - JUnit 5 + Testcontainers
 - Arxitektura: `controller` / `service` / `repository` / `entity` / `dto`
 
 **DevOps**
 
-- Docker Compose (postgres, backend) lokal mühit üçün
+- Docker Compose (postgres, redis, backend) lokal mühit üçün
 - GitHub Actions CI (hər PR və `main` push)
 
 ## Repo Strukturu
