@@ -12,7 +12,9 @@ const LAST_DAY = 31
  * check marks, a clock whose hands turn, and a tear-off page whose day number
  * advances. One scroll listener writes the progress (0..1) to the `--p` CSS
  * variable; every movement is a CSS calc() of it, so React never re-renders
- * while scrolling. With prefers-reduced-motion the scene stays still.
+ * while scrolling. With prefers-reduced-motion the scene stays still. The
+ * scene starts below the 65px sticky header so the tear-off page is never
+ * hidden behind it.
  */
 export function ScrollScene() {
   const root = useRef<HTMLDivElement>(null)
@@ -53,7 +55,7 @@ export function ScrollScene() {
       ref={root}
       data-testid="scroll-scene"
       aria-hidden
-      className="scroll-scene pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      className="scroll-scene pointer-events-none fixed inset-x-0 top-[65px] bottom-0 -z-10 overflow-hidden"
     >
       <svg
         viewBox="0 0 800 600"
@@ -63,7 +65,7 @@ export function ScrollScene() {
         {/* Calendar */}
         <g
           transform="translate(255 150) scale(0.94)"
-          className="opacity-[0.16] md:opacity-[0.12] lg:opacity-[0.08]"
+          className="opacity-[0.22] md:opacity-35"
         >
           <rect width="360" height="300" rx="18" fill="var(--brand-white)" />
           <rect width="360" height="64" rx="18" fill="var(--brand-navy)" />
@@ -85,7 +87,7 @@ export function ScrollScene() {
             const order = CHECKED.indexOf(i)
             return (
               <g key={i} transform={`translate(${x} ${y})`}>
-                <rect width="36" height="34" rx="6" fill="#dbe3ef" />
+                <rect width="36" height="34" rx="6" fill="#c3cddd" />
                 {order >= 0 && (
                   <g
                     className="scene-check"
@@ -96,11 +98,16 @@ export function ScrollScene() {
                       } as React.CSSProperties
                     }
                   >
-                    <circle cx="18" cy="17" r="13" fill="var(--brand-teal)" />
+                    <circle
+                      cx="18"
+                      cy="17"
+                      r="13"
+                      fill="var(--brand-teal-dark)"
+                    />
                     <path
                       d="M11 17.5l5 5 9-10"
                       fill="none"
-                      stroke="var(--brand-navy)"
+                      stroke="var(--brand-white)"
                       strokeWidth="3.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -115,7 +122,7 @@ export function ScrollScene() {
         {/* Clock */}
         <g
           transform="translate(655 445) scale(0.9)"
-          className="opacity-[0.18] md:opacity-[0.14] lg:opacity-[0.1]"
+          className="opacity-25 md:opacity-45"
         >
           <circle r="96" fill="var(--brand-white)" />
           <circle
@@ -159,7 +166,7 @@ export function ScrollScene() {
         {/* Tear-off page */}
         <g
           transform="translate(615 40) scale(0.8)"
-          className="opacity-[0.14] md:hidden"
+          className="opacity-[0.22] md:opacity-45"
         >
           <rect width="190" height="210" rx="14" fill="var(--brand-white)" />
           <rect width="190" height="46" rx="14" fill="var(--brand-blue)" />
