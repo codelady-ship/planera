@@ -30,7 +30,7 @@ public class ServiceOfferingService {
     @Transactional(readOnly = true)
     public List<ServiceView> list(Long providerId) {
         provider(providerId);
-        return services.findByProviderIdOrderByPriceAsc(providerId).stream().map(ProviderService::view).toList();
+        return services.findByProviderIdAndActiveTrueOrderByPriceAsc(providerId).stream().map(ProviderService::view).toList();
     }
 
     public ServiceView create(Long providerId, ServiceRequest request) {
