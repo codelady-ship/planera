@@ -45,9 +45,14 @@ export function ProviderCard({
           <span className="text-muted-foreground">Qiymət: </span>
           {formatPrice(provider.priceFrom)}-dan
         </p>
-        <Badge variant="secondary" className="h-6 gap-1.5 px-2.5">
+        <Badge
+          variant="secondary"
+          className="h-auto min-h-6 max-w-full gap-1.5 px-2.5 py-1 text-left whitespace-normal"
+        >
           <Clock aria-hidden />
-          Növbəti boş vaxt: {formatNextSlot(provider.nextSlot, today)}
+          <span>
+            Növbəti boş vaxt: {formatNextSlot(provider.nextSlot, today)}
+          </span>
         </Badge>
       </CardContent>
       <CardFooter className="mt-auto">
