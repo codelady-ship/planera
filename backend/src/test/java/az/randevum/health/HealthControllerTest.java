@@ -1,9 +1,9 @@
-package az.randevu.health;
+package az.randevum.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import az.randevu.config.SecurityConfig;
-import az.randevu.config.TimeConfig;
+import az.randevum.config.SecurityConfig;
+import az.randevum.config.TimeConfig;
 import java.time.Clock;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;

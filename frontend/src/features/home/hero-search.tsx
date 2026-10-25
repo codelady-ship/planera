@@ -9,6 +9,10 @@ export function HeroSearch() {
   return (
     <section className="mx-auto max-w-6xl px-4 pt-12 pb-16 md:pt-20 md:pb-24">
       <div className="max-w-2xl">
+        <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 text-sm font-medium text-primary ring-1 ring-border">
+          <span className="size-2 rounded-full bg-brand-teal" aria-hidden />
+          Vaxtını seç, rahatlığını yaşa.
+        </p>
         <h1 className="text-4xl font-semibold tracking-tight text-balance md:text-5xl">
           Boş saatı seçin, randevunu bir neçə kliklə götürün
         </h1>

@@ -48,8 +48,8 @@ export const CATEGORIES: Category[] = [
   },
   {
     slug: 'konsultasiya',
-    name: 'Məsləhət',
-    description: 'Hüquq, maliyyə, psixoloq',
+    name: 'Biznes və məsləhət',
+    description: 'Konsultant, hüquq, maliyyə',
     providerCount: 37,
   },
   {

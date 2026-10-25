@@ -1,11 +1,17 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { BrandMark } from './site-header'
 
 export function SiteFooter() {
   return (
     <footer className="border-t">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-        <BrandMark />
+        <Image
+          src="/brand/randevum-logo.png"
+          alt="Randevum - Vaxtını seç, rahatlığını yaşa."
+          width={1106}
+          height={272}
+          className="h-12 w-auto"
+        />
         <nav className="flex flex-wrap gap-4">
           <Link href="/search" className="hover:text-foreground">
             Xidmətlər
@@ -17,7 +23,7 @@ export function SiteFooter() {
             Mütəxəssis kimi qoşul
           </Link>
           <a
-            href="https://github.com/codelady-ship/randevu"
+            href="https://github.com/codelady-ship/randevum"
             className="hover:text-foreground"
           >
             GitHub

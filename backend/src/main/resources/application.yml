@@ -1,10 +1,10 @@
 spring:
   application:
-    name: randevu-api
+    name: randevum-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/randevu}
-    username: ${SPRING_DATASOURCE_USERNAME:randevu}
-    password: ${SPRING_DATASOURCE_PASSWORD:randevu}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/randevum}
+    username: ${SPRING_DATASOURCE_USERNAME:randevum}
+    password: ${SPRING_DATASOURCE_PASSWORD:randevum}
   jpa:
     open-in-view: false
     hibernate:

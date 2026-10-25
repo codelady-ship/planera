@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Emoji-ban guard for the randevu monorepo.
+// Emoji-ban guard for the Randevum monorepo.
 //
 // Project rule: emoji are forbidden in code, UI, docs and commit messages.
 // Visual symbols must use lucide-react icon components instead.

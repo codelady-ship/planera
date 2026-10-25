@@ -1,5 +1,6 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { CalendarCheck, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Sheet,
@@ -16,11 +17,19 @@ const NAV = [
 
 export function BrandMark() {
   return (
-    <Link href="/" className="flex items-center gap-2 font-semibold">
-      <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-        <CalendarCheck className="size-4" aria-hidden />
-      </span>
-      randevu
+    <Link
+      href="/"
+      className="flex items-center"
+      aria-label="Randevum ana səhifə"
+    >
+      <Image
+        src="/brand/randevum-wordmark.png"
+        alt="Randevum"
+        width={1106}
+        height={192}
+        priority
+        className="h-7 w-auto md:h-8"
+      />
     </Link>
   )
 }

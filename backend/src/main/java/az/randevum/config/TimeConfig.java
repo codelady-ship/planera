@@ -1,4 +1,4 @@
-package az.randevu.config;
+package az.randevum.config;
 
 import java.time.Clock;
 import java.time.ZoneId;

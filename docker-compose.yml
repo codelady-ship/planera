@@ -8,15 +8,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: randevu
-      POSTGRES_USER: randevu
-      POSTGRES_PASSWORD: randevu
+      POSTGRES_DB: randevum
+      POSTGRES_USER: randevum
+      POSTGRES_PASSWORD: randevum
     ports:
       - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U randevu -d randevu"]
+      test: ["CMD-SHELL", "pg_isready -U randevum -d randevum"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,9 +24,9 @@ services:
   backend:
     build: ./backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/randevu
-      SPRING_DATASOURCE_USERNAME: randevu
-      SPRING_DATASOURCE_PASSWORD: randevu
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/randevum
+      SPRING_DATASOURCE_USERNAME: randevum
+      SPRING_DATASOURCE_PASSWORD: randevum
     ports:
       - "8080:8080"
     depends_on:
