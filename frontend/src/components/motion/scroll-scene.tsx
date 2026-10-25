@@ -63,7 +63,7 @@ export function ScrollScene() {
         {/* Calendar */}
         <g
           transform="translate(255 150) scale(0.94)"
-          className="opacity-[0.16] md:opacity-25"
+          className="opacity-[0.16] md:opacity-[0.12] lg:opacity-[0.08]"
         >
           <rect width="360" height="300" rx="18" fill="var(--brand-white)" />
           <rect width="360" height="64" rx="18" fill="var(--brand-navy)" />
@@ -115,7 +115,7 @@ export function ScrollScene() {
         {/* Clock */}
         <g
           transform="translate(655 445) scale(0.9)"
-          className="opacity-[0.18] md:opacity-30"
+          className="opacity-[0.18] md:opacity-[0.14] lg:opacity-[0.1]"
         >
           <circle r="96" fill="var(--brand-white)" />
           <circle
@@ -159,7 +159,7 @@ export function ScrollScene() {
         {/* Tear-off page */}
         <g
           transform="translate(615 40) scale(0.8)"
-          className="opacity-[0.14] md:opacity-20"
+          className="opacity-[0.14] md:hidden"
         >
           <rect width="190" height="210" rx="14" fill="var(--brand-white)" />
           <rect width="190" height="46" rx="14" fill="var(--brand-blue)" />

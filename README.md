@@ -29,10 +29,10 @@ docker compose up --build
 
 ## GitHub Codespaces (Docker lazım deyil)
 
-Repo səhifəsində **Code > Codespaces > Create codespace on main**. Mühitdə Java 21, Node 22 və Docker hazırdır:
+Repo səhifəsində **Code > Codespaces > Create codespace on main**. Mühitdə Java 21, Node 22 və Docker hazırdır. PostgreSQL və Redis hər açılışda avtomatik qalxır (`postStartCommand`):
 
 ```bash
-docker compose up -d postgres              # PostgreSQL :5433
+docker compose up -d postgres redis        # avtomatik; PostgreSQL :5433, Redis :6379
 cd backend && ./gradlew bootRun --args="--spring.profiles.active=dev"   # API :8080, demo data ilə
 cd backend && ./gradlew check              # Testcontainers testləri daxil
 cd frontend && npm run dev                 # sayt :3000
