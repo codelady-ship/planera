@@ -10,7 +10,6 @@ import az.randevum.auth.AuthDtos.TokenResponse;
 import az.randevum.common.ConflictException;
 import az.randevum.common.UnauthorizedException;
 import az.randevum.config.JwtConfig;
-import az.randevum.config.SecurityConfig;
 import az.randevum.domain.UserRole;
 import az.randevum.redis.RateLimiter;
 import az.randevum.redis.RedisSupport;
@@ -22,6 +21,8 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,19 +36,23 @@ import org.testcontainers.junit.jupiter.Testcontainers;
     TestcontainersConfiguration.class,
     AuthService.class,
     JwtConfig.class,
-    SecurityConfig.class,
     RateLimiter.class,
     RedisSupport.class,
-    AuthIntegrationTest.SystemClock.class
+    AuthIntegrationTest.Beans.class
 })
 @ActiveProfiles("dev")
 class AuthIntegrationTest {
 
     @TestConfiguration
-    static class SystemClock {
+    static class Beans {
         @Bean
         Clock clock() {
             return Clock.systemUTC();
+        }
+
+        @Bean
+        PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
         }
     }
 
