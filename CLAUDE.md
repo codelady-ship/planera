@@ -15,7 +15,7 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
 
 - **Emoji QADAĞANDIR** — issue, commit, UI və sənədlərdə. Vizual işarələr üçün
   YALNIZ `lucide-react` ikonları. `scripts/check-no-emoji.mjs` CI-da yoxlayır.
-- **UI kitabxanası: shadcn/ui** (Radix UI əsasında). Əvvəlcə shadcn komponenti,
+- **UI kitabxanası: shadcn/ui** (`base-nova` stili, Base UI əsasında). Əvvəlcə shadcn komponenti,
   qarşılığı yoxdursa custom komponent.
 - **Qradient və bənövşəyi-mavi qarışıqları qadağandır.**
 - **İnterfeys dili: Azərbaycan dili.** Qiymətlər AZN, vaxt zonası `Asia/Baku`.
