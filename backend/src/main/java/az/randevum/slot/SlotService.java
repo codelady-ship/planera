@@ -1,6 +1,5 @@
 package az.randevum.slot;
 
-import az.randevum.availability.AvailabilityService.AvailabilityChanged;
 import az.randevum.common.NotFoundException;
 import az.randevum.config.TimeConfig;
 import az.randevum.domain.Appointment;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * Free start times of a provider's service (#18, #19). Each request loads the
@@ -135,11 +133,6 @@ public class SlotService {
                     day, windows, service.getDurationMinutes(), provider.getSlotStepMinutes(), busy, now, TimeConfig.BAKU)));
         }
         return new DayRange(days);
-    }
-
-    @TransactionalEventListener(fallbackExecution = true)
-    void onAvailabilityChanged(AvailabilityChanged event) {
-        cache.evictProvider(event.providerId());
     }
 
     /** The active service, which must belong to the active provider {@code slug}. */
