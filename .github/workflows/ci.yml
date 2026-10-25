@@ -71,6 +71,14 @@ jobs:
       # (they are skipped on machines without Docker).
       - name: Check
         run: ./gradlew check --no-daemon
+      # Docker is available here, so nothing may be skipped: a skipped
+      # Testcontainers test would hide a broken database layer.
+      - name: No skipped tests
+        run: |
+          grep -ho 'testsuite name="[^"]*" tests="[0-9]*" skipped="[0-9]*"' build/test-results/test/*.xml
+          if grep -l 'skipped="[1-9]' build/test-results/test/*.xml; then
+            echo "Tests were skipped although Docker is available"; exit 1
+          fi
       - name: Test reports
         if: failure()
         uses: actions/upload-artifact@v4

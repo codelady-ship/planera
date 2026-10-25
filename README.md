@@ -27,6 +27,17 @@ npm run dev
 docker compose up --build
 ```
 
+## GitHub Codespaces (Docker lazım deyil)
+
+Repo səhifəsində **Code > Codespaces > Create codespace on main**. Mühitdə Java 21, Node 22 və Docker hazırdır:
+
+```bash
+docker compose up -d postgres              # PostgreSQL :5433
+cd backend && ./gradlew bootRun --args="--spring.profiles.active=dev"   # API :8080, demo data ilə
+cd backend && ./gradlew check              # Testcontainers testləri daxil
+cd frontend && npm run dev                 # sayt :3000
+```
+
 ## Layihə necə qurulub (istifadə olunan komandalar)
 
 ```bash

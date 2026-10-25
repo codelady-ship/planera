@@ -1,0 +1,4 @@
+# Public demo deployment: same demo catalog as dev, production settings otherwise.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed
