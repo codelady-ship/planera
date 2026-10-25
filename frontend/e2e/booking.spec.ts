@@ -1,0 +1,49 @@
+import { expect, test } from '@playwright/test'
+
+// The whole customer flow against a real API with the demo data (#35):
+// search, profile, slot, login, confirmation, account and cancellation.
+test('a customer books and cancels an appointment', async ({ page }) => {
+  await page.goto('/search?q=Elvin')
+  await page.getByRole('link', { name: 'Elvin Məmmədov' }).first().click()
+  await expect(
+    page.getByRole('heading', { name: 'Elvin Məmmədov' }),
+  ).toBeVisible()
+
+  await page.goto('/book/elvin-barber')
+  await page.getByRole('button', { name: /Saç kəsimi/ }).click()
+
+  // The first free day; the next month when this one is already full.
+  const freeDay = page.locator('[role=grid] button:enabled').first()
+  await expect(page.locator('[role=grid]')).toBeVisible()
+  if ((await freeDay.count()) === 0) {
+    await page.getByRole('button', { name: 'Növbəti ay' }).click()
+  }
+  await freeDay.click()
+
+  const slot = page.getByRole('button', { name: /^\d{2}:\d{2}$/ }).first()
+  const time = (await slot.textContent())!.trim()
+  await slot.click()
+
+  await page.getByRole('link', { name: 'Daxil olub təsdiqləyin' }).click()
+  await page.getByLabel('E-poçt').fill('musteri@randevum.az')
+  await page.getByLabel('Şifrə').fill('Randevum123')
+  await page.getByRole('button', { name: 'Daxil ol' }).click()
+
+  await page.getByRole('button', { name: 'Randevunu təsdiqlə' }).click()
+  await expect(page.getByText('Randevunuz qəbul olundu')).toBeVisible()
+  await expect(page.getByText(/RV-\d{4}-\d{6}/)).toBeVisible()
+
+  await page.goto('/account')
+  const card = page
+    .getByRole('listitem')
+    .filter({ hasText: 'Saç kəsimi' })
+    .filter({ hasText: time })
+    .first()
+  await expect(card).toBeVisible()
+  await card.getByRole('button', { name: 'Ləğv et' }).click()
+  await page.getByRole('button', { name: 'Bəli, ləğv et' }).click()
+  await expect(card).toBeHidden()
+
+  await page.getByRole('tab', { name: 'Ləğv edilmiş' }).click()
+  await expect(page.getByText('Ləğv edilib').first()).toBeVisible()
+})
