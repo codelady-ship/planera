@@ -71,13 +71,13 @@ qatında, həm də verilənlər bazası səviyyəsində (constraint) alınır.
 
 - Hər iş GitHub issue ilə başlayır; branch adı `feat/<issue>-qisa-ad`.
 - PR təsvirində `Closes #<issue>` olur, CI yaşıl olduqdan sonra squash merge.
-- Hər həftə bir milestone (`Həftə N`) bağlanır və `main` Vercel-ə deploy olunur.
+- Layihə 7 gündə hazırlanır: hər gün bir milestone (`Gün N`) bağlanır və `main` Vercel-ə deploy olunur. Plan: BACKLOG.md.
 
 ## Mobil və Bildirişlər (yol xəritəsi)
 
-- Həftə 10: PWA (quraşdırılan sayt) + Web Push xatırlatmaları
-- Həftə 11: şəxsi qeydlər: əvvəl təqvimdən tarix, sonra saat seçilir (danışıqdan
+- Gün 6: PWA (quraşdırılan sayt) + Web Push xatırlatmaları
+- Gün 6: şəxsi qeydlər: əvvəl təqvimdən tarix, sonra saat seçilir (danışıqdan
   tarix/saat təxmin edilmir), sonra qeyd yazılır və ya səslə deyilir (Web Speech
   API, `az-AZ`, səs yalnız mətnə çevrilir); seçilmiş vaxtda alarm və bildiriş
-- Həftə 12: Capacitor ilə Android/iOS tətbiqi: lokal bildirişlər, əsl alarm,
+- Gün 7: Capacitor ilə Android tətbiqi (iOS build Mac tələb edir, v1.1): lokal bildirişlər, əsl alarm,
   Siri / Google Assistant qısayolları
