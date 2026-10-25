@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { UserMenu } from '@/features/auth/user-menu'
 
 const NAV = [
   { href: '/search', label: 'Xidmətlər' },
@@ -52,16 +53,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <Link
-            href="/login"
-            className={buttonVariants({ variant: 'ghost', size: 'lg' })}
-          >
-            Daxil ol
-          </Link>
-          <Link href="/register" className={buttonVariants({ size: 'lg' })}>
-            Qeydiyyat
-          </Link>
+        <div className="hidden md:block">
+          <UserMenu />
         </div>
 
         <Sheet>
@@ -91,21 +84,7 @@ export function SiteHeader() {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                href="/login"
-                className="rounded-lg px-3 py-2 hover:bg-muted"
-              >
-                Daxil ol
-              </Link>
-              <Link
-                href="/register"
-                className={buttonVariants({
-                  size: 'lg',
-                  className: 'mt-2 h-10',
-                })}
-              >
-                Qeydiyyat
-              </Link>
+              <UserMenu stacked />
             </nav>
           </SheetContent>
         </Sheet>
