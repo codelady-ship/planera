@@ -156,3 +156,46 @@
     @apply font-sans;
   }
 }
+
+/* Scroll scene (#78). --p is the page scroll progress (0..1) written by
+   ScrollScene; every movement below derives from it. */
+.scroll-scene {
+  --p: 0;
+}
+
+.scene-drift {
+  transform: translateY(calc(var(--p) * -6%));
+}
+
+/* Hands are drawn from the clock center (0,0) upwards, so they pivot on the
+   bottom center of their own box. */
+.scene-minute,
+.scene-hour {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.scene-minute {
+  transform: rotate(calc(var(--p) * 720deg));
+}
+
+.scene-hour {
+  transform: rotate(calc(60deg + var(--p) * 60deg));
+}
+
+/* Check i of n appears once progress passes i / n. */
+.scene-check {
+  opacity: clamp(0, calc(var(--p) * var(--n) - var(--i)), 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-drift,
+  .scene-minute,
+  .scene-hour {
+    transform: none;
+  }
+
+  .scene-check {
+    opacity: 1;
+  }
+}

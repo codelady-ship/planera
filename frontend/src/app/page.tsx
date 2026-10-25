@@ -1,3 +1,4 @@
+import { ScrollScene } from '@/components/motion/scroll-scene'
 import { CategoryGrid } from '@/features/home/category-grid'
 import { HeroSearch } from '@/features/home/hero-search'
 import { HowItWorks } from '@/features/home/how-it-works'
@@ -13,6 +14,7 @@ const MOCK_TODAY = '2026-10-25'
 export default function Home() {
   return (
     <>
+      <ScrollScene />
       <SiteHeader />
       <main className="flex-1">
         <HeroSearch />
