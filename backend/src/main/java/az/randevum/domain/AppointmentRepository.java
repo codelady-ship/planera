@@ -18,4 +18,30 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
               and a.startsAt < :to and a.endsAt > :from
             order by a.startsAt""")
     List<Appointment> findActiveOverlapping(Long providerId, Instant from, Instant to);
+
+    @Query(value = "select nextval('appointment_code_seq')", nativeQuery = true)
+    long nextCodeNumber();
+
+    @Query("""
+            select a from Appointment a join fetch a.provider join fetch a.service
+            where a.customer.id = :customerId
+              and a.status in (az.randevum.domain.AppointmentStatus.PENDING, az.randevum.domain.AppointmentStatus.CONFIRMED)
+              and a.endsAt > :now
+            order by a.startsAt""")
+    List<Appointment> findUpcoming(Long customerId, Instant now);
+
+    @Query("""
+            select a from Appointment a join fetch a.provider join fetch a.service
+            where a.customer.id = :customerId
+              and (a.status in (az.randevum.domain.AppointmentStatus.COMPLETED, az.randevum.domain.AppointmentStatus.NO_SHOW)
+                   or (a.status in (az.randevum.domain.AppointmentStatus.PENDING, az.randevum.domain.AppointmentStatus.CONFIRMED)
+                       and a.endsAt <= :now))
+            order by a.startsAt desc""")
+    List<Appointment> findPast(Long customerId, Instant now);
+
+    @Query("""
+            select a from Appointment a join fetch a.provider join fetch a.service
+            where a.customer.id = :customerId and a.status = az.randevum.domain.AppointmentStatus.CANCELLED
+            order by a.startsAt desc""")
+    List<Appointment> findCancelled(Long customerId);
 }

@@ -96,7 +96,9 @@ public class SlotService {
      * leaves an appointment out of the busy ranges, so a reschedule may move
      * within its own current time.
      */
-    public List<LocalTime> freeStarts(ServiceOffering service, LocalDate date, Long ignoreAppointmentId) {
+    public List<LocalTime> freeStarts(Long serviceId, LocalDate date, Long ignoreAppointmentId) {
+        ServiceOffering service = services.findById(serviceId)
+                .orElseThrow(() -> new NotFoundException("Xidmət tapılmadı: " + serviceId));
         return freeStarts(service, date, date, ignoreAppointmentId).getOrDefault(date);
     }
 
