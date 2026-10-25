@@ -29,7 +29,7 @@ export interface Problem {
 export interface Category {
   slug: string
   name: string
-  icon: string | null
+  description: string | null
   providerCount: number
 }
 

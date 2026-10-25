@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { formatNextSlot } from './format'
 import { HeroSearch } from './hero-search'
-import { TOP_PROVIDERS } from './mock-data'
+import type { ProviderSummary } from '@/lib/api/types'
 import { ProviderCard } from './top-providers'
 
 describe('formatNextSlot', () => {
@@ -33,7 +33,19 @@ describe('HeroSearch', () => {
 
 describe('ProviderCard', () => {
   test('shows price, rating, next slot and a booking link', () => {
-    const provider = TOP_PROVIDERS[0]
+    const provider: ProviderSummary = {
+      slug: 'elvin-barber',
+      name: 'Elvin Məmmədov',
+      title: 'Bərbər',
+      category: 'gozellik',
+      categoryName: 'Gözəllik və baxım',
+      city: 'Bakı',
+      rating: 4.9,
+      reviewCount: 214,
+      priceFrom: 15,
+      initials: 'EM',
+      nextSlot: '2026-10-26T11:30',
+    }
     render(<ProviderCard provider={provider} today="2026-10-25" />)
     expect(screen.getByText(provider.name)).toBeInTheDocument()
     expect(screen.getByText('4.9')).toBeInTheDocument()
@@ -43,5 +55,30 @@ describe('ProviderCard', () => {
       'href',
       `/providers/${provider.slug}`,
     )
+  })
+})
+
+describe('ProviderCard without data', () => {
+  test('hides the price and next slot it does not know', () => {
+    render(
+      <ProviderCard
+        provider={{
+          slug: 'yeni',
+          name: 'Yeni Mütəxəssis',
+          title: 'Müəllim',
+          category: 'tehsil',
+          categoryName: 'Müəllim və dərslər',
+          city: 'Bakı',
+          rating: 0,
+          reviewCount: 0,
+          priceFrom: null,
+          initials: 'YM',
+          nextSlot: null,
+        }}
+        today="2026-10-25"
+      />,
+    )
+    expect(screen.queryByText(/Qiymət/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Növbəti boş vaxt/)).not.toBeInTheDocument()
   })
 })

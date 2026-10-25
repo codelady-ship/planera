@@ -1,7 +1,8 @@
 import { CalendarDays, MapPin, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { CITIES } from './mock-data'
+
+const CITIES = ['Bakı', 'Sumqayıt', 'Gəncə', 'Lənkəran', 'Şəki']
 
 // A plain GET form: the search page (#29) reads the same query parameters, so
 // the hero works without client-side JavaScript.

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { formatNextSlot, formatPrice } from './format'
-import type { ProviderSummary } from './mock-data'
+import type { ProviderSummary } from '@/lib/api/types'
 
 export function ProviderCard({
   provider,
@@ -41,19 +41,23 @@ export function ProviderCard({
             {provider.city}
           </span>
         </div>
-        <p className="text-sm">
-          <span className="text-muted-foreground">Qiymət: </span>
-          {formatPrice(provider.priceFrom)}-dan
-        </p>
-        <Badge
-          variant="secondary"
-          className="h-auto min-h-6 max-w-full gap-1.5 px-2.5 py-1 text-left whitespace-normal"
-        >
-          <Clock aria-hidden />
-          <span>
-            Növbəti boş vaxt: {formatNextSlot(provider.nextSlot, today)}
-          </span>
-        </Badge>
+        {provider.priceFrom !== null && (
+          <p className="text-sm">
+            <span className="text-muted-foreground">Qiymət: </span>
+            {formatPrice(provider.priceFrom)}-dan
+          </p>
+        )}
+        {provider.nextSlot && (
+          <Badge
+            variant="secondary"
+            className="h-auto min-h-6 max-w-full gap-1.5 px-2.5 py-1 text-left whitespace-normal"
+          >
+            <Clock aria-hidden />
+            <span>
+              Növbəti boş vaxt: {formatNextSlot(provider.nextSlot, today)}
+            </span>
+          </Badge>
+        )}
       </CardContent>
       <CardFooter className="mt-auto">
         <Link
@@ -89,13 +93,19 @@ export function TopProviders({
           Hamısına bax
         </Link>
       </div>
-      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {providers.map((provider) => (
-          <li key={provider.slug}>
-            <ProviderCard provider={provider} today={today} />
-          </li>
-        ))}
-      </ul>
+      {providers.length === 0 ? (
+        <p className="mt-6 rounded-xl border border-dashed bg-card p-8 text-center text-muted-foreground">
+          Mütəxəssislər bir azdan görünəcək. Server oyanır, səhifəni yeniləyin.
+        </p>
+      ) : (
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {providers.map((provider) => (
+            <li key={provider.slug}>
+              <ProviderCard provider={provider} today={today} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
