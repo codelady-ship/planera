@@ -30,7 +30,14 @@ export function BrandMark() {
         width={1408}
         height={293}
         priority
-        className="h-8 w-auto md:h-9"
+        className="h-8 w-auto md:h-9 dark:hidden"
+      />
+      <Image
+        src="/brand/planera-wordmark-dark.png"
+        alt="Planera"
+        width={1408}
+        height={293}
+        className="hidden h-8 w-auto md:h-9 dark:block"
       />
     </Link>
   )
