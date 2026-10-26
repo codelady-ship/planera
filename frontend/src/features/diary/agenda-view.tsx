@@ -39,10 +39,19 @@ const RANGE_DAYS = 30
 export const UNDO_MS = 5000
 
 /** The diary (#59, #68): appointments and personal notes by day, with new, edit and delete. */
-export function AgendaView() {
+export function AgendaView({
+  openNew = false,
+  initialText,
+}: {
+  /** Start with the new-note wizard open, e.g. from a deep link (#66). */
+  openNew?: boolean
+  initialText?: string
+} = {}) {
   const [items, setItems] = useState<AgendaItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [editing, setEditing] = useState<PersonalNote | 'new' | null>(null)
+  const [editing, setEditing] = useState<PersonalNote | 'new' | null>(
+    openNew ? 'new' : null,
+  )
   const [deleting, setDeleting] = useState<AgendaItem | null>(null)
   const [undo, setUndo] = useState<AgendaItem | null>(null)
   const undoTimer = useRef<number | null>(null)
@@ -240,6 +249,7 @@ export function AgendaView() {
       {editing && (
         <NoteWizard
           initial={editing === 'new' ? undefined : editing}
+          initialTitle={editing === 'new' ? initialText : undefined}
           onClose={() => setEditing(null)}
           onSaved={() => void load()}
         />

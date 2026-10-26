@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher long-press shortcut and the deep link Google Assistant can open (#66). -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_note"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_new_note_short"
+        android:shortcutLongLabel="@string/shortcut_new_note_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="randevum://reminder/new"
+            android:targetPackage="az.randevum.app"
+            android:targetClass="az.randevum.app.MainActivity" />
+    </shortcut>
+</shortcuts>
