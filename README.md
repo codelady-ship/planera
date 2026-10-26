@@ -12,6 +12,53 @@ randevunu bir neçə kliklə götür.
 
 Plan və həftəlik bölgü: [BACKLOG.md](./BACKLOG.md). Qaydalar: [CLAUDE.md](./CLAUDE.md).
 
+## Arxitektura
+
+```mermaid
+flowchart LR
+    subgraph Client["Müştəri cihazı"]
+        B["Brauzer / PWA<br/>(Next.js səhifələri, service worker)"]
+        M["Android / iOS tətbiqi<br/>(Capacitor WebView + lokal alarm)"]
+    end
+    subgraph Vercel["Vercel"]
+        N["Next.js (App Router)<br/>SSR, keş, /api/backend gateway<br/>httpOnly cookie-də JWT"]
+    end
+    subgraph Render["Render (Frankfurt)"]
+        A["Spring Boot API<br/>controller / service / repository"]
+        R[("Redis<br/>boş saat keşi, kilid, rate limit")]
+        J["Xatırlatma job-u<br/>(hər dəqiqə, skip locked)"]
+    end
+    D[("PostgreSQL 16 (Neon)<br/>Flyway miqrasiyaları")]
+    P["Push servisləri<br/>(FCM / APNs / Mozilla)"]
+
+    B -->|HTTPS| N
+    M -->|server.url| N
+    N -->|Bearer JWT| A
+    A --> R
+    A --> D
+    J --> D
+    J -->|VAPID, RFC 8291| P
+    P -.->|Web Push| B
+```
+
+- Brauzer API-yə birbaşa müraciət etmir: hər sorğu saytın `/api/backend` keçidindən keçir, token httpOnly cookie-dən əlavə olunur.
+- Eyni vaxta iki randevu həm service qatında (Redis kilidi), həm bazada (`appointments_no_overlap` exclusion constraint) bloklanır.
+- Xatırlatmalar (`reminders` cədvəli) randevuya və ya şəxsi qeydə baxır; job sətirləri `for update skip locked` ilə götürür, ona görə bir neçə instansiyada da bir dəfə göndərilir.
+
+## Ekran şəkilləri
+
+| Ana səhifə | Axtarış | Mütəxəssis | Randevu | Giriş |
+|---|---|---|---|---|
+| ![Ana səhifə](docs/screenshots/home.png) | ![Axtarış](docs/screenshots/search.png) | ![Mütəxəssis səhifəsi](docs/screenshots/provider.png) | ![Randevu götürmə](docs/screenshots/booking.png) | ![Giriş](docs/screenshots/login.png) |
+
+Gecə rejimi header-dəki düymə ilə (sistem / gündüz / gecə), 360px enində mobil-first.
+
+## API sənədi
+
+- OpenAPI: `https://randevum-api-uu30.onrender.com/v3/api-docs`
+- Swagger UI (yalnız oxuma, "Try it out" bağlıdır): `https://randevum-api-uu30.onrender.com/swagger-ui.html`
+- Lokalda: `http://localhost:8080/swagger-ui.html`. Qorunan endpoint-lər üçün `POST /api/auth/login` cavabındakı `accessToken` Bearer kimi göndərilir.
+
 ## Lokal işə salma
 
 ```bash

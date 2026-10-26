@@ -24,6 +24,15 @@ class HealthControllerTest {
     MockMvcTester mvc;
 
     @Test
+    void apiDocumentationNeedsNoToken() {
+        // springdoc is not part of this slice, so the paths answer 404, never 401 (#51).
+        for (String path : new String[] {"/v3/api-docs", "/swagger-ui.html"}) {
+            assertThat(mvc.get().uri(path)).satisfies(result ->
+                    assertThat(result.getResponse().getStatus()).isNotEqualTo(HttpStatus.UNAUTHORIZED.value()));
+        }
+    }
+
+    @Test
     void healthIsPublicAndReportsUp() {
         assertThat(mvc.get().uri("/api/health"))
                 .hasStatusOk()

@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/health", "/actuator/health/**").permitAll()
+                        // API documentation (#51): the document and the UI are public, read-only.
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories", "/api/providers", "/api/providers/**")
                         .permitAll()
