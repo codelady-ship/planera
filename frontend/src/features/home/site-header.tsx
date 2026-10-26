@@ -30,7 +30,7 @@ export function BrandMark() {
         width={1408}
         height={293}
         priority
-        className="h-7 w-auto md:h-8"
+        className="h-8 w-auto md:h-9"
       />
     </Link>
   )
