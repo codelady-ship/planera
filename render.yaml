@@ -27,6 +27,13 @@ services:
         sync: false
       - key: SPRING_DATASOURCE_PASSWORD
         sync: false
+      # Web Push (#55): `npx web-push generate-vapid-keys`, keep the pair forever.
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: mailto:info@randevum.az
       - key: REDIS_URL
         fromService:
           type: keyvalue

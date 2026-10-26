@@ -142,3 +142,14 @@ export interface Stats {
   week: { date: string; count: number }[]
   popularServices: { name: string; count: number }[]
 }
+
+/** One browser/device subscribed to Web Push (#55). */
+export interface PushSubscriptionView {
+  id: number
+  device: string | null
+  createdAt: string
+}
+
+export interface PushDelivery {
+  delivered: number
+}

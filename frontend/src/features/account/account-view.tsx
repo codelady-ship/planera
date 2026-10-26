@@ -13,6 +13,7 @@ import { setSessionUser, useSession } from '@/features/auth/use-session'
 import { ApiError, api } from '@/lib/api/client'
 import type { Appointment, SessionUser } from '@/lib/api/types'
 import { AppointmentCard } from './appointment-card'
+import { NotificationSettings } from './notification-settings'
 
 const SCOPES = [
   {
@@ -47,6 +48,7 @@ export function AccountView() {
             </TabsTrigger>
           ))}
           <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="notifications">Bildirişlər</TabsTrigger>
         </TabsList>
         {SCOPES.map((s) => (
           <TabsContent key={s.value} value={s.value} className="pt-4">
@@ -57,6 +59,9 @@ export function AccountView() {
         ))}
         <TabsContent value="profile" className="pt-4">
           {user ? <ProfileForm user={user} /> : <Skeleton className="h-48" />}
+        </TabsContent>
+        <TabsContent value="notifications" className="pt-4">
+          {tab === 'notifications' && <NotificationSettings />}
         </TabsContent>
       </Tabs>
     </div>

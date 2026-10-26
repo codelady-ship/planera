@@ -79,7 +79,8 @@ Bütün demo hesabların şifrəsi: `Randevum123`
 3. Render -> `randevum-api` -> Environment: Neon -> Connect bölməsindən (birbaşa bağlantı, `-pooler` olmayan host):
    - `SPRING_DATASOURCE_URL` = `jdbc:postgresql://<host>/<database>?sslmode=require`
    - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
-4. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
+4. Web Push üçün bir dəfə `npx web-push generate-vapid-keys` işlədin və Environment-ə `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` yazın (`VAPID_SUBJECT` `mailto:` ünvandır). Açarlar boşdursa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
+5. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
 - **Production API:** https://randevum-api-uu30.onrender.com
 - Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
