@@ -4,7 +4,7 @@ import manifest from './manifest'
 describe('manifest', () => {
   test('is installable: name, standalone display and maskable icons', () => {
     const m = manifest()
-    expect(m.name).toBe('Randevum')
+    expect(m.name).toBe('Planera')
     expect(m.display).toBe('standalone')
     expect(m.start_url).toBe('/')
     expect(m.lang).toBe('az')

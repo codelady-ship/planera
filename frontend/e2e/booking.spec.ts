@@ -29,8 +29,8 @@ test('a customer books and cancels an appointment', async ({ page }) => {
   await slot.click()
 
   await page.getByRole('link', { name: 'Daxil olub təsdiqləyin' }).click()
-  await page.getByLabel('E-poçt').fill('musteri@randevum.az')
-  await page.getByLabel('Şifrə').fill('Randevum123')
+  await page.getByLabel('E-poçt').fill('musteri@planera.az')
+  await page.getByLabel('Şifrə').fill('Planera123')
   await page.getByRole('button', { name: 'Daxil ol' }).click()
 
   await page.getByRole('button', { name: 'Randevunu təsdiqlə' }).click()

@@ -117,7 +117,7 @@ describe('native alarms', () => {
   test('the permission request also creates the Android channel', async () => {
     expect(await requestNativePermission()).toBe('granted')
     expect(plugin.createChannel).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'randevum-alarms', importance: 5 }),
+      expect.objectContaining({ id: 'planera-alarms', importance: 5 }),
     )
   })
 

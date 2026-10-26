@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "az.randevum.app"
+    namespace = "az.planera.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "az.randevum.app"
+        applicationId "az.planera.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

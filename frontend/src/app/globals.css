@@ -54,7 +54,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Randevum design tokens (docs/DESIGN.md), taken from the logo.
+/* Planera design tokens (docs/DESIGN.md), taken from the logo.
    Light: mist surface #F4F7FB, white cards, ink #0F1B33 text.
    Primary: navy #072968. CTA: blue #1D5FE0. Both carry white text.
    Teal #00C3BD is decorative only (navy text on it); confirmed status uses

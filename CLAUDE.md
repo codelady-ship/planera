@@ -1,4 +1,4 @@
-# Randevum
+# Planera
 
 Universal onlayn randevu platforması və şəxsi gündəlik asistenti. Şüar: "Vaxtını seç, rahatlığını yaşa." Müştəri xidmət göstərəni (bərbər, həkim,
 müəllim, konsultant və s.) tapır, xidməti seçir, yalnız boş saatlar arasından
@@ -19,7 +19,7 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
   qarşılığı yoxdursa custom komponent.
 - **UI-da qradient və bənövşəyi-mavi qarışıqları qadağandır.** Qradient yalnız loqonun özündədir (`docs/brand`); düymə, fon və kartlar düz rəngdir.
 - **İnterfeys dili: Azərbaycan dili.** Qiymətlər AZN, vaxt zonası `Asia/Baku`.
-- **Brend:** ad həmişə `Randevum` (böyük R ilə). Loqo və ikonlar: `docs/brand`, `frontend/public/brand`.
+- **Brend:** ad həmişə `Planera` (böyük P ilə). Loqo və ikonlar: `docs/brand`, `frontend/public/brand`.
 - Mobil-first: hər səhifə 360px enində rahat işləməlidir.
 - Dizayn tokenləri və rəng palitrası: [docs/DESIGN.md](./docs/DESIGN.md).
 
@@ -48,7 +48,7 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
 ## Repo Strukturu
 
 ```
-randevum/
+planera/
 ├── frontend/          # Next.js tətbiqi (müştəri saytı + admin panel)
 ├── backend/           # Spring Boot API
 ├── docs/              # DESIGN.md və digər sənədlər

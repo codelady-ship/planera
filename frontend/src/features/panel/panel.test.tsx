@@ -10,7 +10,7 @@ import { validateService } from './services-manager'
 
 const user = (role: SessionUser['role']): SessionUser => ({
   id: 1,
-  email: 'elvin-barber@randevum.az',
+  email: 'elvin-barber@planera.az',
   fullName: 'Elvin Məmmədov',
   phone: null,
   role,

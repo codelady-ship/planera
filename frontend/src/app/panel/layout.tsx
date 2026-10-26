@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { PanelShell } from '@/features/panel/panel-shell'
 
 export const metadata: Metadata = {
-  title: { default: 'Panel', template: '%s | Randevum panel' },
+  title: { default: 'Panel', template: '%s | Planera panel' },
   robots: { index: false },
 }
 

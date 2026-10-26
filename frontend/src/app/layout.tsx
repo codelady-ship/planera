@@ -18,15 +18,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Randevum - Vaxtını seç, rahatlığını yaşa',
-    template: '%s | Randevum',
+    default: 'Planera - Vaxtını seç, rahatlığını yaşa',
+    template: '%s | Planera',
   },
-  applicationName: 'Randevum',
+  applicationName: 'Planera',
   description:
     'Bərbər, həkim, müəllim və digər xidmətlər üçün boş saatı seçin və randevunu bir neçə kliklə götürün.',
   appleWebApp: {
     capable: true,
-    title: 'Randevum',
+    title: 'Planera',
     statusBarStyle: 'default',
   },
 }

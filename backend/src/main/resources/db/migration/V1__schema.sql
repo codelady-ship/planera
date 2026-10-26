@@ -1,4 +1,4 @@
--- Randevum core schema (#8, #9).
+-- Planera core schema (#8, #9).
 -- All instants are timestamptz; the application works in Asia/Baku.
 
 create extension if not exists btree_gist;

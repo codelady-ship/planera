@@ -23,8 +23,8 @@ describe('AuthForm', () => {
     vi.stubGlobal('fetch', fetchMock)
     render(<AuthForm mode="login" />)
 
-    fill('E-poçt', 'musteri@randevum.az')
-    fill('Şifrə', 'Randevum123')
+    fill('E-poçt', 'musteri@planera.az')
+    fill('Şifrə', 'Planera123')
     fireEvent.click(screen.getByRole('button', { name: 'Daxil ol' }))
 
     await waitFor(() =>
@@ -34,8 +34,8 @@ describe('AuthForm', () => {
       '/api/auth/login',
       expect.objectContaining({
         body: JSON.stringify({
-          email: 'musteri@randevum.az',
-          password: 'Randevum123',
+          email: 'musteri@planera.az',
+          password: 'Planera123',
         }),
       }),
     )

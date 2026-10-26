@@ -22,15 +22,15 @@ export function BrandMark() {
     <Link
       href="/"
       className="flex items-center"
-      aria-label="Randevum ana səhifə"
+      aria-label="Planera ana səhifə"
     >
       <Image
-        src="/brand/randevum-wordmark.png"
-        alt="Randevum"
-        width={1106}
-        height={192}
+        src="/brand/planera-wordmark.png"
+        alt="Planera"
+        width={1408}
+        height={293}
         priority
-        className="h-7 w-auto md:h-8"
+        className="h-8 w-auto md:h-9"
       />
     </Link>
   )

@@ -1,4 +1,4 @@
-// Shapes of the Randevum API responses (backend/src/main/java/az/randevum).
+// Shapes of the Planera API responses (backend/src/main/java/az/planera).
 
 export type UserRole = 'ADMIN' | 'PROVIDER' | 'CUSTOMER'
 
@@ -18,7 +18,7 @@ export interface TokenResponse {
   user: SessionUser
 }
 
-/** RFC 9457 problem details, plus Randevum's extra fields. */
+/** RFC 9457 problem details, plus Planera's extra fields. */
 export interface Problem {
   status: number
   detail?: string

@@ -16,20 +16,20 @@ describe('deep links', () => {
   beforeEach(() => vi.clearAllMocks())
 
   test('the new-note link opens the diary wizard with the text prefilled', () => {
-    expect(pathForDeepLink('randevum://reminder/new')).toBe(
+    expect(pathForDeepLink('planera://reminder/new')).toBe(
       '/account?tab=agenda&new=1',
     )
     expect(
       pathForDeepLink(
-        'randevum://reminder/new?text=h%C9%99kim%C9%99%20getm%C9%99k',
+        'planera://reminder/new?text=h%C9%99kim%C9%99%20getm%C9%99k',
       ),
     ).toBe('/account?tab=agenda&new=1&text=h%C9%99kim%C9%99+getm%C9%99k')
-    expect(pathForDeepLink('randevum://agenda')).toBe('/account?tab=agenda')
+    expect(pathForDeepLink('planera://agenda')).toBe('/account?tab=agenda')
   })
 
   test('other links are ignored', () => {
     expect(pathForDeepLink('https://randevum-seven.vercel.app/')).toBeNull()
-    expect(pathForDeepLink('randevum://settings')).toBeNull()
+    expect(pathForDeepLink('planera://settings')).toBeNull()
     expect(pathForDeepLink('not a url')).toBeNull()
   })
 
@@ -42,12 +42,12 @@ describe('deep links', () => {
       },
     )
     app.getLaunchUrl.mockResolvedValue({
-      url: 'randevum://reminder/new?text=idman',
+      url: 'planera://reminder/new?text=idman',
     })
     const open = vi.fn()
     await listenForDeepLinks(open)
     expect(open).toHaveBeenCalledWith('/account?tab=agenda&new=1&text=idman')
-    handler({ url: 'randevum://agenda' })
+    handler({ url: 'planera://agenda' })
     expect(open).toHaveBeenLastCalledWith('/account?tab=agenda')
   })
 })

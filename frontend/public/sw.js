@@ -1,15 +1,15 @@
-// Randevum service worker (#54).
+// Planera service worker (#54).
 // - Pages: network first, the cached copy or /offline when the network fails.
 // - Build assets, brand images and icons: cache first (their URLs are hashed
 //   or change rarely).
 // - API calls are never cached: appointments must always be fresh.
 // - Push events show a notification (#55 sends them).
-const VERSION = 'randevum-v1'
+const VERSION = 'planera-v1'
 const OFFLINE_URL = '/offline'
 const PRECACHE = [
   OFFLINE_URL,
-  '/brand/randevum-wordmark.png',
-  '/brand/randevum-mark.png',
+  '/brand/planera-wordmark.png',
+  '/brand/planera-mark.png',
   '/icons/icon-192.png',
 ]
 
@@ -93,7 +93,7 @@ self.addEventListener('push', (event) => {
   } catch {
     data = { body: event.data ? event.data.text() : '' }
   }
-  const title = data.title || 'Randevum'
+  const title = data.title || 'Planera'
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || '',

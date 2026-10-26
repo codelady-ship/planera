@@ -5,8 +5,8 @@ import type { MetadataRoute } from 'next'
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'Randevum',
-    short_name: 'Randevum',
+    name: 'Planera',
+    short_name: 'Planera',
     description:
       'Vaxtını seç, rahatlığını yaşa. Bərbər, həkim, müəllim və digər xidmətlərə onlayn randevu.',
     lang: 'az',
