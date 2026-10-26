@@ -5,11 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -57,23 +54,10 @@ public class User extends BaseEntity {
 
     /** Largest offset first; empty when the user turned reminders off. */
     public List<Integer> getReminderOffsets() {
-        if (reminderOffsets == null || reminderOffsets.isBlank()) {
-            return List.of();
-        }
-        return Arrays.stream(reminderOffsets.split(","))
-                .map(String::strip)
-                .filter(s -> !s.isEmpty())
-                .map(Integer::valueOf)
-                .distinct()
-                .sorted(Comparator.reverseOrder())
-                .toList();
+        return Offsets.parse(reminderOffsets);
     }
 
     public void setReminderOffsets(Collection<Integer> offsets) {
-        this.reminderOffsets = offsets.stream()
-                .distinct()
-                .sorted(Comparator.reverseOrder())
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+        this.reminderOffsets = Offsets.join(offsets);
     }
 }

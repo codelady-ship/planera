@@ -45,6 +45,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             order by a.startsAt desc""")
     List<Appointment> findCancelled(Long customerId);
 
+    /** A customer's appointments in [from, to) that were not cancelled, for the agenda (#59). */
+    @Query("""
+            select a from Appointment a join fetch a.provider join fetch a.service
+            where a.customer.id = :customerId
+              and a.status <> az.randevum.domain.AppointmentStatus.CANCELLED
+              and a.startsAt >= :from and a.startsAt < :to
+            order by a.startsAt""")
+    List<Appointment> findForCustomerInRange(Long customerId, Instant from, Instant to);
+
     /** A provider's appointments in [from, to), every status, for the provider panel (#26). */
     @Query("""
             select a from Appointment a join fetch a.customer join fetch a.service join fetch a.provider

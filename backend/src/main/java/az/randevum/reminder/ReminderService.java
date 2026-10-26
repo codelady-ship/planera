@@ -4,6 +4,7 @@ import az.randevum.appointment.AppointmentChanged;
 import az.randevum.config.TimeConfig;
 import az.randevum.domain.Appointment;
 import az.randevum.domain.AppointmentRepository;
+import az.randevum.domain.PersonalReminder;
 import az.randevum.domain.Reminder;
 import az.randevum.domain.ReminderRepository;
 import az.randevum.push.PushMessage;
@@ -35,6 +36,7 @@ public class ReminderService {
     public static final List<Integer> ALLOWED_OFFSETS = List.of(1440, 60, 15, 0);
     static final int BATCH = 100;
     static final String TITLE = "Randevu xatırlatması";
+    static final String NOTE_TITLE = "Qeyd xatırlatması";
 
     private static final Logger log = LoggerFactory.getLogger(ReminderService.class);
     private static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
@@ -77,6 +79,22 @@ public class ReminderService {
         }
     }
 
+    /** Re-plans a personal note (#59): future offsets while it is active, nothing otherwise. */
+    @Transactional
+    public void planPersonal(PersonalReminder note) {
+        reminders.deleteByPersonalReminderId(note.getId());
+        if (note.getStatus() != PersonalReminder.Status.ACTIVE) {
+            return;
+        }
+        Instant now = clock.instant();
+        for (int offset : note.getReminderOffsets()) {
+            Instant due = note.getStartsAt().minus(Duration.ofMinutes(offset));
+            if (due.isAfter(now)) {
+                reminders.save(new Reminder(note, offset, due));
+            }
+        }
+    }
+
     /** Sends every due reminder once; returns how many were sent to a customer. */
     @Transactional
     public int sendDue() {
@@ -84,7 +102,8 @@ public class ReminderService {
         int sent = 0;
         for (Reminder reminder : reminders.lockDue(now, BATCH)) {
             Appointment a = reminder.getAppointment();
-            if (a.getStatus().isActive()) {
+            PersonalReminder note = reminder.getPersonalReminder();
+            if (a != null && a.getStatus().isActive()) {
                 PushMessage message = new PushMessage(
                         TITLE,
                         body(a.getStartsAt(), a.getProvider().getDisplayName(), reminder.getOffsetMinutes(), clock),
@@ -92,6 +111,12 @@ public class ReminderService {
                         "appointment-" + a.getId());
                 int delivered = push.sendToUser(a.getCustomer().getId(), message);
                 log.info("Reminder {} for appointment {} sent to {} device(s)", reminder.getId(), a.getId(), delivered);
+                sent++;
+            } else if (note != null && note.getStatus() == PersonalReminder.Status.ACTIVE) {
+                PushMessage message = new PushMessage(
+                        NOTE_TITLE, noteBody(note.getStartsAt(), note.getTitle(), clock), "/account", "note-" + note.getId());
+                int delivered = push.sendToUser(note.getUser().getId(), message);
+                log.info("Reminder {} for note {} sent to {} device(s)", reminder.getId(), note.getId(), delivered);
                 sent++;
             }
             reminder.markSent(now);
@@ -101,6 +126,17 @@ public class ReminderService {
 
     /** "Bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var"; at the start itself: "başlayır". */
     static String body(Instant startsAt, String providerName, int offsetMinutes, Clock clock) {
+        String verb = offsetMinutes == 0 ? "başlayır" : "var";
+        return when(startsAt, clock) + " " + providerName + " ilə randevunuz " + verb;
+    }
+
+    /** "Bu gün saat 15:00-da qeydiniz var: həkimə getmək" (#59, #62). */
+    static String noteBody(Instant startsAt, String title, Clock clock) {
+        return when(startsAt, clock) + " qeydiniz var: " + title;
+    }
+
+    /** "Bu gün saat 15:00-da", "Sabah saat 09:30-da" or "30 oktyabr saat 18:00-da", in Baku time. */
+    static String when(Instant startsAt, Clock clock) {
         ZonedDateTime start = startsAt.atZone(TimeConfig.BAKU);
         LocalDate today = LocalDate.now(clock.withZone(TimeConfig.BAKU));
         LocalDate day = start.toLocalDate();
@@ -109,7 +145,6 @@ public class ReminderService {
                 : day.equals(today.plusDays(1))
                         ? "Sabah"
                         : day.getDayOfMonth() + " " + MONTHS[day.getMonthValue() - 1];
-        String verb = offsetMinutes == 0 ? "başlayır" : "var";
-        return when + " saat " + HH_MM.format(start) + "-da " + providerName + " ilə randevunuz " + verb;
+        return when + " saat " + HH_MM.format(start) + "-da";
     }
 }
