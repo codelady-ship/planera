@@ -34,6 +34,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { logout, useSession } from '@/features/auth/use-session'
 import { BrandMark } from '@/features/home/site-header'
 import type { UserRole } from '@/lib/api/types'
+import { ThemeToggle } from '@/features/theme/theme-toggle'
 
 interface NavItem {
   href: string
@@ -118,6 +119,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
             <span className="text-sm text-muted-foreground">
               {ROLE_LABEL[user.role]} paneli
             </span>
+            <ThemeToggle className="ml-auto" />
           </header>
           <main className="mx-auto w-full max-w-6xl flex-1 p-4 md:p-6">
             {children}

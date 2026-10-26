@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { UserMenu } from '@/features/auth/user-menu'
+import { ThemeChoice, ThemeToggle } from '@/features/theme/theme-toggle'
 
 const NAV = [
   { href: '/search', label: 'Xidmətlər' },
@@ -53,7 +54,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-1 md:flex">
+          <ThemeToggle />
           <UserMenu />
         </div>
 
@@ -85,6 +87,7 @@ export function SiteHeader() {
                 </Link>
               ))}
               <UserMenu stacked />
+              <ThemeChoice className="mt-2" />
             </nav>
           </SheetContent>
         </Sheet>
