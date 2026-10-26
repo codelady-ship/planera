@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { listenForDeepLinks } from '@/features/mobile/deep-links'
 import { listenForAlarmTaps } from '@/features/mobile/native-alarms'
 import { speak } from './speech'
 
@@ -24,13 +25,16 @@ export function AlarmReader() {
     router.replace(rest.size > 0 ? `${pathname}?${rest}` : pathname)
   }, [say, params, pathname, router])
 
-  // In the native app a tapped local alarm arrives here instead of via the URL (#65).
+  // In the native app a tapped local alarm (#65) or a deep link (#66) arrives here.
   useEffect(() => {
-    let dispose: (() => void) | undefined
-    void listenForAlarmTaps((url) => router.push(url)).then((off) => {
-      dispose = off
-    })
-    return () => dispose?.()
+    const disposers: (() => void)[] = []
+    void listenForAlarmTaps((url) => router.push(url)).then((off) =>
+      disposers.push(off),
+    )
+    void listenForDeepLinks((path) => router.push(path)).then((off) =>
+      disposers.push(off),
+    )
+    return () => disposers.forEach((off) => off())
   }, [router])
 
   return null

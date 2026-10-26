@@ -55,10 +55,13 @@ export const NOTE_REMINDER_OPTIONS = [
  */
 export function NoteWizard({
   initial,
+  initialTitle,
   onClose,
   onSaved,
 }: {
   initial?: PersonalNote
+  /** Text dictated to Siri or the Assistant (#66); the date and time are still chosen here. */
+  initialTitle?: string
   onClose: () => void
   onSaved: (note: PersonalNote) => void
 }) {
@@ -66,7 +69,7 @@ export function NoteWizard({
   const [step, setStep] = useState(0)
   const [date, setDate] = useState<string | null>(initial?.date ?? null)
   const [time, setTime] = useState<string | null>(initial?.time ?? null)
-  const [title, setTitle] = useState(initial?.title ?? '')
+  const [title, setTitle] = useState(initial?.title ?? initialTitle ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
   const [offsets, setOffsets] = useState<number[]>(
     initial?.reminderOffsets ?? [0],

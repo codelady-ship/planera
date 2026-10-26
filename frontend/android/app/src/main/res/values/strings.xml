@@ -4,4 +4,6 @@
     <string name="title_activity_main">Randevum</string>
     <string name="package_name">az.randevum.app</string>
     <string name="custom_url_scheme">az.randevum.app</string>
+    <string name="shortcut_new_note_short">Yeni qeyd</string>
+    <string name="shortcut_new_note_long">Randevum-a qeyd et</string>
 </resources>

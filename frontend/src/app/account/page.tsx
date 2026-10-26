@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { AccountView } from '@/features/account/account-view'
 import { AlarmReader } from '@/features/diary/alarm-reader'
 import { SiteFooter } from '@/features/home/site-footer'
@@ -16,7 +17,10 @@ export default function AccountPage() {
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
-        <AccountView />
+        {/* useSearchParams inside: rendered on the client past this boundary. */}
+        <Suspense fallback={<Skeleton className="h-64 rounded-xl" />}>
+          <AccountView />
+        </Suspense>
         <Suspense>
           <AlarmReader />
         </Suspense>

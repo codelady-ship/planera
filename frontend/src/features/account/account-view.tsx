@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { CalendarX, LoaderCircle } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -32,7 +32,13 @@ const SCOPES = [
 
 /** Personal account (#32): appointments by scope and profile details. */
 export function AccountView() {
-  const [tab, setTab] = useState<string>('upcoming')
+  // ?tab=agenda&new=1&text=... comes from a deep link or shortcut (#66).
+  const params = useSearchParams()
+  const [tab, setTab] = useState<string>(() =>
+    params.get('tab') === 'agenda' ? 'agenda' : 'upcoming',
+  )
+  const openNew = params.get('new') === '1'
+  const initialText = params.get('text') ?? undefined
   const { user } = useSession()
 
   return (
@@ -53,7 +59,9 @@ export function AccountView() {
           <TabsTrigger value="notifications">Bildirişlər</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda" className="pt-4">
-          {tab === 'agenda' && <AgendaView />}
+          {tab === 'agenda' && (
+            <AgendaView openNew={openNew} initialText={initialText} />
+          )}
         </TabsContent>
         {SCOPES.map((s) => (
           <TabsContent key={s.value} value={s.value} className="pt-4">
