@@ -103,7 +103,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
             Rəylər
           </h2>
           <ProviderReviews
-            reviews={provider.reviews}
+            reviews={provider.reviews ?? []}
             reviewCount={summary.reviewCount}
           />
         </section>
