@@ -1,5 +1,7 @@
-import { CalendarDays, MapPin, Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { CalendarDays, MapPin, NotebookPen, Search } from 'lucide-react'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 
 const CITIES = ['Bakı', 'Sumqayıt', 'Gəncə', 'Lənkəran', 'Şəki']
@@ -21,6 +23,31 @@ export function HeroSearch() {
           Bərbər, həkim, müəllim və konsultantların real vaxtda boş saatlarını
           görün. Zəng və yazışma lazım deyil.
         </p>
+        <p className="mt-2 text-sm font-medium text-primary">
+          Randevu, qeyd, canlı bildiriş: bir yerdə.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href="/search"
+            className={cn(
+              buttonVariants({ size: 'lg' }),
+              'h-11 bg-cta px-6 text-base text-cta-foreground hover:bg-cta/90',
+            )}
+          >
+            <CalendarDays aria-hidden />
+            Randevu et
+          </Link>
+          <Link
+            href="/account?tab=agenda&new=1"
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'lg' }),
+              'h-11 px-6 text-base',
+            )}
+          >
+            <NotebookPen aria-hidden />
+            Qeyd yaz
+          </Link>
+        </div>
       </div>
 
       <form

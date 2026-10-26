@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { CategoryGrid } from '@/features/home/category-grid'
 import { HeroSearch } from '@/features/home/hero-search'
 import { HowItWorks } from '@/features/home/how-it-works'
+import { LiveReminders } from '@/features/home/live-reminders'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
 import { TopProviders } from '@/features/home/top-providers'
@@ -35,6 +36,7 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <HeroSearch />
+        <LiveReminders />
         <Suspense fallback={<SectionSkeleton />}>
           <Categories />
         </Suspense>
