@@ -199,7 +199,7 @@ class PersonalReminderIntegrationTest {
         assertThat(reminderService.sendDue()).isZero();
         assertThat(SENT).hasSize(1);
         assertThat(SENT.getFirst().title()).isEqualTo("Qeyd xatırlatması");
-        assertThat(SENT.getFirst().body()).isEqualTo("Bu gün saat 15:00-da qeydiniz var: Həkimə getmək");
+        assertThat(SENT.getFirst().body()).isEqualTo("Sizin bu gün saat 15:00-da qeydiniz var: Həkimə getmək");
         assertThat(SENT.getFirst().tag()).isEqualTo("note-" + view.id());
     }
 

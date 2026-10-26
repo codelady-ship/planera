@@ -107,10 +107,14 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = new URL(
+  const target = new URL(
     (event.notification.data && event.notification.data.url) || '/',
     self.location.origin,
-  ).href
+  )
+  // The page reads the sentence aloud (#62).
+  if (event.notification.body)
+    target.searchParams.set('say', event.notification.body)
+  const url = target.href
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })

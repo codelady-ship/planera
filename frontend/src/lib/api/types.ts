@@ -170,3 +170,31 @@ export interface PushDelivery {
 export interface NotificationSettings {
   reminderOffsets: number[]
 }
+
+export type NoteSource = 'MANUAL' | 'VOICE'
+export type NoteStatus = 'ACTIVE' | 'DONE' | 'CANCELLED'
+
+/** A personal note with an alarm (#59); date and time are Baku local. */
+export interface PersonalNote {
+  id: number
+  title: string
+  note: string | null
+  date: string
+  time: string
+  startsAt: string
+  reminderOffsets: number[]
+  source: NoteSource
+  status: NoteStatus
+}
+
+/** One line of the diary: an appointment or a note, by time (#59). */
+export interface AgendaItem {
+  type: 'APPOINTMENT' | 'NOTE'
+  id: number
+  startsAt: string
+  date: string
+  time: string
+  title: string
+  subtitle: string | null
+  status: AppointmentStatus | NoteStatus
+}
