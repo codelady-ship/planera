@@ -1,4 +1,4 @@
-# Randevum
+# Planera
 
 **Canlı sayt:** https://randevum-seven.vercel.app
 
