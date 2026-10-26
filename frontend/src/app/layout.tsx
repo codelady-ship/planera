@@ -1,6 +1,9 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { Suspense } from 'react'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import { InstallBanner } from '@/features/pwa/install-banner'
+import { ServiceWorkerRegistration } from '@/features/pwa/service-worker'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -20,6 +23,18 @@ export const metadata: Metadata = {
   applicationName: 'Randevum',
   description:
     'Bərbər, həkim, müəllim və digər xidmətlər üçün boş saatı seçin və randevunu bir neçə kliklə götürün.',
+  appleWebApp: {
+    capable: true,
+    title: 'Randevum',
+    statusBarStyle: 'default',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#072968',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
@@ -28,7 +43,14 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       lang="az"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        {/* usePathname() inside: streamed so the shell still prerenders. */}
+        <Suspense>
+          <InstallBanner />
+        </Suspense>
+        <ServiceWorkerRegistration />
+      </body>
     </html>
   )
 }
