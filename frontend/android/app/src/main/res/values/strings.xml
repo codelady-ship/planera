@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Randevum</string>
+    <string name="title_activity_main">Randevum</string>
+    <string name="package_name">az.randevum.app</string>
+    <string name="custom_url_scheme">az.randevum.app</string>
+</resources>
