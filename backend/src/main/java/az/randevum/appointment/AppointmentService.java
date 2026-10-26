@@ -32,6 +32,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
@@ -71,6 +72,7 @@ public class AppointmentService {
     private final TransactionTemplate tx;
     private final TransactionTemplate readOnly;
     private final Clock clock;
+    private final ApplicationEventPublisher events;
 
     public AppointmentService(
             AppointmentRepository appointments,
@@ -81,7 +83,9 @@ public class AppointmentService {
             RedisLock locks,
             RateLimiter limiter,
             PlatformTransactionManager transactions,
-            Clock clock) {
+            Clock clock,
+            ApplicationEventPublisher events) {
+        this.events = events;
         this.appointments = appointments;
         this.services = services;
         this.users = users;
@@ -118,11 +122,18 @@ public class AppointmentService {
                         code(), s.getProvider(), users.getReferenceById(customer.getId()), s,
                         startsAt, startsAt.plus(Duration.ofMinutes(s.getDurationMinutes())));
                 a.setCustomerNote(request.note());
-                return view(appointments.saveAndFlush(a));
+                return view(changed(a));
             });
             cache.evictDay(providerId, request.date());
             return view;
         }
+    }
+
+    /** Saves and tells listeners in the same transaction that the appointment changed (reminders, #56). */
+    private Appointment changed(Appointment a) {
+        Appointment saved = appointments.saveAndFlush(a);
+        events.publishEvent(new AppointmentChanged(saved.getId()));
+        return saved;
     }
 
     public AppointmentView get(Actor actor, Long id) {
@@ -147,7 +158,7 @@ public class AppointmentService {
             Appointment a = owned(actor, id);
             requireChangeable(actor, a);
             a.cancel(clock.instant(), reason);
-            return view(appointments.saveAndFlush(a));
+            return view(changed(a));
         });
         cache.evictDay(providerId(id), view.date());
         return view;
@@ -167,7 +178,7 @@ public class AppointmentService {
             Appointment a = appointments.findById(id).orElseThrow();
             Instant startsAt = instant(date, time);
             a.reschedule(startsAt, startsAt.plus(Duration.ofMinutes(a.getService().getDurationMinutes())));
-            return view(appointments.saveAndFlush(a));
+            return view(changed(a));
         });
         Long providerId = providerId(id);
         cache.evictDay(providerId, before.date());
@@ -198,7 +209,7 @@ public class AppointmentService {
             } else {
                 a.setStatus(next);
             }
-            return view(appointments.saveAndFlush(a));
+            return view(changed(a));
         });
         cache.evictDay(providerId(id), view.date());
         return view;
