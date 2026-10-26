@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/features/account/status-badge'
+import { syncNativeAlarms } from '@/features/mobile/native-alarms'
 import { api } from '@/lib/api/client'
 import type {
   AgendaItem,
@@ -289,6 +290,8 @@ function groupByDay(items: AgendaItem[]): [string, AgendaItem[]][] {
 function useAlarms(items: AgendaItem[] | null) {
   useEffect(() => {
     if (!items) return
+    // In the Android / iOS app the same items become exact local alarms (#65).
+    void syncNativeAlarms(items)
     const now = Date.now()
     const today = todayInBaku()
     const timers = items

@@ -22,6 +22,12 @@ import {
   type PushStatus,
 } from '@/features/pwa/push'
 import { VoiceSettings } from '@/features/diary/voice-settings'
+import {
+  checkNativePermission,
+  isNativeApp,
+  requestNativePermission,
+  sendNativeTest,
+} from '@/features/mobile/native-alarms'
 import { api } from '@/lib/api/client'
 import type { NotificationSettings as Settings } from '@/lib/api/types'
 
@@ -37,12 +43,22 @@ export const REMINDER_OPTIONS = [
 export function NotificationSettings() {
   const [status, setStatus] = useState<PushStatus | 'loading'>('loading')
   const [homeScreen, setHomeScreen] = useState(false)
+  const [native, setNative] = useState(false)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
-    getPushStatus().then((s) => {
+    // The Android / iOS app uses local alarms instead of Web Push (#65).
+    const load = isNativeApp()
+      ? checkNativePermission().then((p) => {
+          if (active) setNative(true)
+          return (
+            p === 'granted' ? 'on' : p === 'denied' ? 'denied' : 'off'
+          ) as PushStatus
+        })
+      : getPushStatus()
+    load.then((s) => {
       if (!active) return
       setStatus(s)
       setHomeScreen(needsHomeScreen())
@@ -66,6 +82,13 @@ export function NotificationSettings() {
 
   const enable = () =>
     run(async () => {
+      if (native) {
+        const permission = await requestNativePermission()
+        setStatus(permission === 'granted' ? 'on' : 'denied')
+        return permission === 'granted'
+          ? 'Alarm bildirişləri bu cihazda açıldı.'
+          : 'İcazə verilmədi. Telefonun ayarlarından Randevum üçün bildirişlərə icazə verin.'
+      }
       const next = await enablePush()
       setStatus(next)
       return next === 'on'
@@ -83,6 +106,10 @@ export function NotificationSettings() {
 
   const sendTest = () =>
     run(async () => {
+      if (native) {
+        await sendNativeTest()
+        return 'Test alarmı 3 saniyəyə gələcək.'
+      }
       const delivered = await sendTestPush()
       return delivered > 0
         ? 'Test bildirişi göndərildi.'
@@ -143,10 +170,12 @@ export function NotificationSettings() {
                   <Send aria-hidden />
                   Test bildirişi göndər
                 </Button>
-                <Button variant="ghost" onClick={disable} disabled={busy}>
-                  <BellOff aria-hidden />
-                  Bağla
-                </Button>
+                {!native && (
+                  <Button variant="ghost" onClick={disable} disabled={busy}>
+                    <BellOff aria-hidden />
+                    Bağla
+                  </Button>
+                )}
               </>
             )}
           </div>

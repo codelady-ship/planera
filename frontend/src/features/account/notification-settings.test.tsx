@@ -11,9 +11,16 @@ const push = vi.hoisted(() => ({
 }))
 
 const client = vi.hoisted(() => ({ api: vi.fn() }))
+const native = vi.hoisted(() => ({
+  isNativeApp: vi.fn().mockReturnValue(false),
+  checkNativePermission: vi.fn(),
+  requestNativePermission: vi.fn(),
+  sendNativeTest: vi.fn(),
+}))
 
 vi.mock('@/features/pwa/push', () => push)
 vi.mock('@/lib/api/client', () => client)
+vi.mock('@/features/mobile/native-alarms', () => native)
 
 describe('NotificationSettings', () => {
   beforeEach(() => {
@@ -52,6 +59,26 @@ describe('NotificationSettings', () => {
     expect(
       (await screen.findAllByRole('status')).map((s) => s.textContent),
     ).toContain('Test bildirişi göndərildi.')
+  })
+
+  test('in the native app the button asks for local alarm permission', async () => {
+    native.isNativeApp.mockReturnValue(true)
+    native.checkNativePermission.mockResolvedValue('prompt')
+    native.requestNativePermission.mockResolvedValue('granted')
+    render(<NotificationSettings />)
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Bildirişləri aç' }),
+    )
+    expect(native.requestNativePermission).toHaveBeenCalledOnce()
+    expect(push.enablePush).not.toHaveBeenCalled()
+    expect(
+      (await screen.findAllByRole('status')).map((s) => s.textContent),
+    ).toContain('Alarm bildirişləri bu cihazda açıldı.')
+    expect(
+      screen.queryByRole('button', { name: 'Bağla' }),
+    ).not.toBeInTheDocument()
+    native.isNativeApp.mockReturnValue(false)
   })
 
   test('explains the home screen step on an iPhone browser', async () => {

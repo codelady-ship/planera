@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { listenForAlarmTaps } from '@/features/mobile/native-alarms'
 import { speak } from './speech'
 
 /**
@@ -22,6 +23,15 @@ export function AlarmReader() {
     rest.delete('say')
     router.replace(rest.size > 0 ? `${pathname}?${rest}` : pathname)
   }, [say, params, pathname, router])
+
+  // In the native app a tapped local alarm arrives here instead of via the URL (#65).
+  useEffect(() => {
+    let dispose: (() => void) | undefined
+    void listenForAlarmTaps((url) => router.push(url)).then((off) => {
+      dispose = off
+    })
+    return () => dispose?.()
+  }, [router])
 
   return null
 }
