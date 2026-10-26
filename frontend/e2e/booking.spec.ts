@@ -12,13 +12,17 @@ test('a customer books and cancels an appointment', async ({ page }) => {
   await page.goto('/book/elvin-barber')
   await page.getByRole('button', { name: /Saç kəsimi/ }).click()
 
-  // The first free day; the next month when this one is already full.
-  const freeDay = page.locator('[role=grid] button:enabled').first()
+  // The second free day, never today: a slot a few minutes away falls inside
+  // the provider's cancellation window and the card has no "Ləğv et" then.
+  // The next month when this one has fewer than two free days left.
+  const freeDays = page.locator('[role=grid] button:enabled')
   await expect(page.locator('[role=grid]')).toBeVisible()
-  if ((await freeDay.count()) === 0) {
+  if ((await freeDays.count()) < 2) {
     await page.getByRole('button', { name: 'Növbəti ay' }).click()
+    await freeDays.first().click()
+  } else {
+    await freeDays.nth(1).click()
   }
-  await freeDay.click()
 
   const slot = page.getByRole('button', { name: /^\d{2}:\d{2}$/ }).first()
   const time = (await slot.textContent())!.trim()
