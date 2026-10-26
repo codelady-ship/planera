@@ -55,6 +55,20 @@ class PushServiceTest {
     }
 
     @Test
+    void aNewDeviceBeyondTheQuotaIsRefused() {
+        given(users.findByEmailIgnoreCase("musteri@randevum.az")).willReturn(Optional.of(user));
+        given(subscriptions.findByEndpoint(any())).willReturn(Optional.empty());
+        given(subscriptions.findByUserIdOrderByCreatedAtAsc(any()))
+                .willReturn(java.util.Collections.nCopies(PushService.MAX_DEVICES, phone));
+
+        assertThatThrownBy(() -> service.subscribe("musteri@randevum.az",
+                        new az.randevum.push.PushDtos.SubscribeRequest(
+                                "https://push.example/new", new az.randevum.push.PushDtos.Keys("p", "a"), null)))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("cihaz");
+    }
+
+    @Test
     void testMessageNeedsAtLeastOneDevice() {
         given(users.findByEmailIgnoreCase("musteri@randevum.az")).willReturn(Optional.of(user));
         given(subscriptions.findByUserIdOrderByCreatedAtAsc(any())).willReturn(List.of());

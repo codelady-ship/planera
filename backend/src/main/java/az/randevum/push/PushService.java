@@ -24,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PushService {
 
+    /** Devices per account (#81): enough for phones and laptops, not for abuse. */
+    static final int MAX_DEVICES = 20;
+
     private static final Logger log = LoggerFactory.getLogger(PushService.class);
 
     private final PushSubscriptionRepository subscriptions;
@@ -53,6 +56,10 @@ public class PushService {
     /** The same endpoint subscribed again (new keys or another account) updates the row. */
     public SubscriptionView subscribe(String email, SubscribeRequest request) {
         User user = user(email);
+        if (subscriptions.findByEndpoint(request.endpoint()).isEmpty()
+                && subscriptions.findByUserIdOrderByCreatedAtAsc(user.getId()).size() >= MAX_DEVICES) {
+            throw new BusinessRuleException("Bir hesabda ən çox " + MAX_DEVICES + " cihaz ola bilər");
+        }
         PushSubscription subscription = subscriptions
                 .findByEndpoint(request.endpoint())
                 .map(existing -> {
