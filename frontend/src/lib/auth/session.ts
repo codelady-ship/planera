@@ -1,5 +1,5 @@
 import 'server-only'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { apiUrl } from '@/lib/api/server'
 import type { TokenResponse } from '@/lib/api/types'
 
@@ -78,11 +78,17 @@ export async function fetchAsUser(
     )
   }
   const store = await cookies()
+  // The API limits anonymous calls per address (#81); pass the browser's on.
+  const incoming = await headers()
+  const clientIp =
+    incoming.get('x-forwarded-for')?.split(',')[0].trim() ??
+    incoming.get('x-real-ip')
   const send = (token: string | null | undefined) => {
-    const headers = new Headers(init.headers)
-    headers.set('Accept', 'application/json')
-    if (token) headers.set('Authorization', `Bearer ${token}`)
-    return fetch(url, { ...init, headers, cache: 'no-store' })
+    const outgoing = new Headers(init.headers)
+    outgoing.set('Accept', 'application/json')
+    if (token) outgoing.set('Authorization', `Bearer ${token}`)
+    if (clientIp) outgoing.set('X-Forwarded-For', clientIp)
+    return fetch(url, { ...init, headers: outgoing, cache: 'no-store' })
   }
 
   let token = store.get(ACCESS_COOKIE)?.value ?? (await refresh(store))

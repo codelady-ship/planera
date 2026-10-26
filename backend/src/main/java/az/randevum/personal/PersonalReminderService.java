@@ -2,6 +2,7 @@ package az.randevum.personal;
 
 import az.randevum.common.BusinessRuleException;
 import az.randevum.common.NotFoundException;
+import az.randevum.common.TooManyRequestsException;
 import az.randevum.config.TimeConfig;
 import az.randevum.domain.Appointment;
 import az.randevum.domain.AppointmentRepository;
@@ -13,8 +14,10 @@ import az.randevum.personal.PersonalReminderDtos.AgendaItem;
 import az.randevum.personal.PersonalReminderDtos.CreateRequest;
 import az.randevum.personal.PersonalReminderDtos.ReminderView;
 import az.randevum.personal.PersonalReminderDtos.UpdateRequest;
+import az.randevum.redis.RateLimiter;
 import az.randevum.reminder.ReminderService;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -43,10 +46,14 @@ public class PersonalReminderService {
 
     private static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
 
+    /** Notes a user may create per day (#81). */
+    static final int NOTES_PER_DAY = 50;
+
     private final PersonalReminderRepository notes;
     private final AppointmentRepository appointments;
     private final UserRepository users;
     private final ReminderService reminders;
+    private final RateLimiter limiter;
     private final Clock clock;
 
     public PersonalReminderService(
@@ -54,15 +61,20 @@ public class PersonalReminderService {
             AppointmentRepository appointments,
             UserRepository users,
             ReminderService reminders,
+            RateLimiter limiter,
             Clock clock) {
         this.notes = notes;
         this.appointments = appointments;
         this.users = users;
         this.reminders = reminders;
+        this.limiter = limiter;
         this.clock = clock;
     }
 
     public ReminderView create(String email, CreateRequest request) {
+        if (!limiter.allow("notes:day:" + email.toLowerCase() + ":" + LocalDate.now(clock), NOTES_PER_DAY, Duration.ofDays(1))) {
+            throw new TooManyRequestsException("Gündəlik qeyd limiti dolub.", Duration.ofHours(1));
+        }
         Instant startsAt = instant(request.date(), request.time());
         if (!startsAt.isAfter(clock.instant())) {
             throw new BusinessRuleException("Keçmiş vaxta qeyd yazmaq olmaz");

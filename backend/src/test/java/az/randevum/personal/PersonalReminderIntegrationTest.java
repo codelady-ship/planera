@@ -29,6 +29,8 @@ import az.randevum.push.PushMessage;
 import az.randevum.push.PushSender;
 import az.randevum.push.PushService;
 import az.randevum.push.VapidKeys;
+import az.randevum.redis.RateLimiter;
+import az.randevum.redis.RedisSupport;
 import az.randevum.reminder.ReminderService;
 import java.time.Clock;
 import java.time.Duration;
@@ -69,6 +71,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
     ReminderService.class,
     PushService.class,
     VapidKeys.class,
+    RateLimiter.class,
+    RedisSupport.class,
     PersonalReminderIntegrationTest.Beans.class
 })
 @ActiveProfiles("dev")
