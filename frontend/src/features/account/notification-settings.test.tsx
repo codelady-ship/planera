@@ -10,10 +10,17 @@ const push = vi.hoisted(() => ({
   needsHomeScreen: vi.fn().mockReturnValue(false),
 }))
 
+const client = vi.hoisted(() => ({ api: vi.fn() }))
+
 vi.mock('@/features/pwa/push', () => push)
+vi.mock('@/lib/api/client', () => client)
 
 describe('NotificationSettings', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    push.needsHomeScreen.mockReturnValue(false)
+    client.api.mockResolvedValue({ reminderOffsets: [60, 15, 0] })
+  })
 
   test('offers to turn notifications on and reports success', async () => {
     push.getPushStatus.mockResolvedValue('off')
@@ -26,9 +33,9 @@ describe('NotificationSettings', () => {
     fireEvent.click(button)
 
     expect(push.enablePush).toHaveBeenCalledOnce()
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Bildirişlər bu cihazda açıldı.',
-    )
+    expect(
+      (await screen.findAllByRole('status')).map((s) => s.textContent),
+    ).toContain('Bildirişlər bu cihazda açıldı.')
     expect(
       screen.getByRole('button', { name: 'Test bildirişi göndər' }),
     ).toBeInTheDocument()
@@ -42,9 +49,9 @@ describe('NotificationSettings', () => {
     fireEvent.click(
       await screen.findByRole('button', { name: 'Test bildirişi göndər' }),
     )
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Test bildirişi göndərildi.',
-    )
+    expect(
+      (await screen.findAllByRole('status')).map((s) => s.textContent),
+    ).toContain('Test bildirişi göndərildi.')
   })
 
   test('explains the home screen step on an iPhone browser', async () => {
@@ -53,6 +60,36 @@ describe('NotificationSettings', () => {
     render(<NotificationSettings />)
 
     expect(await screen.findByText(/ana ekrana əlavə edin/)).toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Bildirişləri aç' }),
+    ).not.toBeInTheDocument()
+  })
+
+  test('loads the reminder times and saves a changed selection', async () => {
+    push.getPushStatus.mockResolvedValue('off')
+    render(<NotificationSettings />)
+
+    const day = await screen.findByRole('checkbox', { name: '1 gün əvvəl' })
+    const hour = screen.getByRole('checkbox', { name: '1 saat əvvəl' })
+    expect(day).toHaveAttribute('aria-checked', 'false')
+    expect(hour).toHaveAttribute('aria-checked', 'true')
+    const save = screen.getByRole('button', { name: 'Yadda saxla' })
+    expect(save).toBeDisabled()
+
+    fireEvent.click(day)
+    fireEvent.click(hour)
+    expect(save).toBeEnabled()
+
+    client.api.mockResolvedValueOnce({ reminderOffsets: [1440, 15, 0] })
+    fireEvent.click(save)
+
+    expect(
+      (await screen.findAllByRole('status')).map((s) => s.textContent),
+    ).toContain('Xatırlatma vaxtları yadda saxlanıldı.')
+    expect(client.api).toHaveBeenLastCalledWith('/me/notification-settings', {
+      method: 'PUT',
+      body: JSON.stringify({ reminderOffsets: [1440, 15, 0] }),
+    })
+    expect(save).toBeDisabled()
   })
 })

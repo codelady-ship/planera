@@ -8,14 +8,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
-/** A planned reminder for one appointment, {@code offsetMinutes} before its start (#56). */
+/**
+ * A planned reminder, {@code offsetMinutes} before the start of either an
+ * appointment (#56) or a personal note (#59); exactly one of the two is set.
+ */
 @Entity
 @Table(name = "reminders")
 public class Reminder extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "appointment_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "appointment_id")
     private Appointment appointment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "personal_reminder_id")
+    private PersonalReminder personalReminder;
 
     @Column(name = "offset_minutes", nullable = false)
     private int offsetMinutes;
@@ -34,7 +41,14 @@ public class Reminder extends BaseEntity {
         this.dueAt = dueAt;
     }
 
+    public Reminder(PersonalReminder personalReminder, int offsetMinutes, Instant dueAt) {
+        this.personalReminder = personalReminder;
+        this.offsetMinutes = offsetMinutes;
+        this.dueAt = dueAt;
+    }
+
     public Appointment getAppointment() { return appointment; }
+    public PersonalReminder getPersonalReminder() { return personalReminder; }
     public int getOffsetMinutes() { return offsetMinutes; }
     public Instant getDueAt() { return dueAt; }
     public Instant getSentAt() { return sentAt; }

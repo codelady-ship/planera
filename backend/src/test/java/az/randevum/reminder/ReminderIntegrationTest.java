@@ -56,6 +56,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Import({
     TestcontainersConfiguration.class,
     ReminderService.class,
+    NotificationSettingsService.class,
     PushService.class,
     VapidKeys.class,
     ReminderIntegrationTest.Beans.class
@@ -98,6 +99,7 @@ class ReminderIntegrationTest {
     }
 
     @Autowired ReminderService service;
+    @Autowired NotificationSettingsService settings;
     @Autowired ReminderRepository reminders;
     @Autowired AppointmentRepository appointments;
     @Autowired PushSubscriptionRepository subscriptions;
@@ -124,6 +126,7 @@ class ReminderIntegrationTest {
         reminders.deleteAll();
         appointments.deleteAll();
         subscriptions.deleteAll();
+        settings.update(customer.getEmail(), List.of(60, 15, 0));
     }
 
     private Appointment book(LocalTime start) {
@@ -165,6 +168,19 @@ class ReminderIntegrationTest {
         assertThat(SENT.getLast().body()).endsWith("randevunuz başlayır");
         assertThat(reminders.findByAppointmentIdOrderByOffsetMinutesDesc(a.getId()))
                 .allSatisfy(r -> assertThat(r.getSentAt()).isNotNull());
+    }
+
+    @Test
+    void changingTheSettingsReplansUpcomingAppointments() {
+        Appointment a = book(LocalTime.of(15, 0));
+        assertThat(settings.get(customer.getEmail()).reminderOffsets()).containsExactly(60, 15, 0);
+
+        // A day ahead is already in the past for today's booking; only the start remains.
+        assertThat(settings.update(customer.getEmail(), List.of(0, 1440)).reminderOffsets()).containsExactly(1440, 0);
+        assertThat(plannedOffsets(a)).containsExactly(0);
+
+        assertThat(settings.update(customer.getEmail(), List.of()).reminderOffsets()).isEmpty();
+        assertThat(plannedOffsets(a)).isEmpty();
     }
 
     @Test
