@@ -6,8 +6,8 @@ import type { CapacitorConfig } from '@capacitor/cli'
  * top. CAPACITOR_SERVER_URL points a build at a preview or local site.
  */
 const config: CapacitorConfig = {
-  appId: 'az.randevum.app',
-  appName: 'Randevum',
+  appId: 'az.planera.app',
+  appName: 'Planera',
   // Only the offline placeholder lives here; the real pages come from server.url.
   webDir: 'capacitor/www',
   server: {
@@ -25,7 +25,7 @@ const config: CapacitorConfig = {
   },
   plugins: {
     LocalNotifications: {
-      smallIcon: 'ic_stat_randevum',
+      smallIcon: 'ic_stat_planera',
       iconColor: '#072968',
     },
   },

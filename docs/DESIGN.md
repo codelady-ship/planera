@@ -5,11 +5,11 @@ qarışığı yoxdur, emoji yoxdur (ikonlar: `lucide-react`).
 
 ## Brend
 
-- Ad: **Randevum**. Şüar: **Vaxtını seç, rahatlığını yaşa.**
+- Ad: **Planera**. Şüar: **Vaxtını seç, rahatlığını yaşa.**
 - Fayllar: `docs/brand/` (mənbə və kəsilmiş variantlar), `frontend/public/brand/`.
-  - `randevum-logo.png` — wordmark + şüar (footer, sənədlər)
-  - `randevum-wordmark.png` — yalnız wordmark (header)
-  - `randevum-mark.png` — saatlı R (favicon, tətbiq ikonu, PWA)
+  - `planera-logo.png` — wordmark + şüar (footer, sənədlər)
+  - `planera-wordmark.png` — yalnız wordmark (header)
+  - `planera-mark.png` — saatlı R (favicon, tətbiq ikonu, PWA)
 - Loqodakı göy-firuzəyi qradient yalnız loqonun özündə qalır. UI elementləri
   aşağıdakı düz rənglərdən istifadə edir.
 

@@ -10,7 +10,7 @@ export default function LoginPage() {
       title="Daxil ol"
       hint={
         <p className="text-sm text-muted-foreground">
-          Demo: musteri@randevum.az, şifrə Randevum123
+          Demo: musteri@planera.az, şifrə Planera123
         </p>
       }
     />

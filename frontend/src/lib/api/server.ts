@@ -1,7 +1,7 @@
 import 'server-only'
 
 /**
- * Server-side access to the Randevum API. `API_URL` (e.g. the Render URL)
+ * Server-side access to the Planera API. `API_URL` (e.g. the Render URL)
  * is only read on the server: the browser talks to this Next.js app, which
  * forwards to the API (see app/api/backend).
  */

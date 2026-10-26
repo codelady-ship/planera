@@ -116,7 +116,7 @@ export function InstallBanner() {
           <Download className="size-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1 space-y-1">
-          <p className="font-medium">Randevum-u ana ekrana əlavə et</p>
+          <p className="font-medium">Planera-nı ana ekrana əlavə et</p>
           {platform === 'ios' ? (
             <p className="text-sm text-muted-foreground">
               Safari-də{' '}

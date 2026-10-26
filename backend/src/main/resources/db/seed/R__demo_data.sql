@@ -24,8 +24,8 @@ begin
     end if;
 
     insert into users (email, full_name, phone, role) values
-        ('admin@randevum.az',    'Randevum Admin', null, 'ADMIN'),
-        ('musteri@randevum.az',  'Aynur Qasımova', '+994501112233', 'CUSTOMER')
+        ('admin@planera.az',    'Planera Admin', null, 'ADMIN'),
+        ('musteri@planera.az',  'Aynur Qasımova', '+994501112233', 'CUSTOMER')
     on conflict (email) do nothing;
 
     for rec in
@@ -41,7 +41,7 @@ begin
         ) as t(slug, name, title, category, city, address, rating, reviews, bio)
     loop
         insert into users (email, full_name, role)
-        values (rec.slug || '@randevum.az', rec.name, 'PROVIDER')
+        values (rec.slug || '@planera.az', rec.name, 'PROVIDER')
         returning id into u_id;
 
         insert into provider_profiles (user_id, category_id, slug, display_name, title, bio, city, address, rating_avg, rating_count)
@@ -83,7 +83,7 @@ begin
     set price_from = (select min(price) from service_offerings s where s.provider_id = p.id and s.active);
 end $$;
 
--- Demo logins (#25): every demo account uses the password "Randevum123".
+-- Demo logins (#25): every demo account uses the password "Planera123".
 create extension if not exists pgcrypto;
-update users set password_hash = crypt('Randevum123', gen_salt('bf', 10))
-where password_hash is null and email like '%@randevum.az';
+update users set password_hash = crypt('Planera123', gen_salt('bf', 10))
+where password_hash is null and email like '%@planera.az';

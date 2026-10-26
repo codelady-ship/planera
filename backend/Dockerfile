@@ -10,9 +10,9 @@ RUN ./gradlew bootJar --no-daemon -x test
 # Runtime stage: JRE only, non-root user.
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-RUN useradd --system --uid 10001 randevum
+RUN useradd --system --uid 10001 planera
 COPY --from=build /app/build/libs/*.jar app.jar
-USER randevum
+USER planera
 # Size the heap from the container limit (Render free plan has 512 MB).
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+UseSerialGC"
 EXPOSE 8080

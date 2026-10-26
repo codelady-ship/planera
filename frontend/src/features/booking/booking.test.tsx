@@ -96,7 +96,7 @@ describe('BookingWizard', () => {
   it('offers the alternatives when the time was just taken', async () => {
     setSessionUser({
       id: 2,
-      email: 'musteri@randevum.az',
+      email: 'musteri@planera.az',
       fullName: 'Aynur Qasımova',
       phone: null,
       role: 'CUSTOMER',
@@ -137,7 +137,7 @@ describe('BookingWizard', () => {
   it('shows the appointment code after booking', async () => {
     setSessionUser({
       id: 2,
-      email: 'musteri@randevum.az',
+      email: 'musteri@planera.az',
       fullName: 'Aynur Qasımova',
       phone: null,
       role: 'CUSTOMER',

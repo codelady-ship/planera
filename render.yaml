@@ -33,7 +33,7 @@ services:
       - key: VAPID_PRIVATE_KEY
         sync: false
       - key: VAPID_SUBJECT
-        value: mailto:info@randevum.az
+        value: mailto:info@planera.az
       - key: REDIS_URL
         fromService:
           type: keyvalue

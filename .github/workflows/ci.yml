@@ -105,7 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build backend image
-        run: docker build -t randevum-backend ./backend
+        run: docker build -t planera-backend ./backend
 
   e2e:
     name: End-to-end (Playwright)

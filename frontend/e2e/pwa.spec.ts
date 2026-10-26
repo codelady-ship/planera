@@ -8,7 +8,7 @@ test('serves the manifest, the service worker and the offline page', async ({
   const manifest = await request.get('/manifest.webmanifest')
   expect(manifest.ok()).toBe(true)
   const json = await manifest.json()
-  expect(json.name).toBe('Randevum')
+  expect(json.name).toBe('Planera')
   expect(json.display).toBe('standalone')
   expect(
     json.icons.some((i: { purpose?: string }) => i.purpose === 'maskable'),

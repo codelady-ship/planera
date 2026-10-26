@@ -9,8 +9,8 @@
         android:shortcutLongLabel="@string/shortcut_new_note_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="randevum://reminder/new"
-            android:targetPackage="az.randevum.app"
-            android:targetClass="az.randevum.app.MainActivity" />
+            android:data="planera://reminder/new"
+            android:targetPackage="az.planera.app"
+            android:targetClass="az.planera.app.MainActivity" />
     </shortcut>
 </shortcuts>

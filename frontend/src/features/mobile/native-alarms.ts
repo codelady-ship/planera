@@ -10,7 +10,7 @@ import { formatDateLong, todayInBaku } from '@/lib/dates'
 // into local notifications that fire at the exact time, with sound, even
 // when the app is closed. The web site keeps Web Push and the in-page alarm.
 
-export const CHANNEL_ID = 'randevum-alarms'
+export const CHANNEL_ID = 'planera-alarms'
 /** Reserved id range so the app's alarms never collide with other plugins. */
 const ID_BASE = 100_000
 const HORIZON_MS = 30 * 24 * 60 * 60 * 1000
@@ -76,7 +76,7 @@ export function toNotification(
     schedule: { at: new Date(at), allowWhileIdle: true },
     channelId: CHANNEL_ID,
     sound: 'default',
-    smallIcon: 'ic_stat_randevum',
+    smallIcon: 'ic_stat_planera',
     extra: { url: '/account', say: sentence },
   }
 }
@@ -111,12 +111,12 @@ export async function sendNativeTest() {
     notifications: [
       {
         id: ID_BASE - 1,
-        title: 'Randevum',
+        title: 'Planera',
         body: sentence,
         schedule: { at: new Date(Date.now() + 3000), allowWhileIdle: true },
         channelId: CHANNEL_ID,
         sound: 'default',
-        smallIcon: 'ic_stat_randevum',
+        smallIcon: 'ic_stat_planera',
         extra: { url: '/account', say: sentence },
       },
     ],
@@ -130,7 +130,7 @@ export async function listenForAlarmTaps(open: (url: string) => void) {
     'localNotificationActionPerformed',
     ({ notification }) => {
       const extra = (notification.extra ?? {}) as { url?: string; say?: string }
-      const target = new URL(extra.url ?? '/account', 'https://randevum.app')
+      const target = new URL(extra.url ?? '/account', 'https://planera.app')
       if (extra.say) target.searchParams.set('say', extra.say)
       open(target.pathname + target.search)
     },

@@ -1,4 +1,4 @@
-# Randevum
+# Planera
 
 **Canlı sayt:** https://randevum-seven.vercel.app
 
@@ -62,8 +62,8 @@ Gecə rejimi header-dəki düymə ilə (sistem / gündüz / gecə), 360px enind�
 ## Lokal işə salma
 
 ```bash
-git clone https://github.com/codelady-ship/randevum.git
-cd randevum
+git clone https://github.com/codelady-ship/planera.git
+cd planera
 
 # Frontend (http://localhost:3000)
 cd frontend
@@ -94,19 +94,19 @@ cd frontend && npx shadcn@latest init
 
 # Backend (Spring Initializr)
 curl https://start.spring.io/starter.zip -d type=gradle-project -d language=java \
-  -d javaVersion=21 -d groupId=az.randevum -d artifactId=backend \
+  -d javaVersion=21 -d groupId=az.planera -d artifactId=backend \
   -d dependencies=web,data-jpa,postgresql,flyway,validation,security,actuator,testcontainers -o backend.zip
 ```
 
 ## Demo hesablar
 
-Bütün demo hesabların şifrəsi: `Randevum123`
+Bütün demo hesabların şifrəsi: `Planera123`
 
 | Rol | E-poçt |
 |---|---|
-| Admin | admin@randevum.az |
-| Müştəri | musteri@randevum.az |
-| Mütəxəssis | elvin-barber@randevum.az (və digər `<slug>@randevum.az`) |
+| Admin | admin@planera.az |
+| Müştəri | musteri@planera.az |
+| Mütəxəssis | elvin-barber@planera.az (və digər `<slug>@planera.az`) |
 
 ## Deploy
 
@@ -119,11 +119,11 @@ Bütün demo hesabların şifrəsi: `Randevum123`
 
 ### Backend (Render, Docker)
 
-`render.yaml` Blueprint iki servis yaradır: `randevum-api` (`backend/Dockerfile`) və `randevum-redis` (Key Value). PostgreSQL 16 bazası Neon-dadır (pulsuz, silinmir, Frankfurt).
+`render.yaml` Blueprint iki servis yaradır: `planera-api` (`backend/Dockerfile`) və `planera-redis` (Key Value). PostgreSQL 16 bazası Neon-dadır (pulsuz, silinmir, Frankfurt).
 
 1. https://render.com - GitHub ilə daxil ol.
-2. New -> Blueprint -> `codelady-ship/randevum` reposunu seç -> Apply.
-3. Render -> `randevum-api` -> Environment: Neon -> Connect bölməsindən (birbaşa bağlantı, `-pooler` olmayan host):
+2. New -> Blueprint -> `codelady-ship/planera` reposunu seç -> Apply.
+3. Render -> `planera-api` -> Environment: Neon -> Connect bölməsindən (birbaşa bağlantı, `-pooler` olmayan host):
    - `SPRING_DATASOURCE_URL` = `jdbc:postgresql://<host>/<database>?sslmode=require`
    - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
 4. Web Push üçün bir dəfə `npx web-push generate-vapid-keys` işlədin və Environment-ə `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` yazın (`VAPID_SUBJECT` `mailto:` ünvandır). Açarlar boşdursa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.

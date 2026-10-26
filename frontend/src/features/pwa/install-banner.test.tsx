@@ -48,7 +48,7 @@ describe('InstallBanner', () => {
     mockUserAgent(IPHONE)
     render(<InstallBanner />)
     expect(
-      screen.getByText('Randevum-u ana ekrana əlavə et'),
+      screen.getByText('Planera-nı ana ekrana əlavə et'),
     ).toBeInTheDocument()
     expect(screen.getByText('Ana ekrana əlavə et')).toBeInTheDocument()
     expect(

@@ -3,7 +3,7 @@
 import { mkdir } from 'node:fs/promises'
 import sharp from 'sharp'
 
-const SOURCE = 'public/brand/randevum-mark.png'
+const SOURCE = 'public/brand/planera-mark.png'
 const OUT = 'public/icons'
 const WHITE = { r: 255, g: 255, b: 255, alpha: 1 }
 

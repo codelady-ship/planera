@@ -1,7 +1,7 @@
 import { App } from '@capacitor/app'
 import { isNativeApp } from './native-alarms'
 
-// Deep links (#66): randevum://reminder/new?text=... from Siri, the
+// Deep links (#66): planera://reminder/new?text=... from Siri, the
 // launcher shortcut or Google Assistant lands in the diary with the note
 // wizard open and the text prefilled. Only the text travels; date and time
 // are always chosen by hand (#60).
@@ -14,7 +14,7 @@ export function pathForDeepLink(raw: string): string | null {
   } catch {
     return null
   }
-  if (url.protocol !== 'randevum:') return null
+  if (url.protocol !== 'planera:') return null
   const route = `${url.hostname}${url.pathname}`.replace(/\/+$/, '')
   if (route === 'reminder/new' || route === 'reminder') {
     const params = new URLSearchParams({ tab: 'agenda', new: '1' })

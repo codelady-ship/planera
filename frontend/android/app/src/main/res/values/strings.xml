@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Randevum</string>
-    <string name="title_activity_main">Randevum</string>
-    <string name="package_name">az.randevum.app</string>
-    <string name="custom_url_scheme">az.randevum.app</string>
+    <string name="app_name">Planera</string>
+    <string name="title_activity_main">Planera</string>
+    <string name="package_name">az.planera.app</string>
+    <string name="custom_url_scheme">az.planera.app</string>
     <string name="shortcut_new_note_short">Yeni qeyd</string>
-    <string name="shortcut_new_note_long">Randevum-a qeyd et</string>
+    <string name="shortcut_new_note_long">Planera-a qeyd et</string>
 </resources>

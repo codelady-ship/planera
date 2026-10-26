@@ -1,6 +1,6 @@
 spring:
   application:
-    name: randevum-api
+    name: planera-api
   datasource:
     # Production sets SPRING_DATASOURCE_URL (Neon); DB_HOST/DB_PORT/DB_NAME are local fallbacks.
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:randevum}}
@@ -28,7 +28,7 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
-randevum:
+planera:
   jwt:
     secret: ${JWT_SECRET:} # at least 32 bytes in production; empty = random key per start
   cors:
@@ -39,7 +39,7 @@ randevum:
       # Format of `npx web-push generate-vapid-keys`; empty = random pair per start (subscriptions reset).
       public-key: ${VAPID_PUBLIC_KEY:}
       private-key: ${VAPID_PRIVATE_KEY:}
-      subject: ${VAPID_SUBJECT:mailto:info@randevum.az}
+      subject: ${VAPID_SUBJECT:mailto:info@planera.az}
 
 server:
   port: ${PORT:8080}

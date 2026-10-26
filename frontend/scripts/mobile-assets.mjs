@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import sharp from 'sharp'
 
-const MARK = 'public/brand/randevum-mark.png'
+const MARK = 'public/brand/planera-mark.png'
 const WHITE = { r: 255, g: 255, b: 255, alpha: 1 }
 const NAVY = { r: 7, g: 41, b: 104, alpha: 1 }
 
@@ -69,7 +69,7 @@ async function android() {
     const drawable = `${res}/drawable-${density}`
     await mkdir(drawable, { recursive: true })
     await writeFile(
-      `${drawable}/ic_stat_randevum.png`,
+      `${drawable}/ic_stat_planera.png`,
       await statusIcon(Math.round(24 * factor)),
     )
   }

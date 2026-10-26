@@ -6,10 +6,10 @@ export function SiteFooter() {
     <footer className="border-t">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
         <Image
-          src="/brand/randevum-logo.png"
-          alt="Randevum - Vaxtını seç, rahatlığını yaşa."
-          width={1106}
-          height={272}
+          src="/brand/planera-logo.png"
+          alt="Planera - Vaxtını seç, rahatlığını yaşa."
+          width={1408}
+          height={382}
           className="h-12 w-auto"
         />
         <nav className="flex flex-wrap gap-4">
@@ -23,7 +23,7 @@ export function SiteFooter() {
             Mütəxəssis kimi qoşul
           </Link>
           <a
-            href="https://github.com/codelady-ship/randevum"
+            href="https://github.com/codelady-ship/planera"
             className="hover:text-foreground"
           >
             GitHub

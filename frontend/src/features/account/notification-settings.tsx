@@ -87,7 +87,7 @@ export function NotificationSettings() {
         setStatus(permission === 'granted' ? 'on' : 'denied')
         return permission === 'granted'
           ? 'Alarm bildirişləri bu cihazda açıldı.'
-          : 'İcazə verilmədi. Telefonun ayarlarından Randevum üçün bildirişlərə icazə verin.'
+          : 'İcazə verilmədi. Telefonun ayarlarından Planera üçün bildirişlərə icazə verin.'
       }
       const next = await enablePush()
       setStatus(next)

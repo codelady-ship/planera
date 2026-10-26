@@ -10,15 +10,15 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>az.randevum.app</string>
+			<string>az.planera.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>randevum</string>
+				<string>planera</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleDisplayName</key>
-        <string>Randevum</string>
+        <string>Planera</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
