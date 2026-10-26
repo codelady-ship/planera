@@ -26,8 +26,10 @@ class HealthControllerTest {
     @Test
     void apiDocumentationNeedsNoToken() {
         // springdoc is not part of this slice, so the paths answer 404, never 401 (#51).
-        assertThat(mvc.get().uri("/v3/api-docs")).doesNotHaveStatus(HttpStatus.UNAUTHORIZED);
-        assertThat(mvc.get().uri("/swagger-ui.html")).doesNotHaveStatus(HttpStatus.UNAUTHORIZED);
+        for (String path : new String[] {"/v3/api-docs", "/swagger-ui.html"}) {
+            assertThat(mvc.get().uri(path)).satisfies(result ->
+                    assertThat(result.getResponse().getStatus()).isNotEqualTo(HttpStatus.UNAUTHORIZED.value()));
+        }
     }
 
     @Test
