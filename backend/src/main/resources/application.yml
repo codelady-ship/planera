@@ -2,10 +2,16 @@ spring:
   application:
     name: randevum-api
   datasource:
-    # Render passes host/port/name separately (render.yaml); a full JDBC URL still wins.
+    # Production sets SPRING_DATASOURCE_URL (Neon); DB_HOST/DB_PORT/DB_NAME are local fallbacks.
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:randevum}}
     username: ${SPRING_DATASOURCE_USERNAME:randevum}
     password: ${SPRING_DATASOURCE_PASSWORD:randevum}
+    hikari:
+      # Idle connections close after two minutes, so a serverless database
+      # (Neon) can scale to zero while the API is quiet.
+      minimum-idle: 0
+      idle-timeout: 120000 # ms
+      maximum-pool-size: 5
   jpa:
     open-in-view: false
     # No hibernate.jdbc.time_zone: it shifts local time/date columns (working
