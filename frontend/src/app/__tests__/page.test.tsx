@@ -15,7 +15,8 @@ test('renders the static home page sections', async () => {
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
     /randevunu bir neçə kliklə/,
   )
-  expect(screen.getByRole('img', { name: 'Planera' })).toBeInTheDocument()
+  // Light and night wordmarks; CSS shows one of them (#93).
+  expect(screen.getAllByRole('img', { name: 'Planera' })).toHaveLength(2)
   expect(screen.getByText('Vaxtını seç, rahatlığını yaşa.')).toBeInTheDocument()
   expect(screen.getByRole('search')).toBeInTheDocument()
   expect(

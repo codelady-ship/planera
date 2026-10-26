@@ -10,7 +10,14 @@ export function SiteFooter() {
           alt="Planera - Vaxtını seç, rahatlığını yaşa."
           width={1408}
           height={382}
-          className="h-12 w-auto"
+          className="h-12 w-auto dark:hidden"
+        />
+        <Image
+          src="/brand/planera-logo-dark.png"
+          alt="Planera - Vaxtını seç, rahatlığını yaşa."
+          width={1408}
+          height={382}
+          className="hidden h-12 w-auto dark:block"
         />
         <nav className="flex flex-wrap gap-4">
           <Link href="/search" className="hover:text-foreground">
