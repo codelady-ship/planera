@@ -10,7 +10,12 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
 
     List<Reminder> findByAppointmentIdOrderByOffsetMinutesDesc(Long appointmentId);
 
-    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    /**
+     * No {@code clearAutomatically}: this runs inside the booking transaction
+     * (via the AppointmentChanged event) and clearing the persistence context
+     * there would detach the appointment the caller is still mapping.
+     */
+    @Modifying(flushAutomatically = true)
     @Query("delete from Reminder r where r.appointment.id = :appointmentId")
     int deleteByAppointmentId(Long appointmentId);
 
