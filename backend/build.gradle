@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	// Web Push (RFC 8291 encryption, RFC 8292 VAPID) with the JDK HTTP client, no transitive dependencies (#55).
 	implementation 'com.zerodeplibs:zerodep-web-push-java:2.1.5'
+	// OpenAPI document and Swagger UI, read-only in production (#51).
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'

@@ -44,6 +44,16 @@ randevum:
 server:
   port: ${PORT:8080}
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # Read-only in production (#51): no "Try it out" buttons.
+    supported-submit-methods: []
+    operations-sorter: alpha
+    tags-sorter: alpha
+
 management:
   health:
     redis:
