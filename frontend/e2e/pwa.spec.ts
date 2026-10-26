@@ -24,10 +24,10 @@ test('serves the manifest, the service worker and the offline page', async ({
     'href',
     /manifest\.webmanifest/,
   )
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute(
-    'content',
-    '#072968',
-  )
+  // One theme-color per colour scheme (#93).
+  await expect(
+    page.locator('meta[name="theme-color"][media*="light"]'),
+  ).toHaveAttribute('content', '#072968')
 
   await page.goto('/offline')
   await expect(
