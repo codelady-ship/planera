@@ -13,6 +13,7 @@ import az.randevum.provider.ProviderDtos.Interval;
 import az.randevum.provider.ProviderDtos.ProviderDetail;
 import az.randevum.provider.ProviderDtos.ProviderSummary;
 import az.randevum.provider.ProviderDtos.ServiceView;
+import az.randevum.review.ReviewService;
 import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.List;
@@ -28,12 +29,17 @@ public class ProviderService {
     private final ProviderProfileRepository providers;
     private final ServiceOfferingRepository services;
     private final AvailabilityRuleRepository rules;
+    private final ReviewService reviews;
 
     public ProviderService(
-            ProviderProfileRepository providers, ServiceOfferingRepository services, AvailabilityRuleRepository rules) {
+            ProviderProfileRepository providers,
+            ServiceOfferingRepository services,
+            AvailabilityRuleRepository rules,
+            ReviewService reviews) {
         this.providers = providers;
         this.services = services;
         this.rules = rules;
+        this.reviews = reviews;
     }
 
     public PageResponse<ProviderSummary> search(ProviderSearch search) {
@@ -50,7 +56,8 @@ public class ProviderService {
                 p.getPhone(),
                 p.getCancellationHours(),
                 activeServices(p),
-                schedule(rules.findByProviderIdOrderByDayOfWeekAscStartTimeAsc(p.getId())));
+                schedule(rules.findByProviderIdOrderByDayOfWeekAscStartTimeAsc(p.getId())),
+                reviews.latest(p.getId()));
     }
 
     public List<ServiceView> services(String slug) {

@@ -36,6 +36,7 @@ const ITEM: PanelAppointment = {
     price: 15,
     note: null,
     cancellable: true,
+    reviewable: false,
   },
   customerName: 'Aynur Qasımova',
   customerPhone: '+994501112233',

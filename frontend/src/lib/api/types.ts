@@ -76,6 +76,16 @@ export interface ProviderDetail {
   cancellationHours: number
   services: ServiceView[]
   schedule: DaySchedule[]
+  /** The newest reviews (#44); the full list is paged at /providers/{slug}/reviews. */
+  reviews: Review[]
+}
+
+export interface Review {
+  id: number
+  rating: number
+  comment: string | null
+  customerName: string
+  createdAt: string
 }
 
 export interface SlotsView {
@@ -110,6 +120,8 @@ export interface Appointment {
   price: number
   note: string | null
   cancellable: boolean
+  /** Completed and not reviewed yet (#44). */
+  reviewable: boolean
 }
 
 /** An appointment as the panel sees it, with who booked it. */

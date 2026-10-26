@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { CalendarClock, Clock, LoaderCircle, X } from 'lucide-react'
+import { CalendarClock, Clock, LoaderCircle, Star, X } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -31,6 +31,7 @@ import {
   formatPrice,
   todayInBaku,
 } from '@/lib/dates'
+import { ReviewDialog } from './review-dialog'
 import { StatusBadge } from './status-badge'
 
 /** One appointment in the account list, with cancel and reschedule (#32). */
@@ -43,6 +44,7 @@ export function AppointmentCard({
 }) {
   const [cancelOpen, setCancelOpen] = useState(false)
   const [moveOpen, setMoveOpen] = useState(false)
+  const [reviewOpen, setReviewOpen] = useState(false)
 
   return (
     <Card size="sm">
@@ -91,7 +93,23 @@ export function AppointmentCard({
             </Button>
           </div>
         )}
+        {appointment.reviewable && (
+          <div>
+            <Button variant="outline" onClick={() => setReviewOpen(true)}>
+              <Star aria-hidden />
+              Rəy yaz
+            </Button>
+          </div>
+        )}
       </CardContent>
+
+      {reviewOpen && (
+        <ReviewDialog
+          appointment={appointment}
+          onClose={() => setReviewOpen(false)}
+          onDone={onChange}
+        />
+      )}
 
       <CancelDialog
         appointment={appointment}

@@ -24,6 +24,7 @@ const PROVIDER: ProviderDetail = {
   address: null,
   phone: null,
   cancellationHours: 2,
+  reviews: [],
   services: [
     {
       id: 1,
