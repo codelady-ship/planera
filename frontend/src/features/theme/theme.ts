@@ -18,9 +18,16 @@ export function getTheme(): Theme {
   }
 }
 
+/** jsdom has no matchMedia; without it "system" means light. */
+function systemMedia(): MediaQueryList | null {
+  return typeof window.matchMedia === 'function'
+    ? window.matchMedia(DARK_QUERY)
+    : null
+}
+
 export function isDark(theme: Theme = getTheme()): boolean {
   if (theme !== 'system') return theme === 'dark'
-  return window.matchMedia(DARK_QUERY).matches
+  return systemMedia()?.matches ?? false
 }
 
 /** Puts the `.dark` class on <html> according to the theme. */
@@ -43,15 +50,15 @@ export function setTheme(theme: Theme) {
 /** For useSyncExternalStore: theme changes here and OS changes while on "system". */
 export function subscribeTheme(listener: () => void) {
   listeners.add(listener)
-  const media = window.matchMedia(DARK_QUERY)
+  const media = systemMedia()
   const onMedia = () => {
     if (getTheme() === 'system') applyTheme('system')
     listener()
   }
-  media.addEventListener('change', onMedia)
+  media?.addEventListener('change', onMedia)
   return () => {
     listeners.delete(listener)
-    media.removeEventListener('change', onMedia)
+    media?.removeEventListener('change', onMedia)
   }
 }
 
