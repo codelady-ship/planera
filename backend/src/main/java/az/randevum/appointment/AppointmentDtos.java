@@ -49,7 +49,9 @@ public final class AppointmentDtos {
             AppointmentStatus status,
             BigDecimal price,
             String note,
-            boolean cancellable) {}
+            boolean cancellable,
+            /** Completed and not reviewed yet (#44). */
+            boolean reviewable) {}
 
     /** What a provider sees: the appointment plus who booked it. */
     public record ProviderAppointmentView(AppointmentView appointment, String customerName, String customerPhone) {}

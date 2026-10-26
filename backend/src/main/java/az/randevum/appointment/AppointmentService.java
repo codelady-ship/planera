@@ -14,6 +14,7 @@ import az.randevum.domain.Appointment;
 import az.randevum.domain.AppointmentRepository;
 import az.randevum.domain.AppointmentStatus;
 import az.randevum.domain.ServiceOffering;
+import az.randevum.domain.ReviewRepository;
 import az.randevum.domain.ServiceOfferingRepository;
 import az.randevum.domain.User;
 import az.randevum.domain.UserRepository;
@@ -73,6 +74,7 @@ public class AppointmentService {
     private final TransactionTemplate readOnly;
     private final Clock clock;
     private final ApplicationEventPublisher events;
+    private final ReviewRepository reviews;
 
     public AppointmentService(
             AppointmentRepository appointments,
@@ -84,8 +86,10 @@ public class AppointmentService {
             RateLimiter limiter,
             PlatformTransactionManager transactions,
             Clock clock,
-            ApplicationEventPublisher events) {
+            ApplicationEventPublisher events,
+            ReviewRepository reviews) {
         this.events = events;
+        this.reviews = reviews;
         this.appointments = appointments;
         this.services = services;
         this.users = users;
@@ -332,6 +336,7 @@ public class AppointmentService {
                 a.getStatus(),
                 a.getPrice(),
                 a.getCustomerNote(),
-                a.getStatus().isActive() && beforeDeadline(a));
+                a.getStatus().isActive() && beforeDeadline(a),
+                a.getStatus() == AppointmentStatus.COMPLETED && !reviews.existsByAppointmentId(a.getId()));
     }
 }

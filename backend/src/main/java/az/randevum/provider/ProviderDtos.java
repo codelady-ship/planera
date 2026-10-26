@@ -1,5 +1,6 @@
 package az.randevum.provider;
 
+import az.randevum.review.ReviewDtos.ReviewView;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
@@ -37,6 +38,7 @@ public final class ProviderDtos {
     /** ISO day number (1 = Monday) with its working intervals; empty = day off. */
     public record DaySchedule(int day, List<Interval> intervals) {}
 
+    /** {@code reviews} holds the newest ones (#44); the full list is paged at /reviews. */
     public record ProviderDetail(
             ProviderSummary summary,
             String bio,
@@ -44,7 +46,8 @@ public final class ProviderDtos {
             String phone,
             int cancellationHours,
             List<ServiceView> services,
-            List<DaySchedule> schedule) {}
+            List<DaySchedule> schedule,
+            List<ReviewView> reviews) {}
 
     public record ServiceRequest(
             @NotBlank @Size(max = 120) String name,

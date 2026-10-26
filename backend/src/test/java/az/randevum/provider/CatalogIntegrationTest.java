@@ -24,7 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({TestcontainersConfiguration.class, ProviderService.class, ServiceOfferingService.class, CategoryService.class})
+@Import({TestcontainersConfiguration.class, ProviderService.class, az.randevum.review.ReviewService.class, ServiceOfferingService.class, CategoryService.class})
 @ActiveProfiles("dev")
 class CatalogIntegrationTest {
 

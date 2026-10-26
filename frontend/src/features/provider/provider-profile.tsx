@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { Clock, MapPin, MessageSquareText, Phone, Star } from 'lucide-react'
+import { Clock, MapPin, Phone, Star } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { ProviderDetail } from '@/lib/api/types'
 import { formatDuration, formatPrice } from '@/lib/dates'
+import { ProviderReviews } from './provider-reviews'
 
 const DAY_NAMES = [
   'Bazar ertəsi',
@@ -101,10 +102,10 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
           <h2 id="reviews" className="text-xl font-semibold">
             Rəylər
           </h2>
-          <div className="flex items-center gap-3 rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-            <MessageSquareText className="size-5 shrink-0" aria-hidden />
-            Rəylər randevudan sonra yazılır və tezliklə burada görünəcək.
-          </div>
+          <ProviderReviews
+            reviews={provider.reviews}
+            reviewCount={summary.reviewCount}
+          />
         </section>
       </div>
 
