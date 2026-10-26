@@ -153,3 +153,8 @@ export interface PushSubscriptionView {
 export interface PushDelivery {
   delivered: number
 }
+
+/** Reminder minutes before an appointment, largest first (#57). */
+export interface NotificationSettings {
+  reminderOffsets: number[]
+}

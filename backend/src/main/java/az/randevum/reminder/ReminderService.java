@@ -31,8 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReminderService {
 
-    /** Minutes before the start: one hour, a quarter, and at the start itself. */
-    public static final List<Integer> DEFAULT_OFFSETS = List.of(60, 15, 0);
+    /** Offsets a user may choose (#57): a day, an hour, a quarter, and the start itself. */
+    public static final List<Integer> ALLOWED_OFFSETS = List.of(1440, 60, 15, 0);
     static final int BATCH = 100;
     static final String TITLE = "Randevu xatırlatması";
 
@@ -56,7 +56,10 @@ public class ReminderService {
         this.clock = clock;
     }
 
-    /** Re-plans from scratch: an active appointment gets its future reminders, any other loses them. */
+    /**
+     * Re-plans from scratch: an active appointment gets its future reminders
+     * at the customer's chosen offsets, any other loses them.
+     */
     @EventListener
     @Transactional
     public void onAppointmentChanged(AppointmentChanged event) {
@@ -66,7 +69,7 @@ public class ReminderService {
             return;
         }
         Instant now = clock.instant();
-        for (int offset : DEFAULT_OFFSETS) {
+        for (int offset : a.getCustomer().getReminderOffsets()) {
             Instant due = a.getStartsAt().minus(Duration.ofMinutes(offset));
             if (due.isAfter(now)) {
                 reminders.save(new Reminder(a, offset, due));
