@@ -1,0 +1,88 @@
+# Native shells (#64): a debug APK on Linux and an iOS simulator build on
+# macOS (free for public repositories). Runs when the native projects or the
+# Capacitor config change, and on demand. Signed builds and store uploads are
+# #67 and need the developer accounts.
+name: Mobile
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - frontend/android/**
+      - frontend/ios/**
+      - frontend/capacitor.config.ts
+      - frontend/capacitor/**
+      - frontend/package.json
+      - .github/workflows/mobile.yml
+  push:
+    branches: [main]
+    paths:
+      - frontend/android/**
+      - frontend/ios/**
+      - frontend/capacitor.config.ts
+      - frontend/capacitor/**
+      - .github/workflows/mobile.yml
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android debug APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      # The ubuntu runner ships the Android SDK (ANDROID_HOME is set).
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Sync the native project
+        run: |
+          npm ci
+          npx cap sync android
+      - name: Build
+        working-directory: frontend/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: randevum-debug-apk
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+
+  ios:
+    name: iOS simulator build
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Sync the native project
+        run: |
+          npm ci
+          npx cap sync ios
+      - name: Build for the simulator (no signing)
+        working-directory: frontend/ios/App
+        # Capacitor 7+ templates use Swift Package Manager: a project, no workspace.
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO -quiet build

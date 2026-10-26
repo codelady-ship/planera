@@ -87,6 +87,15 @@ Bütün demo hesabların şifrəsi: `Randevum123`
 
 Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Neon pulsuz planında ayda 100 CU-saat var; API boş bağlantıları 2 dəqiqəyə bağlayır ki, baza yata bilsin. Backup: Neon pulsuz planda bazanı son saatların istənilən anına qaytarmağa (restore) imkan verir; daha uzun saxlama ödənişli plandadır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
 
+## Mobil tətbiq (Capacitor, Android və iOS)
+
+Tətbiq production saytı native WebView-da açır (`frontend/capacitor.config.ts`, `server.url`) və native plaginlərə (lokal bildiriş, alarm) körpü ilə müraciət edir. Native layihələr `frontend/android` və `frontend/ios`-dadır; ikon və splash `node scripts/mobile-assets.mjs` ilə brend işarəsindən yaradılır.
+
+- **Android (lokal):** Android Studio ilə `frontend/android` qovluğunu açın və ya `cd frontend && npx cap sync android && cd android && ./gradlew assembleDebug`; APK `android/app/build/outputs/apk/debug/app-debug.apk`.
+- **CI:** `.github/workflows/mobile.yml` hər dəyişiklikdə Android debug APK-nı artifact kimi yükləyir və iOS-u macOS runner-də simulyator üçün build edir (imzasız). Actions -> Mobile -> Run workflow ilə əl ilə də işə salınır.
+- **iOS cihaz / TestFlight:** Apple Developer hesabı tələb edir (#67); o vaxta qədər iPhone-da PWA işləyir.
+- Başqa ünvana baxan build üçün: `CAPACITOR_SERVER_URL=https://... npx cap sync`.
+
 ## Təhlükəsizlik (OWASP əsas yoxlamaları)
 
 | Risk | Necə qorunur |
