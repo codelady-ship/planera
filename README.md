@@ -68,6 +68,7 @@ Bütün demo hesabların şifrəsi: `Randevum123`
 - **Production:** https://randevum-seven.vercel.app
 - Vercel layihəsi `randevum`, Root Directory: `frontend`, Node 22.
 - `main`-ə hər merge avtomatik production deploy edir; hər PR öz preview linkini alır.
+- **PWA:** sayt telefona quraşdırıla bilir (`src/app/manifest.ts`, `public/sw.js`, offline səhifə `/offline`). Android Chrome "Quraşdır" düyməsi göstərir; iPhone-da banner Safari-nin "Paylaş -> Ana ekrana əlavə et" addımlarını izah edir (iOS-da push yalnız quraşdırılmış PWA-da işləyir). İkonlar `public/icons`-dadır, `node scripts/pwa-icons.mjs` ilə brend işarəsindən yenidən yaradılır. Service worker API cavablarını keşləmir; `sw.js` dəyişəndə `VERSION` sabitini artırın.
 
 ### Backend (Render, Docker)
 
