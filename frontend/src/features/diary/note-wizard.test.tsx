@@ -24,8 +24,8 @@ describe('NoteWizard', () => {
     fireEvent.click(screen.getByRole('button', { name: tomorrow }))
 
     // Step 2: the time.
-    fireEvent.click(screen.getByRole('button', { name: 'Saat 15' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Dəqiqə 30' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Saat 15' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Dəqiqə 30' }))
     expect(screen.getByText('15:30')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Davam et' }))
 
@@ -34,8 +34,8 @@ describe('NoteWizard', () => {
       target: { value: 'Həkimə getmək' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Geri' }))
-    expect(screen.getByRole('button', { name: 'Saat 15' })).toHaveAttribute(
-      'aria-pressed',
+    expect(screen.getByRole('option', { name: 'Saat 15' })).toHaveAttribute(
+      'aria-selected',
       'true',
     )
     fireEvent.click(screen.getByRole('button', { name: 'Davam et' }))
