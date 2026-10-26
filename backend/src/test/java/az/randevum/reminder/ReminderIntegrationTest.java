@@ -160,12 +160,13 @@ class ReminderIntegrationTest {
         assertThat(service.sendDue()).isEqualTo(1);
         assertThat(service.sendDue()).isZero();
         assertThat(SENT).hasSize(1);
-        assertThat(SENT.getFirst().body()).isEqualTo("Bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var");
+        assertThat(SENT.getFirst().body())
+                .isEqualTo("Sizin bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var: " + haircut.getName());
         assertThat(SENT.getFirst().tag()).isEqualTo("appointment-" + a.getId());
 
         CLOCK.now = baku(MONDAY, LocalTime.of(15, 1));
         assertThat(service.sendDue()).isEqualTo(2);
-        assertThat(SENT.getLast().body()).endsWith("randevunuz başlayır");
+        assertThat(SENT).hasSize(3);
         assertThat(reminders.findByAppointmentIdOrderByOffsetMinutesDesc(a.getId()))
                 .allSatisfy(r -> assertThat(r.getSentAt()).isNotNull());
     }

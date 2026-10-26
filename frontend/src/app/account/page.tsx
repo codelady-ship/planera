@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { AccountView } from '@/features/account/account-view'
+import { AlarmReader } from '@/features/diary/alarm-reader'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
 
@@ -15,6 +17,9 @@ export default function AccountPage() {
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
         <AccountView />
+        <Suspense>
+          <AlarmReader />
+        </Suspense>
       </main>
       <SiteFooter />
     </>

@@ -106,7 +106,7 @@ public class ReminderService {
             if (a != null && a.getStatus().isActive()) {
                 PushMessage message = new PushMessage(
                         TITLE,
-                        body(a.getStartsAt(), a.getProvider().getDisplayName(), reminder.getOffsetMinutes(), clock),
+                        body(a.getStartsAt(), a.getProvider().getDisplayName(), a.getService().getName(), clock),
                         "/account",
                         "appointment-" + a.getId());
                 int delivered = push.sendToUser(a.getCustomer().getId(), message);
@@ -124,26 +124,28 @@ public class ReminderService {
         return sent;
     }
 
-    /** "Bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var"; at the start itself: "başlayır". */
-    static String body(Instant startsAt, String providerName, int offsetMinutes, Clock clock) {
-        String verb = offsetMinutes == 0 ? "başlayır" : "var";
-        return when(startsAt, clock) + " " + providerName + " ilə randevunuz " + verb;
+    /**
+     * The alarm sentence (#62), the same in the push and when read aloud:
+     * "Sizin bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var: Saç kəsimi".
+     */
+    static String body(Instant startsAt, String providerName, String serviceName, Clock clock) {
+        return "Sizin " + when(startsAt, clock) + " " + providerName + " ilə randevunuz var: " + serviceName;
     }
 
-    /** "Bu gün saat 15:00-da qeydiniz var: həkimə getmək" (#59, #62). */
+    /** "Sizin bu gün saat 15:00-da qeydiniz var: həkimə getmək" (#59, #62). */
     static String noteBody(Instant startsAt, String title, Clock clock) {
-        return when(startsAt, clock) + " qeydiniz var: " + title;
+        return "Sizin " + when(startsAt, clock) + " qeydiniz var: " + title;
     }
 
-    /** "Bu gün saat 15:00-da", "Sabah saat 09:30-da" or "30 oktyabr saat 18:00-da", in Baku time. */
+    /** "bu gün saat 15:00-da", "sabah saat 09:30-da" or "30 oktyabr saat 18:00-da", in Baku time. */
     static String when(Instant startsAt, Clock clock) {
         ZonedDateTime start = startsAt.atZone(TimeConfig.BAKU);
         LocalDate today = LocalDate.now(clock.withZone(TimeConfig.BAKU));
         LocalDate day = start.toLocalDate();
         String when = day.equals(today)
-                ? "Bu gün"
+                ? "bu gün"
                 : day.equals(today.plusDays(1))
-                        ? "Sabah"
+                        ? "sabah"
                         : day.getDayOfMonth() + " " + MONTHS[day.getMonthValue() - 1];
         return when + " saat " + HH_MM.format(start) + "-da";
     }

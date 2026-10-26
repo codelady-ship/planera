@@ -10,7 +10,7 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
-/** Reminder wording in Baku time, relative to a fixed clock (#56). */
+/** Alarm wording in Baku time, relative to a fixed clock (#56, #62). */
 class ReminderTextTest {
 
     static final Clock MONDAY_10_10 = Clock.fixed(
@@ -23,25 +23,24 @@ class ReminderTextTest {
 
     @Test
     void todayTomorrowAndADate() {
-        assertThat(ReminderService.body(baku(26, 15, 0), "Elvin Məmmədov", 60, MONDAY_10_10))
-                .isEqualTo("Bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var");
-        assertThat(ReminderService.body(baku(27, 9, 30), "Elvin Məmmədov", 15, MONDAY_10_10))
-                .isEqualTo("Sabah saat 09:30-da Elvin Məmmədov ilə randevunuz var");
-        assertThat(ReminderService.body(baku(30, 18, 0), "Dr. Leyla Hüseynova", 60, MONDAY_10_10))
-                .isEqualTo("30 oktyabr saat 18:00-da Dr. Leyla Hüseynova ilə randevunuz var");
+        assertThat(ReminderService.body(baku(26, 15, 0), "Elvin Məmmədov", "Saç kəsimi", MONDAY_10_10))
+                .isEqualTo("Sizin bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var: Saç kəsimi");
+        assertThat(ReminderService.body(baku(27, 9, 30), "Elvin Məmmədov", "Saç kəsimi", MONDAY_10_10))
+                .isEqualTo("Sizin sabah saat 09:30-da Elvin Məmmədov ilə randevunuz var: Saç kəsimi");
+        assertThat(ReminderService.body(baku(30, 18, 0), "Dr. Leyla Hüseynova", "Konsultasiya", MONDAY_10_10))
+                .isEqualTo("Sizin 30 oktyabr saat 18:00-da Dr. Leyla Hüseynova ilə randevunuz var: Konsultasiya");
     }
 
     @Test
-    void atTheStartTheWordingChanges() {
-        assertThat(ReminderService.body(baku(26, 15, 0), "Elvin Məmmədov", 0, MONDAY_10_10))
-                .isEqualTo("Bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz başlayır");
+    void personalNotesHaveTheirOwnSentence() {
+        assertThat(ReminderService.noteBody(baku(26, 15, 0), "həkimə getmək", MONDAY_10_10))
+                .isEqualTo("Sizin bu gün saat 15:00-da qeydiniz var: həkimə getmək");
     }
 
     @Test
     void theDayIsJudgedInBakuEvenWhenTheClockIsUtc() {
         // 23:30 UTC on Monday is already 03:30 Tuesday in Baku.
         Clock utcLateMonday = Clock.fixed(Instant.parse("2026-10-26T23:30:00Z"), java.time.ZoneOffset.UTC);
-        assertThat(ReminderService.body(baku(27, 9, 0), "Elvin Məmmədov", 60, utcLateMonday))
-                .startsWith("Bu gün");
+        assertThat(ReminderService.noteBody(baku(27, 9, 0), "idman", utcLateMonday)).startsWith("Sizin bu gün");
     }
 }

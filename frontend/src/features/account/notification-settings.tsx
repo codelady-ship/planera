@@ -21,6 +21,7 @@ import {
   sendTestPush,
   type PushStatus,
 } from '@/features/pwa/push'
+import { VoiceSettings } from '@/features/diary/voice-settings'
 import { api } from '@/lib/api/client'
 import type { NotificationSettings as Settings } from '@/lib/api/types'
 
@@ -159,6 +160,7 @@ export function NotificationSettings() {
       </section>
 
       <ReminderTimes />
+      <VoiceSettings />
     </div>
   )
 }

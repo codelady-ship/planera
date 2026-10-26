@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { setSessionUser, useSession } from '@/features/auth/use-session'
 import { ApiError, api } from '@/lib/api/client'
 import type { Appointment, SessionUser } from '@/lib/api/types'
+import { AgendaView } from '@/features/diary/agenda-view'
 import { AppointmentCard } from './appointment-card'
 import { NotificationSettings } from './notification-settings'
 
@@ -42,6 +43,7 @@ export function AccountView() {
       </div>
       <Tabs value={tab} onValueChange={(value) => setTab(String(value))}>
         <TabsList className="w-full overflow-x-auto overflow-y-hidden sm:w-auto">
+          <TabsTrigger value="agenda">Gündəlik</TabsTrigger>
           {SCOPES.map((s) => (
             <TabsTrigger key={s.value} value={s.value}>
               {s.label}
@@ -50,6 +52,9 @@ export function AccountView() {
           <TabsTrigger value="profile">Profil</TabsTrigger>
           <TabsTrigger value="notifications">Bildirişlər</TabsTrigger>
         </TabsList>
+        <TabsContent value="agenda" className="pt-4">
+          {tab === 'agenda' && <AgendaView />}
+        </TabsContent>
         {SCOPES.map((s) => (
           <TabsContent key={s.value} value={s.value} className="pt-4">
             {tab === s.value && (
