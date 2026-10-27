@@ -1,9 +1,10 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { WEEKDAYS_SHORT, addMonths, formatMonth, monthGrid } from '@/lib/dates'
+import { addMonths, dateNames, formatMonth, monthGrid } from '@/lib/dates'
 import { cn } from '@/lib/utils'
 
 /**
@@ -27,6 +28,8 @@ export function MonthCalendar({
   onSelect: (date: string) => void
   onMonthChange: (month: string) => void
 }) {
+  const t = useTranslations('calendar')
+  const locale = useLocale()
   const open = new Set(active ?? [])
   return (
     <div className="flex flex-col gap-3">
@@ -34,19 +37,19 @@ export function MonthCalendar({
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Əvvəlki ay"
+          aria-label={t('previousMonth')}
           disabled={month <= minMonth}
           onClick={() => onMonthChange(addMonths(month, -1))}
         >
           <ChevronLeft />
         </Button>
         <p className="font-medium" aria-live="polite">
-          {formatMonth(month)}
+          {formatMonth(month, locale)}
         </p>
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Növbəti ay"
+          aria-label={t('nextMonth')}
           disabled={month >= maxMonth}
           onClick={() => onMonthChange(addMonths(month, 1))}
         >
@@ -54,7 +57,7 @@ export function MonthCalendar({
         </Button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
-        {WEEKDAYS_SHORT.map((d) => (
+        {dateNames(locale).weekdaysShort.map((d) => (
           <span key={d}>{d}</span>
         ))}
       </div>
@@ -89,9 +92,7 @@ export function MonthCalendar({
         </div>
       )}
       {active !== null && active.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          Bu ay boş gün yoxdur, növbəti aya baxın.
-        </p>
+        <p className="text-sm text-muted-foreground">{t('noDays')}</p>
       )}
     </div>
   )
@@ -107,13 +108,10 @@ export function SlotGrid({
   selected: string | null
   onSelect: (time: string) => void
 }) {
+  const t = useTranslations('calendar')
   if (slots === null) return <Skeleton className="h-40 w-full" />
   if (slots.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Bu gün boş saat qalmayıb, başqa gün seçin.
-      </p>
-    )
+    return <p className="text-sm text-muted-foreground">{t('noSlots')}</p>
   }
   return (
     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">

@@ -1,10 +1,11 @@
-import { Link } from '@/i18n/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { Clock, MapPin, Star } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { formatNextSlot, formatPrice } from './format'
+import { Link } from '@/i18n/navigation'
 import type { ProviderSummary } from '@/lib/api/types'
+import { formatNextSlot, formatPrice } from './format'
 
 export function ProviderCard({
   provider,
@@ -13,6 +14,8 @@ export function ProviderCard({
   provider: ProviderSummary
   today: string
 }) {
+  const t = useTranslations('catalog')
+  const locale = useLocale()
   return (
     <Card className="h-full">
       <CardHeader className="flex items-center gap-3">
@@ -34,7 +37,7 @@ export function ProviderCard({
             {provider.rating.toFixed(1)}
           </span>
           <span className="text-muted-foreground">
-            {provider.reviewCount} rəy
+            {t('reviews', { count: provider.reviewCount })}
           </span>
           <span className="flex items-center gap-1 text-muted-foreground">
             <MapPin className="size-3.5" aria-hidden />
@@ -43,8 +46,8 @@ export function ProviderCard({
         </div>
         {provider.priceFrom !== null && (
           <p className="text-sm">
-            <span className="text-muted-foreground">Qiymət: </span>
-            {formatPrice(provider.priceFrom)}-dan
+            <span className="text-muted-foreground">{t('priceFrom')} </span>
+            {t('from', { price: formatPrice(provider.priceFrom) })}
           </p>
         )}
         {provider.nextSlot && (
@@ -54,7 +57,9 @@ export function ProviderCard({
           >
             <Clock aria-hidden />
             <span>
-              Növbəti boş vaxt: {formatNextSlot(provider.nextSlot, today)}
+              {t('nextSlot', {
+                when: formatNextSlot(provider.nextSlot, today, locale),
+              })}
             </span>
           </Badge>
         )}
@@ -66,7 +71,7 @@ export function ProviderCard({
             className: 'h-10 w-full bg-cta text-cta-foreground hover:bg-cta/90',
           })}
         >
-          Randevu götür
+          {t('book')}
         </Link>
       </CardFooter>
     </Card>
@@ -80,22 +85,21 @@ export function TopProviders({
   providers: ProviderSummary[]
   today: string
 }) {
+  const t = useTranslations('catalog')
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
       <div className="flex items-end justify-between gap-4">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          Yüksək reytinqli mütəxəssislər
-        </h2>
+        <h2 className="text-2xl font-semibold tracking-tight">{t('top')}</h2>
         <Link
           href="/search?sort=rating"
           className="text-sm text-muted-foreground hover:text-foreground"
         >
-          Hamısına bax
+          {t('seeAll')}
         </Link>
       </div>
       {providers.length === 0 ? (
         <p className="mt-6 rounded-xl border border-dashed bg-card p-8 text-center text-muted-foreground">
-          Mütəxəssislər bir azdan görünəcək. Server oyanır, səhifəni yeniləyin.
+          {t('waking')}
         </p>
       ) : (
         <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

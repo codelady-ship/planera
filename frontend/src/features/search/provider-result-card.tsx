@@ -1,8 +1,9 @@
-import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import { Clock, MapPin, Star } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Link } from '@/i18n/navigation'
 import type { ProviderSummary } from '@/lib/api/types'
 import { formatPrice } from '@/lib/dates'
 
@@ -12,6 +13,7 @@ export function ProviderResultCard({
 }: {
   provider: ProviderSummary
 }) {
+  const t = useTranslations('catalog')
   return (
     <Card className="h-full">
       <CardContent className="flex flex-col gap-3">
@@ -40,7 +42,7 @@ export function ProviderResultCard({
             {provider.rating}
           </span>
           <span className="text-muted-foreground">
-            {provider.reviewCount} rəy
+            {t('reviews', { count: provider.reviewCount })}
           </span>
           <span className="flex items-center gap-1 text-muted-foreground">
             <MapPin className="size-3.5" aria-hidden />
@@ -49,8 +51,8 @@ export function ProviderResultCard({
         </div>
         {provider.priceFrom !== null && (
           <p className="text-sm">
-            <span className="text-muted-foreground">Qiymət: </span>
-            {formatPrice(provider.priceFrom)}-dan
+            <span className="text-muted-foreground">{t('priceFrom')} </span>
+            {t('from', { price: formatPrice(provider.priceFrom) })}
           </p>
         )}
         {provider.nextSlot && (
@@ -59,7 +61,7 @@ export function ProviderResultCard({
             className="h-auto min-h-6 max-w-full gap-1.5 px-2.5 py-1 text-left whitespace-normal"
           >
             <Clock aria-hidden />
-            <span>Növbəti boş vaxt: {provider.nextSlot}</span>
+            <span>{t('nextSlot', { when: provider.nextSlot })}</span>
           </Badge>
         )}
       </CardContent>
@@ -68,7 +70,7 @@ export function ProviderResultCard({
           href={`/book/${provider.slug}`}
           className={buttonVariants({ size: 'lg', className: 'h-10 w-full' })}
         >
-          Randevu götür
+          {t('book')}
         </Link>
       </CardFooter>
     </Card>

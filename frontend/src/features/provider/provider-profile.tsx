@@ -1,26 +1,25 @@
-import { Link } from '@/i18n/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { Clock, MapPin, Phone, Star } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Link } from '@/i18n/navigation'
 import type { ProviderDetail } from '@/lib/api/types'
-import { formatDuration, formatPrice } from '@/lib/dates'
+import { dateNames, formatDuration, formatPrice } from '@/lib/dates'
 import { ProviderReviews } from './provider-reviews'
-
-const DAY_NAMES = [
-  'Bazar ertəsi',
-  'Çərşənbə axşamı',
-  'Çərşənbə',
-  'Cümə axşamı',
-  'Cümə',
-  'Şənbə',
-  'Bazar',
-]
 
 const hhmm = (time: string) => time.slice(0, 5)
 
 /** Provider profile (#30): who, what it costs, when they work, where. */
 export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
+  const t = useTranslations('provider')
+  const tc = useTranslations('catalog')
+  const locale = useLocale()
   const { summary } = provider
+  // Schedule days are ISO (1 = Monday); the names array starts on Sunday.
+  const dayName = (day: number) => {
+    const name = dateNames(locale).weekdays[day % 7]
+    return name.charAt(0).toUpperCase() + name.slice(1)
+  }
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_20rem]">
       <div className="flex flex-col gap-6">
@@ -44,7 +43,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
                 {summary.rating}
               </span>
               <span className="text-muted-foreground">
-                {summary.reviewCount} rəy
+                {tc('reviews', { count: summary.reviewCount })}
               </span>
               <span className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="size-3.5" aria-hidden />
@@ -58,7 +57,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
 
         <section aria-labelledby="services" className="flex flex-col gap-3">
           <h2 id="services" className="text-xl font-semibold">
-            Xidmətlər
+            {t('services')}
           </h2>
           <ul className="flex flex-col gap-3">
             {provider.services.map((service) => (
@@ -78,7 +77,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
                         </span>
                         <span className="flex items-center gap-1 text-muted-foreground">
                           <Clock className="size-3.5" aria-hidden />
-                          {formatDuration(service.durationMinutes)}
+                          {formatDuration(service.durationMinutes, locale)}
                         </span>
                       </p>
                     </div>
@@ -89,7 +88,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
                         className: 'h-10 shrink-0',
                       })}
                     >
-                      Randevu götür
+                      {t('book')}
                     </Link>
                   </CardContent>
                 </Card>
@@ -100,7 +99,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
 
         <section aria-labelledby="reviews" className="flex flex-col gap-3">
           <h2 id="reviews" className="text-xl font-semibold">
-            Rəylər
+            {t('reviews')}
           </h2>
           <ProviderReviews
             reviews={provider.reviews ?? []}
@@ -112,18 +111,16 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
       <aside className="flex flex-col gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>İş qrafiki</CardTitle>
+            <CardTitle>{t('schedule')}</CardTitle>
           </CardHeader>
           <CardContent>
             <dl className="flex flex-col gap-2 text-sm">
               {provider.schedule.map((day) => (
                 <div key={day.day} className="flex justify-between gap-3">
-                  <dt className="text-muted-foreground">
-                    {DAY_NAMES[day.day - 1]}
-                  </dt>
+                  <dt className="text-muted-foreground">{dayName(day.day)}</dt>
                   <dd className="text-right">
                     {day.intervals.length === 0
-                      ? 'İstirahət'
+                      ? t('dayOff')
                       : day.intervals
                           .map((i) => `${hhmm(i.start)}-${hhmm(i.end)}`)
                           .join(', ')}
@@ -135,7 +132,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Əlaqə</CardTitle>
+            <CardTitle>{t('contact')}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
             {provider.address && (
@@ -151,8 +148,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
               </p>
             )}
             <p className="text-muted-foreground">
-              Ləğv: randevuya {provider.cancellationHours} saat qalanadək
-              pulsuz.
+              {t('cancellation', { hours: provider.cancellationHours })}
             </p>
           </CardContent>
         </Card>
@@ -160,7 +156,7 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
           href={`/book/${summary.slug}`}
           className={buttonVariants({ size: 'lg', className: 'h-11' })}
         >
-          Randevu götür
+          {t('book')}
         </Link>
       </aside>
     </div>
