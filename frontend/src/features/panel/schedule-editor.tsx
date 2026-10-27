@@ -78,7 +78,7 @@ export function ScheduleEditor() {
       ) : !data ? (
         <Skeleton className="h-96" />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_22rem]">
           <WeeklyHours initial={toWeek(data.weekly)} onSaved={reload} />
           <DaysOff items={data.timeOff} onChanged={reload} />
         </div>

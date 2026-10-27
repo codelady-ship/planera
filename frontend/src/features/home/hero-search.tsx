@@ -53,7 +53,7 @@ export function HeroSearch() {
       <form
         action="/search"
         role="search"
-        className="mt-8 grid gap-3 rounded-2xl border bg-card p-3 shadow-sm md:grid-cols-[1.4fr_1fr_1fr_auto]"
+        className="mt-8 grid grid-cols-1 gap-3 rounded-2xl border bg-card p-3 shadow-sm md:grid-cols-[1.4fr_1fr_1fr_auto]"
       >
         <label className="flex items-center gap-2 rounded-lg px-2">
           <Search className="size-4 text-muted-foreground" aria-hidden />

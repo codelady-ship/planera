@@ -21,7 +21,7 @@ async function Providers() {
 
 function SectionSkeleton() {
   return (
-    <div className="mx-auto grid max-w-6xl gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }, (_, i) => (
         <Skeleton key={i} className="h-40" />
       ))}

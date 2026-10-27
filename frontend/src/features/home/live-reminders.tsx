@@ -28,7 +28,7 @@ export function LiveReminders() {
       <h2 id="live-reminders" className="text-2xl font-semibold tracking-tight">
         Canlı bildiriş, heç nəyi unutmayın
       </h2>
-      <ul className="mt-6 grid gap-4 md:grid-cols-3">
+      <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {FEATURES.map((feature) => (
           <li
             key={feature.title}

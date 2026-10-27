@@ -355,7 +355,7 @@ function WeekGrid({
 }) {
   const days = Array.from({ length: 7 }, (_, i) => addDays(from, i))
   return (
-    <div className="grid gap-3 lg:grid-cols-7">
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-7">
       {days.map((day, i) => {
         const dayItems = items.filter((x) => x.appointment.date === day)
         return (
