@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
-import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { usePathname } from '@/i18n/navigation'
 import { Download, Share, SquarePlus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -72,6 +73,7 @@ function usePlatform() {
 }
 
 export function InstallBanner() {
+  const t = useTranslations('install')
   const pathname = usePathname()
   const platform = usePlatform()
   const [installEvent, setInstallEvent] =
@@ -108,7 +110,7 @@ export function InstallBanner() {
 
   return (
     <aside
-      aria-label="Tətbiqi quraşdır"
+      aria-label={t('label')}
       className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md rounded-xl border bg-card p-4 text-card-foreground shadow-lg"
     >
       <div className="flex items-start gap-3">
@@ -116,31 +118,41 @@ export function InstallBanner() {
           <Download className="size-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1 space-y-1">
-          <p className="font-medium">Planera-nı ana ekrana əlavə et</p>
+          <p className="font-medium">{t('title')}</p>
           {platform === 'ios' ? (
             <p className="text-sm text-muted-foreground">
-              Safari-də{' '}
-              <Share className="inline size-4 align-text-bottom" aria-hidden />{' '}
-              <span className="font-medium text-foreground">Paylaş</span>{' '}
-              düyməsinə, sonra{' '}
-              <SquarePlus
-                className="inline size-4 align-text-bottom"
-                aria-hidden
-              />{' '}
-              <span className="font-medium text-foreground">
-                Ana ekrana əlavə et
-              </span>{' '}
-              seçin. Xatırlatmalar yalnız quraşdırılmış tətbiqdə gəlir.
+              {t.rich('iosSteps', {
+                share: (chunks) => (
+                  <>
+                    <Share
+                      className="inline size-4 align-text-bottom"
+                      aria-hidden
+                    />{' '}
+                    <span className="font-medium text-foreground">
+                      {chunks}
+                    </span>
+                  </>
+                ),
+                add: (chunks) => (
+                  <>
+                    <SquarePlus
+                      className="inline size-4 align-text-bottom"
+                      aria-hidden
+                    />{' '}
+                    <span className="font-medium text-foreground">
+                      {chunks}
+                    </span>
+                  </>
+                ),
+              })}
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              Randevularınız və xatırlatmalar bir toxunuşla, tətbiq kimi.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('otherText')}</p>
           )}
           {platform === 'other' && (
             <Button className="mt-2" onClick={install}>
               <Download data-icon="inline-start" aria-hidden />
-              Quraşdır
+              {t('install')}
             </Button>
           )}
         </div>
@@ -148,7 +160,7 @@ export function InstallBanner() {
           variant="ghost"
           size="icon"
           className="-mt-1 -mr-1 shrink-0"
-          aria-label="Bağla"
+          aria-label={t('close')}
           onClick={dismiss}
         >
           <X aria-hidden />

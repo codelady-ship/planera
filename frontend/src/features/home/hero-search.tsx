@@ -1,31 +1,28 @@
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { CalendarDays, MapPin, NotebookPen, Search } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
+import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
 
 const CITIES = ['Bakı', 'Sumqayıt', 'Gəncə', 'Lənkəran', 'Şəki']
 
 // A plain GET form: the search page (#29) reads the same query parameters, so
 // the hero works without client-side JavaScript.
 export function HeroSearch() {
+  const t = useTranslations('home')
   return (
     <section className="mx-auto max-w-6xl px-4 pt-12 pb-16 md:pt-20 md:pb-24">
       <div className="max-w-2xl">
         <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 text-sm font-medium text-primary ring-1 ring-border">
           <span className="size-2 rounded-full bg-brand-teal" aria-hidden />
-          Vaxtını seç, rahatlığını yaşa.
+          {t('slogan')}
         </p>
         <h1 className="text-4xl font-semibold tracking-tight text-balance md:text-5xl">
-          Boş saatı seçin, randevunu bir neçə kliklə götürün
+          {t('title')}
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Bərbər, həkim, müəllim və konsultantların real vaxtda boş saatlarını
-          görün. Zəng və yazışma lazım deyil.
-        </p>
-        <p className="mt-2 text-sm font-medium text-primary">
-          Randevu, qeyd, canlı bildiriş: bir yerdə.
-        </p>
+        <p className="mt-4 text-lg text-muted-foreground">{t('lead')}</p>
+        <p className="mt-2 text-sm font-medium text-primary">{t('tagline')}</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/search"
@@ -35,7 +32,7 @@ export function HeroSearch() {
             )}
           >
             <CalendarDays aria-hidden />
-            Randevu et
+            {t('book')}
           </Link>
           <Link
             href="/account?tab=agenda&new=1"
@@ -45,7 +42,7 @@ export function HeroSearch() {
             )}
           >
             <NotebookPen aria-hidden />
-            Qeyd yaz
+            {t('note')}
           </Link>
         </div>
       </div>
@@ -57,16 +54,16 @@ export function HeroSearch() {
       >
         <label className="flex items-center gap-2 rounded-lg px-2">
           <Search className="size-4 text-muted-foreground" aria-hidden />
-          <span className="sr-only">Hansı xidməti axtarırsınız?</span>
+          <span className="sr-only">{t('searchPlaceholder')}</span>
           <Input
             name="q"
-            placeholder="Hansı xidməti axtarırsınız?"
+            placeholder={t('searchPlaceholder')}
             className="h-11 border-0 shadow-none focus-visible:ring-0"
           />
         </label>
         <label className="flex items-center gap-2 rounded-lg px-2 md:border-l">
           <MapPin className="size-4 text-muted-foreground" aria-hidden />
-          <span className="sr-only">Şəhər</span>
+          <span className="sr-only">{t('city')}</span>
           <select
             name="city"
             defaultValue="Bakı"
@@ -79,7 +76,7 @@ export function HeroSearch() {
         </label>
         <label className="flex items-center gap-2 rounded-lg px-2 md:border-l">
           <CalendarDays className="size-4 text-muted-foreground" aria-hidden />
-          <span className="sr-only">Tarix</span>
+          <span className="sr-only">{t('date')}</span>
           <Input
             type="date"
             name="date"
@@ -90,7 +87,7 @@ export function HeroSearch() {
           type="submit"
           className="h-11 bg-cta px-6 text-base text-cta-foreground hover:bg-cta/90"
         >
-          Axtar
+          {t('search')}
         </Button>
       </form>
     </section>

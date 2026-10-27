@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "title": "Planera - Vaxtını seç, rahatlığını yaşa",
+    "description": "Bərbər, həkim, müəllim və digər xidmətlər üçün boş saatı seçin və randevunu bir neçə kliklə götürün."
+  },
+  "common": {
+    "back": "Geri",
+    "continue": "Davam et",
+    "save": "Yadda saxla",
+    "close": "Bağla",
+    "error": "Xəta baş verdi, yenidən cəhd edin."
+  },
+  "header": {
+    "home": "Planera ana səhifə",
+    "services": "Xidmətlər",
+    "howItWorks": "Necə işləyir?",
+    "openMenu": "Menyunu aç",
+    "menu": "Menyu",
+    "login": "Daxil ol",
+    "register": "Qeydiyyat",
+    "panel": "Panel",
+    "logout": "Çıxış",
+    "language": "Dil"
+  },
+  "theme": {
+    "mode": "Rejim",
+    "system": "Sistem",
+    "light": "Gündüz",
+    "dark": "Gecə",
+    "current": "Rejim: {mode}",
+    "switchTo": "Rejim: {mode}. {next} rejiminə keç"
+  },
+  "footer": {
+    "logoAlt": "Planera - Vaxtını seç, rahatlığını yaşa.",
+    "services": "Xidmətlər",
+    "join": "Mütəxəssis kimi qoşul",
+    "note": "Bütün qiymətlər AZN, vaxt Bakı vaxtı ilədir."
+  },
+  "home": {
+    "slogan": "Vaxtını seç, rahatlığını yaşa.",
+    "title": "Boş saatı seçin, randevunu bir neçə kliklə götürün",
+    "lead": "Bərbər, həkim, müəllim və konsultantların real vaxtda boş saatlarını görün. Zəng və yazışma lazım deyil.",
+    "tagline": "Randevu, qeyd, canlı bildiriş: bir yerdə.",
+    "book": "Randevu et",
+    "note": "Qeyd yaz",
+    "searchPlaceholder": "Hansı xidməti axtarırsınız?",
+    "city": "Şəhər",
+    "date": "Tarix",
+    "search": "Axtar",
+    "live": {
+      "title": "Canlı bildiriş, heç nəyi unutmayın",
+      "reminderTitle": "Canlı xatırlatma",
+      "reminderText": "Randevudan 1 gün, 1 saat və 15 dəqiqə əvvəl telefonunuza bildiriş gəlir; tətbiqdə alarm səslə oxuyur.",
+      "voiceTitle": "Səslə qeyd",
+      "voiceText": "Təqvimdən tarix və saat seçin, qeydi deyin: danışıq mətnə çevrilir, vaxtı siz seçirsiniz.",
+      "diaryTitle": "Vahid gündəlik",
+      "diaryText": "Randevular və şəxsi qeydlər bir siyahıda, redaktə və silmə ilə."
+    },
+    "how": {
+      "title": "Necə işləyir?",
+      "step": "Addım {n}",
+      "findTitle": "Xidməti tapın",
+      "findText": "Kateqoriya, şəhər, qiymət və reytinqə görə mütəxəssis seçin.",
+      "slotTitle": "Boş saatı seçin",
+      "slotText": "Yalnız həqiqətən boş olan saatlar göstərilir, xidmətin müddəti nəzərə alınır.",
+      "confirmTitle": "Təsdiqləyin",
+      "confirmText": "Randevu nömrəsini alın, kabinetdən vaxtı dəyişin və ya ləğv edin."
+    }
+  },
+  "auth": {
+    "loginTitle": "Daxil ol",
+    "registerTitle": "Hesab yaradın",
+    "demoHint": "Demo: {email}, şifrə {password}",
+    "email": "E-poçt",
+    "password": "Şifrə",
+    "passwordNew": "Şifrə (ən azı 8 simvol)",
+    "fullName": "Ad və soyad",
+    "phone": "Telefon",
+    "optional": "(istəyə bağlı)",
+    "login": "Daxil ol",
+    "createAccount": "Hesab yarat",
+    "noAccount": "Hesabınız yoxdur?",
+    "haveAccount": "Hesabınız var?",
+    "registerLink": "Qeydiyyat",
+    "loginLink": "Daxil olun",
+    "failed": "Xəta baş verdi, yenidən cəhd edin.",
+    "offline": "Serverə qoşulmaq olmadı. İnterneti yoxlayın."
+  },
+  "offline": {
+    "title": "İnternet bağlantısı yoxdur",
+    "text": "Randevular və boş saatlar yalnız internet olanda görünür. Bağlantı qayıdanda yenidən yoxlayın.",
+    "retry": "Yenidən yoxla"
+  },
+  "install": {
+    "label": "Tətbiqi quraşdır",
+    "title": "Planera-nı ana ekrana əlavə et",
+    "iosSteps": "Safari-də <share>Paylaş</share> düyməsinə, sonra <add>Ana ekrana əlavə et</add> seçin. Xatırlatmalar yalnız quraşdırılmış tətbiqdə gəlir.",
+    "share": "Paylaş",
+    "otherText": "Randevularınız və xatırlatmalar bir toxunuşla, tətbiq kimi.",
+    "install": "Quraşdır",
+    "close": "Bağla"
+  }
+}

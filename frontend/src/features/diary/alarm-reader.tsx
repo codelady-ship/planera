@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { listenForDeepLinks } from '@/features/mobile/deep-links'
 import { listenForAlarmTaps } from '@/features/mobile/native-alarms'
 import { speak } from './speech'

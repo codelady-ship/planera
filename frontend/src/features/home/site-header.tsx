@@ -1,5 +1,7 @@
+'use client'
+
 import Image from 'next/image'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,20 +12,14 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { UserMenu } from '@/features/auth/user-menu'
+import { LanguageSwitcher } from '@/features/i18n/language-switcher'
 import { ThemeChoice, ThemeToggle } from '@/features/theme/theme-toggle'
-
-const NAV = [
-  { href: '/search', label: 'Xidmətlər' },
-  { href: '/#necə-işləyir', label: 'Necə işləyir?' },
-]
+import { Link } from '@/i18n/navigation'
 
 export function BrandMark() {
+  const t = useTranslations('header')
   return (
-    <Link
-      href="/"
-      className="flex items-center"
-      aria-label="Planera ana səhifə"
-    >
+    <Link href="/" className="flex items-center" aria-label={t('home')}>
       <Image
         src="/brand/planera-wordmark.png"
         alt="Planera"
@@ -44,13 +40,18 @@ export function BrandMark() {
 }
 
 export function SiteHeader() {
+  const t = useTranslations('header')
+  const nav = [
+    { href: '/search', label: t('services') },
+    { href: '/#necə-işləyir', label: t('howItWorks') },
+  ]
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <BrandMark />
 
         <nav className="hidden items-center gap-6 text-sm md:flex">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -62,6 +63,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-1 md:flex">
+          <LanguageSwitcher />
           <ThemeToggle />
           <UserMenu />
         </div>
@@ -73,7 +75,7 @@ export function SiteHeader() {
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
-                aria-label="Menyunu aç"
+                aria-label={t('openMenu')}
               />
             }
           >
@@ -81,10 +83,10 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent side="right">
             <SheetHeader>
-              <SheetTitle>Menyu</SheetTitle>
+              <SheetTitle>{t('menu')}</SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-1 px-4">
-              {NAV.map((item) => (
+              {nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -94,6 +96,7 @@ export function SiteHeader() {
                 </Link>
               ))}
               <UserMenu stacked />
+              <LanguageSwitcher className="mt-2" />
               <ThemeChoice className="mt-2" />
             </nav>
           </SheetContent>

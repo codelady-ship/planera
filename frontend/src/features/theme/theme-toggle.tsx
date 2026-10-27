@@ -1,16 +1,11 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import { useTranslations } from 'next-intl'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { getTheme, setTheme, subscribeTheme, THEMES, type Theme } from './theme'
-
-const LABEL: Record<Theme, string> = {
-  system: 'Sistem',
-  light: 'Gündüz',
-  dark: 'Gecə',
-}
 
 const ICON = { system: Monitor, light: Sun, dark: Moon } as const
 
@@ -20,6 +15,7 @@ function useTheme(): Theme {
 
 /** One button that cycles system, day, night (#93); for headers. */
 export function ThemeToggle({ className }: { className?: string }) {
+  const t = useTranslations('theme')
   const theme = useTheme()
   const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]
   const Icon = ICON[theme]
@@ -28,8 +24,8 @@ export function ThemeToggle({ className }: { className?: string }) {
       variant="ghost"
       size="icon"
       className={className}
-      aria-label={`Rejim: ${LABEL[theme]}. ${LABEL[next]} rejiminə keç`}
-      title={`Rejim: ${LABEL[theme]}`}
+      aria-label={t('switchTo', { mode: t(theme), next: t(next) })}
+      title={t('current', { mode: t(theme) })}
       onClick={() => setTheme(next)}
     >
       <Icon aria-hidden />
@@ -39,11 +35,12 @@ export function ThemeToggle({ className }: { className?: string }) {
 
 /** The three choices side by side, for menus and settings. */
 export function ThemeChoice({ className }: { className?: string }) {
+  const t = useTranslations('theme')
   const theme = useTheme()
   return (
     <div
       role="radiogroup"
-      aria-label="Rejim"
+      aria-label={t('mode')}
       className={cn('flex gap-1 rounded-lg bg-muted p-1', className)}
     >
       {THEMES.map((value) => {
@@ -62,7 +59,7 @@ export function ThemeChoice({ className }: { className?: string }) {
             onClick={() => setTheme(value)}
           >
             <Icon aria-hidden />
-            {LABEL[value]}
+            {t(value)}
           </Button>
         )
       })}

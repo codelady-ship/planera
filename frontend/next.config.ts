@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -33,4 +34,7 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+// Interface languages (#94): messages and the request config live in src/i18n.
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
+
+export default withNextIntl(nextConfig)

@@ -1,55 +1,50 @@
 'use client'
 
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Link, useRouter } from '@/i18n/navigation'
 import { safeNext } from '@/lib/api/client'
 import type { Problem, SessionUser } from '@/lib/api/types'
 import { setSessionUser } from './use-session'
 
 type Mode = 'login' | 'register'
 
-const FIELDS: Record<
-  Mode,
-  {
-    name: string
-    label: string
-    type: string
-    autoComplete: string
-    optional?: boolean
-  }[]
-> = {
+type Field = {
+  name: string
+  label: 'email' | 'password' | 'passwordNew' | 'fullName' | 'phone'
+  type: string
+  autoComplete: string
+  optional?: boolean
+}
+
+const FIELDS: Record<Mode, Field[]> = {
   login: [
-    { name: 'email', label: 'E-poçt', type: 'email', autoComplete: 'email' },
+    { name: 'email', label: 'email', type: 'email', autoComplete: 'email' },
     {
       name: 'password',
-      label: 'Şifrə',
+      label: 'password',
       type: 'password',
       autoComplete: 'current-password',
     },
   ],
   register: [
-    {
-      name: 'fullName',
-      label: 'Ad və soyad',
-      type: 'text',
-      autoComplete: 'name',
-    },
-    { name: 'email', label: 'E-poçt', type: 'email', autoComplete: 'email' },
+    { name: 'fullName', label: 'fullName', type: 'text', autoComplete: 'name' },
+    { name: 'email', label: 'email', type: 'email', autoComplete: 'email' },
     {
       name: 'phone',
-      label: 'Telefon',
+      label: 'phone',
       type: 'tel',
       autoComplete: 'tel',
       optional: true,
     },
     {
       name: 'password',
-      label: 'Şifrə (ən azı 8 simvol)',
+      label: 'passwordNew',
       type: 'password',
       autoComplete: 'new-password',
     },
@@ -61,6 +56,7 @@ const FIELDS: Record<
  * that sent them here (`?next=`), or to the account page.
  */
 export function AuthForm({ mode }: { mode: Mode }) {
+  const t = useTranslations('auth')
   const router = useRouter()
   const next = safeNext(useSearchParams().get('next'))
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -84,7 +80,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       if (!response.ok) {
         const problem = body as Problem
         setErrors(problem.errors ?? {})
-        setMessage(problem.detail ?? 'Xəta baş verdi, yenidən cəhd edin.')
+        setMessage(problem.detail ?? t('failed'))
         return
       }
       const user = (body as { user: SessionUser }).user
@@ -92,7 +88,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       router.replace(next ?? (user.role === 'CUSTOMER' ? '/account' : '/panel'))
       router.refresh()
     } catch {
-      setMessage('Serverə qoşulmaq olmadı. İnterneti yoxlayın.')
+      setMessage(t('offline'))
     } finally {
       setBusy(false)
     }
@@ -100,18 +96,18 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
   const other =
     mode === 'login'
-      ? { text: 'Hesabınız yoxdur?', link: 'Qeydiyyat', href: '/register' }
-      : { text: 'Hesabınız var?', link: 'Daxil olun', href: '/login' }
+      ? { text: t('noAccount'), link: t('registerLink'), href: '/register' }
+      : { text: t('haveAccount'), link: t('loginLink'), href: '/login' }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
       {FIELDS[mode].map((field) => (
         <div key={field.name} className="flex flex-col gap-2">
           <Label htmlFor={field.name}>
-            {field.label}
+            {t(field.label)}
             {field.optional && (
               <span className="font-normal text-muted-foreground">
-                (istəyə bağlı)
+                {t('optional')}
               </span>
             )}
           </Label>
@@ -143,7 +139,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
       <Button type="submit" size="lg" className="h-11" disabled={busy}>
         {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-        {mode === 'login' ? 'Daxil ol' : 'Hesab yarat'}
+        {mode === 'login' ? t('login') : t('createAccount')}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
