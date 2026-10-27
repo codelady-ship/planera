@@ -120,21 +120,17 @@ Bütün demo hesabların şifrəsi: `Planera123`
 
 ### Backend (Render, Docker)
 
- Blueprint üç resurs yaradır:  (PostgreSQL 16),  (Key Value) və  (), hamısı Frankfurt, pulsuz plan. Bazanın host, port, ad, istifadəçi və şifrəsi Blueprint-də  ilə API-yə avtomatik bağlanır; heç bir bağlantı məlumatı əl ilə yazılmır.
+`render.yaml` Blueprint üç resurs yaradır: `planera-db` (PostgreSQL 16), `planera-redis` (Key Value) və `planera-api` (`backend/Dockerfile`), hamısı Frankfurt, pulsuz plan. Bazanın host, port, ad, istifadəçi və şifrəsi Blueprint-də `fromDatabase` ilə API-yə avtomatik bağlanır; heç bir bağlantı məlumatı əl ilə yazılmır.
 
 1. https://render.com - GitHub ilə daxil ol.
-2. https://render.com/deploy?repo=https://github.com/codelady-ship/planera -> Blueprint adı  -> Deploy Blueprint. Pulsuz planda bir Key Value və bir PostgreSQL ola bilər; köhnə  /  qalıbsa əvvəl silin.
-3. Web Push üçün yalnız  dashboard-da yazılır (public açar -dadır, eyni cütün gizli yarısı: Usage: 
-
-  web-push send-notification --endpoint=<url> [--key=<browser key>] [--auth=<auth secret>] [--payload=<message>] [--ttl=<seconds>] [--encoding=<encoding type>] [--vapid-subject=<vapid subject>] [--vapid-pubkey=<public key url base64>] [--vapid-pvtkey=<private key url base64>] [--proxy=<http proxy uri, e.g: http://127.0.0.1:8889>] [--gcm-api-key=<api key>]
-
-  web-push generate-vapid-keys [--json]). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
-4. Yoxlama: . İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
+2. https://render.com/deploy?repo=https://github.com/codelady-ship/planera -> Blueprint adı `planera` -> Deploy Blueprint. Pulsuz planda bir Key Value və bir PostgreSQL ola bilər; köhnə `planera-redis` / `planera-db` qalıbsa əvvəl silin.
+3. Web Push üçün yalnız `VAPID_PRIVATE_KEY` dashboard-da yazılır (public açar `render.yaml`-dadır, eyni cütün gizli yarısı: `npx web-push generate-vapid-keys`). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
+4. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
 - **Production API:** https://randevum-api-uu30.onrender.com
-- Vercel-də  bu ünvana baxır; brauzer API-yə birbaşa yox, saytın  keçidi ilə müraciət edir.
+- Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
 
-Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Render-in pulsuz PostgreSQL-i yaradıldıqdan 30 gün sonra silinir (dashboard xəbərdarlıq edir); daimi baza üçün Neon və ya ödənişli plan: , ,  dəyişənləri dashboard-da yazılanda  əvəzinə o baza işlənir (). API boş bağlantıları 2 dəqiqəyə bağlayır.  xaricindəki dəyişikliklər backend deploy-unu işə salmır.
+Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Render-in pulsuz PostgreSQL-i yaradıldıqdan 30 gün sonra silinir (dashboard xəbərdarlıq edir); daimi baza üçün Neon və ya ödənişli plan: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` dəyişənləri dashboard-da yazılanda `planera-db` əvəzinə o baza işlənir (`jdbc:postgresql://<host>/<db>?sslmode=require`). API boş bağlantıları 2 dəqiqəyə bağlayır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
 
 ## Mobil tətbiq (Capacitor, Android və iOS)
 
