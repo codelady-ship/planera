@@ -25,7 +25,7 @@ public class MeController {
 
     public record ProfileRequest(
             @NotBlank @Size(max = 120) String fullName,
-            @Pattern(regexp = "^\\+?[0-9 ()-]{7,20}$", message = "Telefon nömrəsi düzgün deyil") String phone) {}
+            @Pattern(regexp = "^\\+?[0-9 ()-]{7,20}$", message = "{validation.phone}") String phone) {}
 
     @GetMapping
     public UserView me(Authentication authentication) {

@@ -1,6 +1,7 @@
 package az.planera.push;
 
 import az.planera.common.BusinessRuleException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.domain.PushSubscription;
 import az.planera.domain.PushSubscriptionRepository;
@@ -12,6 +13,7 @@ import az.planera.push.PushDtos.SubscriptionView;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +60,7 @@ public class PushService {
         User user = user(email);
         if (subscriptions.findByEndpoint(request.endpoint()).isEmpty()
                 && subscriptions.findByUserIdOrderByCreatedAtAsc(user.getId()).size() >= MAX_DEVICES) {
-            throw new BusinessRuleException("Bir hesabda ən çox " + MAX_DEVICES + " cihaz ola bilər");
+            throw new BusinessRuleException(Messages.key("push.maxDevices", MAX_DEVICES));
         }
         PushSubscription subscription = subscriptions
                 .findByEndpoint(request.endpoint())
@@ -96,15 +98,15 @@ public class PushService {
     public DeliveryView sendTest(String email) {
         User user = user(email);
         if (subscriptions.findByUserIdOrderByCreatedAtAsc(user.getId()).isEmpty()) {
-            throw new BusinessRuleException("Bu hesabda bildiriş abunəliyi yoxdur");
+            throw new BusinessRuleException(Messages.key("push.noSubscription"));
         }
         PushMessage message = new PushMessage(
-                "Planera", "Bildirişlər işləyir. Xatırlatmalar bu cihaza gələcək.", "/account", "test");
+                "Planera", Messages.get("push.testBody", LocaleContextHolder.getLocale()), "/account", "test");
         return new DeliveryView(sendToUser(user.getId(), message));
     }
 
     private User user(String email) {
-        return users.findByEmailIgnoreCase(email).orElseThrow(() -> new NotFoundException("İstifadəçi tapılmadı"));
+        return users.findByEmailIgnoreCase(email).orElseThrow(() -> new NotFoundException(Messages.key("user.notFound")));
     }
 
     private static SubscriptionView view(PushSubscription s) {

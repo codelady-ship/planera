@@ -13,8 +13,8 @@ public final class ReviewDtos {
     public record ReviewView(Long id, int rating, String comment, String customerName, Instant createdAt) {}
 
     public record CreateRequest(
-            @Min(value = 1, message = "Reytinq 1-5 arası olmalıdır")
-            @Max(value = 5, message = "Reytinq 1-5 arası olmalıdır")
+            @Min(value = 1, message = "{validation.rating}")
+            @Max(value = 5, message = "{validation.rating}")
             int rating,
             @Size(max = 1000) String comment) {}
 }

@@ -6,6 +6,7 @@ import az.planera.appointment.AppointmentDtos.CreateRequest;
 import az.planera.appointment.AppointmentDtos.ProviderAppointmentView;
 import az.planera.appointment.AppointmentDtos.Scope;
 import az.planera.common.BusinessRuleException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.common.SlotTakenException;
 import az.planera.common.TooManyRequestsException;
@@ -110,7 +111,7 @@ public class AppointmentService {
         Long providerId = read(() -> services.findById(serviceId)
                 .filter(s -> s.isActive() && s.getProvider().isActive())
                 .map(s -> s.getProvider().getId())
-                .orElseThrow(() -> new NotFoundException("Xidmət tapılmadı: " + serviceId)));
+                .orElseThrow(() -> new NotFoundException(Messages.key("service.notFound", serviceId))));
         Instant startsAt = instant(request.date(), request.time());
 
         try (RedisLock.Held lock = locks.tryLock("slot:" + providerId + ":" + startsAt, Duration.ofSeconds(10))) {
@@ -197,16 +198,16 @@ public class AppointmentService {
     public AppointmentView changeStatus(Long providerId, Long id, AppointmentStatus next) {
         AppointmentView view = tx.execute(status -> {
             Appointment a = appointments.findById(id)
-                    .orElseThrow(() -> new NotFoundException("Randevu tapılmadı: " + id));
+                    .orElseThrow(() -> new NotFoundException(Messages.key("appointment.notFound", id)));
             if (providerId != null && !providerId.equals(a.getProvider().getId())) {
                 throw new AccessDeniedException("Bu randevu sizə aid deyil");
             }
             if (!a.getStatus().canTransitionTo(next)) {
-                throw new BusinessRuleException("Status " + a.getStatus() + " -> " + next + " keçidinə icazə yoxdur");
+                throw new BusinessRuleException(Messages.key("appointment.transition", a.getStatus(), next));
             }
             boolean finished = next == AppointmentStatus.COMPLETED || next == AppointmentStatus.NO_SHOW;
             if (finished && clock.instant().isBefore(a.getStartsAt())) {
-                throw new BusinessRuleException("Randevu hələ başlamayıb");
+                throw new BusinessRuleException(Messages.key("appointment.notStarted"));
             }
             if (next == AppointmentStatus.CANCELLED) {
                 a.cancel(clock.instant(), null);
@@ -223,7 +224,7 @@ public class AppointmentService {
     /** Appointments of one provider, or of every provider when {@code providerId} is null (admin). */
     public List<ProviderAppointmentView> forProvider(Long providerId, LocalDate from, LocalDate to) {
         if (to.isBefore(from) || ChronoUnit.DAYS.between(from, to) > MAX_RANGE_DAYS) {
-            throw new BusinessRuleException("Tarix aralığı 0-" + MAX_RANGE_DAYS + " gün olmalıdır");
+            throw new BusinessRuleException(Messages.key("range.invalid", MAX_RANGE_DAYS));
         }
         Instant start = instant(from, LocalTime.MIDNIGHT);
         Instant end = instant(to.plusDays(1), LocalTime.MIDNIGHT);
@@ -240,10 +241,10 @@ public class AppointmentService {
     private void checkRateLimit(Long customerId) {
         LocalDate today = LocalDate.now(clock);
         if (!limiter.allow("appointments:minute:" + customerId, PER_MINUTE, Duration.ofMinutes(1))) {
-            throw new TooManyRequestsException("Çox sayda sorğu. Bir dəqiqə sonra yenidən cəhd edin.", Duration.ofMinutes(1));
+            throw new TooManyRequestsException(Messages.key("error.tooMany"), Duration.ofMinutes(1));
         }
         if (!limiter.allow("appointments:day:" + customerId + ":" + today, PER_DAY, Duration.ofDays(1))) {
-            throw new TooManyRequestsException("Gündəlik randevu limiti dolub.", Duration.ofHours(1));
+            throw new TooManyRequestsException(Messages.key("appointment.dailyLimit"), Duration.ofHours(1));
         }
     }
 
@@ -276,11 +277,10 @@ public class AppointmentService {
     /** The customer may change an active appointment only until the provider's cancellation window. */
     private void requireChangeable(Actor actor, Appointment a) {
         if (!a.getStatus().isActive()) {
-            throw new BusinessRuleException("Bu randevu artıq aktiv deyil");
+            throw new BusinessRuleException(Messages.key("appointment.inactive"));
         }
         if (!actor.admin() && !beforeDeadline(a)) {
-            throw new BusinessRuleException("Randevuya " + a.getProvider().getCancellationHours()
-                    + " saatdan az qalıb, dəyişmək və ya ləğv etmək olmur");
+            throw new BusinessRuleException(Messages.key("appointment.tooLate", a.getProvider().getCancellationHours()));
         }
     }
 
@@ -291,7 +291,7 @@ public class AppointmentService {
 
     /** Someone else's appointment is 403 (#26). */
     private Appointment owned(Actor actor, Long id) {
-        Appointment a = appointments.findById(id).orElseThrow(() -> new NotFoundException("Randevu tapılmadı: " + id));
+        Appointment a = appointments.findById(id).orElseThrow(() -> new NotFoundException(Messages.key("appointment.notFound", id)));
         if (!actor.admin() && !a.getCustomer().getEmail().equalsIgnoreCase(actor.email())) {
             throw new AccessDeniedException("Bu randevu sizə aid deyil");
         }
@@ -300,7 +300,7 @@ public class AppointmentService {
 
     private User user(Actor actor) {
         return users.findByEmailIgnoreCase(actor.email())
-                .orElseThrow(() -> new NotFoundException("İstifadəçi tapılmadı"));
+                .orElseThrow(() -> new NotFoundException(Messages.key("user.notFound")));
     }
 
     private Long providerId(Long appointmentId) {

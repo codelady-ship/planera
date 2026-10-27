@@ -1,5 +1,6 @@
 package az.planera.provider;
 
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.common.PageResponse;
 import az.planera.domain.AvailabilityRule;
@@ -66,7 +67,7 @@ public class ProviderService {
 
     ProviderProfile get(String slug) {
         return providers.findBySlugAndActiveTrue(slug)
-                .orElseThrow(() -> new NotFoundException("Mütəxəssis tapılmadı: " + slug));
+                .orElseThrow(() -> new NotFoundException(Messages.key("provider.notFound", slug)));
     }
 
     private List<ServiceView> activeServices(ProviderProfile p) {

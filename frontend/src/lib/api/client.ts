@@ -1,9 +1,13 @@
+import { currentLocale } from '@/i18n/current'
+import { gatewayText } from './gateway-messages'
 import type { Problem } from './types'
 
 /** A non-2xx API answer, carrying its problem details. */
 export class ApiError extends Error {
   constructor(public readonly problem: Problem) {
-    super(problem.detail ?? `Xəta baş verdi (${problem.status})`)
+    super(
+      problem.detail ?? gatewayText(currentLocale(), 'error', problem.status),
+    )
   }
 }
 

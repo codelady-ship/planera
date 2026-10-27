@@ -1,5 +1,6 @@
 package az.planera.slot;
 
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.config.TimeConfig;
 import az.planera.domain.Appointment;
@@ -98,7 +99,7 @@ public class SlotService {
      */
     public List<LocalTime> freeStarts(Long serviceId, LocalDate date, Long ignoreAppointmentId) {
         ServiceOffering service = services.findById(serviceId)
-                .orElseThrow(() -> new NotFoundException("Xidmət tapılmadı: " + serviceId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("service.notFound", serviceId)));
         return freeStarts(service, date, date, ignoreAppointmentId).getOrDefault(date);
     }
 
@@ -140,10 +141,10 @@ public class SlotService {
     /** The active service, which must belong to the active provider {@code slug}. */
     public ServiceOffering activeService(String slug, Long serviceId) {
         ProviderProfile provider = providers.findBySlugAndActiveTrue(slug)
-                .orElseThrow(() -> new NotFoundException("Mütəxəssis tapılmadı: " + slug));
+                .orElseThrow(() -> new NotFoundException(Messages.key("provider.notFound", slug)));
         return services.findByIdAndProviderId(serviceId, provider.getId())
                 .filter(ServiceOffering::isActive)
-                .orElseThrow(() -> new NotFoundException("Xidmət tapılmadı: " + serviceId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("service.notFound", serviceId)));
     }
 
     private static Instant startOf(LocalDate date) {

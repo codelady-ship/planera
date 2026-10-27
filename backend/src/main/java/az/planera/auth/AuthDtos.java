@@ -12,9 +12,9 @@ public final class AuthDtos {
 
     public record RegisterRequest(
             @NotBlank @Size(max = 120) String fullName,
-            @NotBlank @Email(message = "E-poçt düzgün deyil") @Size(max = 255) String email,
-            @NotBlank @Size(min = 8, max = 72, message = "Şifrə 8-72 simvol olmalıdır") String password,
-            @Pattern(regexp = "^\\+?[0-9 ()-]{7,20}$", message = "Telefon nömrəsi düzgün deyil") String phone) {}
+            @NotBlank @Email(message = "{validation.email}") @Size(max = 255) String email,
+            @NotBlank @Size(min = 8, max = 72, message = "{validation.password}") String password,
+            @Pattern(regexp = "^\\+?[0-9 ()-]{7,20}$", message = "{validation.phone}") String phone) {}
 
     public record LoginRequest(@NotBlank String email, @NotBlank String password) {}
 

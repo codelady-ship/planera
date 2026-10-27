@@ -1,8 +1,10 @@
 import 'server-only'
 import { cookies } from 'next/headers'
+import { gatewayText } from '@/lib/api/gateway-messages'
 import { apiUrl } from '@/lib/api/server'
 import type { TokenResponse } from '@/lib/api/types'
 import { storeTokens } from '@/lib/auth/session'
+import { requestLocale } from '@/lib/i18n/request-locale'
 
 /**
  * Forwards a login or registration to the API. On success the tokens go
@@ -12,16 +14,17 @@ export async function exchange(
   path: '/api/auth/login' | '/api/auth/register',
   request: Request,
 ): Promise<Response> {
+  const locale = await requestLocale()
   const url = apiUrl(path)
   if (!url) {
     return Response.json(
-      { status: 503, detail: 'Server hələ qoşulmayıb. Bir az sonra yoxlayın.' },
+      { status: 503, detail: gatewayText(locale, 'unavailable') },
       { status: 503 },
     )
   }
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Accept-Language': locale },
     body: await request.text(),
   })
   const body = await response.json().catch(() => ({}))

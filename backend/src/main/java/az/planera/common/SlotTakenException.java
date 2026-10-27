@@ -8,7 +8,7 @@ public class SlotTakenException extends ConflictException {
     private final List<String> alternatives;
 
     public SlotTakenException(List<String> alternatives) {
-        super("Bu vaxt artıq tutulub. Başqa vaxt seçin.");
+        super(Messages.key("slot.taken"));
         this.alternatives = List.copyOf(alternatives);
     }
 

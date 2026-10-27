@@ -27,6 +27,14 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  web:
+    # Error texts follow Accept-Language (#94): az (default), en, ru.
+    locale: az
+    locale-resolver: accept-header
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
 
 planera:
   jwt:

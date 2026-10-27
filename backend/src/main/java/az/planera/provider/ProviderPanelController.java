@@ -9,6 +9,7 @@ import az.planera.availability.AvailabilityDtos.TimeOffRequest;
 import az.planera.availability.AvailabilityDtos.TimeOffView;
 import az.planera.availability.AvailabilityDtos.WeeklyRequest;
 import az.planera.availability.AvailabilityService;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.domain.ProviderProfile;
 import az.planera.domain.ProviderProfileRepository;
@@ -139,6 +140,6 @@ public class ProviderPanelController {
 
     private ProviderProfile self(Authentication auth) {
         return providers.findByUserEmailIgnoreCase(auth.getName())
-                .orElseThrow(() -> new NotFoundException("Mütəxəssis profili tapılmadı"));
+                .orElseThrow(() -> new NotFoundException(Messages.key("provider.profileNotFound")));
     }
 }

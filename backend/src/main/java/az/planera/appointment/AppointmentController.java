@@ -9,6 +9,7 @@ import az.planera.appointment.AppointmentDtos.RescheduleRequest;
 import az.planera.appointment.AppointmentDtos.Scope;
 import az.planera.appointment.AppointmentDtos.StatusRequest;
 import az.planera.common.BusinessRuleException;
+import az.planera.common.Messages;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -89,7 +90,7 @@ public class AppointmentController {
         try {
             return Scope.valueOf(value.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new BusinessRuleException("Naməlum scope: " + value);
+            throw new BusinessRuleException(Messages.key("appointment.unknownScope", value));
         }
     }
 }

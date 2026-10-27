@@ -1,7 +1,9 @@
 import 'server-only'
 import { cookies, headers } from 'next/headers'
+import { gatewayText } from '@/lib/api/gateway-messages'
 import { apiUrl } from '@/lib/api/server'
 import type { TokenResponse } from '@/lib/api/types'
+import { requestLocale } from '@/lib/i18n/request-locale'
 
 /**
  * Session cookies on the site's own domain (#25, #27). Both tokens are
@@ -71,9 +73,11 @@ export async function fetchAsUser(
   init: RequestInit = {},
 ): Promise<Response> {
   const url = apiUrl(path)
+  // Error texts come back in the interface language (#94).
+  const locale = await requestLocale()
   if (!url) {
     return Response.json(
-      { status: 503, detail: 'Server hələ qoşulmayıb. Bir az sonra yoxlayın.' },
+      { status: 503, detail: gatewayText(locale, 'unavailable') },
       { status: 503 },
     )
   }
@@ -86,6 +90,7 @@ export async function fetchAsUser(
   const send = (token: string | null | undefined) => {
     const outgoing = new Headers(init.headers)
     outgoing.set('Accept', 'application/json')
+    outgoing.set('Accept-Language', locale)
     if (token) outgoing.set('Authorization', `Bearer ${token}`)
     if (clientIp) outgoing.set('X-Forwarded-For', clientIp)
     return fetch(url, { ...init, headers: outgoing, cache: 'no-store' })

@@ -3,6 +3,7 @@ package az.planera.category;
 import az.planera.category.CategoryDtos.CategoryRequest;
 import az.planera.category.CategoryDtos.CategoryView;
 import az.planera.common.ConflictException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.domain.Category;
 import az.planera.domain.CategoryRepository;
@@ -34,7 +35,7 @@ public class CategoryService {
     @Transactional
     public CategoryView create(CategoryRequest request) {
         if (categories.existsBySlug(request.slug())) {
-            throw new ConflictException("Bu slug artıq istifadə olunur: " + request.slug());
+            throw new ConflictException(Messages.key("category.slugTaken", request.slug()));
         }
         Category category = new Category(request.slug(), request.name());
         apply(category, request);
@@ -45,7 +46,7 @@ public class CategoryService {
     public CategoryView update(String slug, CategoryRequest request) {
         Category category = get(slug);
         if (!slug.equals(request.slug()) && categories.existsBySlug(request.slug())) {
-            throw new ConflictException("Bu slug artıq istifadə olunur: " + request.slug());
+            throw new ConflictException(Messages.key("category.slugTaken", request.slug()));
         }
         category.setSlug(request.slug());
         apply(category, request);
@@ -56,13 +57,13 @@ public class CategoryService {
     public void delete(String slug) {
         Category category = get(slug);
         if (providers.countByCategoryIdAndActiveTrue(category.getId()) > 0) {
-            throw new ConflictException("Kateqoriyada aktiv mütəxəssislər var, əvvəlcə onları köçürün");
+            throw new ConflictException(Messages.key("category.hasProviders"));
         }
         categories.delete(category);
     }
 
     private Category get(String slug) {
-        return categories.findBySlug(slug).orElseThrow(() -> new NotFoundException("Kateqoriya tapılmadı: " + slug));
+        return categories.findBySlug(slug).orElseThrow(() -> new NotFoundException(Messages.key("category.notFound", slug)));
     }
 
     private static void apply(Category category, CategoryRequest request) {

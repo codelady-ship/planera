@@ -1,4 +1,6 @@
+import { gatewayText } from '@/lib/api/gateway-messages'
 import { fetchAsUser } from '@/lib/auth/session'
+import { requestLocale } from '@/lib/i18n/request-locale'
 
 /**
  * Same-origin gateway to the API for Client Components:
@@ -12,7 +14,7 @@ async function forward(
   const { path } = await ctx.params
   if (path.some((segment) => segment === '.' || segment === '..')) {
     return Response.json(
-      { status: 400, detail: 'Yanlış ünvan' },
+      { status: 400, detail: gatewayText(await requestLocale(), 'badPath') },
       { status: 400 },
     )
   }
