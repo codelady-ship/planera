@@ -1,9 +1,15 @@
 import type { Metadata } from 'next'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ProviderOnly } from '@/features/panel/panel-shell'
 import { ScheduleEditor } from '@/features/panel/schedule-editor'
 
-export const metadata: Metadata = { title: 'İş qrafiki' }
+export async function generateMetadata({
+  params,
+}: PageProps<'/[locale]/panel/schedule'>): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'schedule' })
+  return { title: t('title') }
+}
 
 export default async function PanelSchedulePage({
   params,

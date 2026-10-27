@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   Ban,
   CalendarX,
@@ -39,8 +40,8 @@ import type {
   UserRole,
 } from '@/lib/api/types'
 import {
-  WEEKDAYS_SHORT,
   addDays,
+  dateNames,
   formatDateLong,
   formatDateShort,
   formatPrice,
@@ -54,20 +55,22 @@ import { useApi } from './use-api'
 
 type View = 'day' | 'week'
 
+type ActionKey = 'confirm' | 'complete' | 'noShow' | 'cancel'
+
 const ACTIONS: Partial<
   Record<
     AppointmentStatus,
-    { status: AppointmentStatus; label: string; icon: LucideIcon }[]
+    { status: AppointmentStatus; label: ActionKey; icon: LucideIcon }[]
   >
 > = {
   PENDING: [
-    { status: 'CONFIRMED', label: 'Təsdiq et', icon: Check },
-    { status: 'CANCELLED', label: 'Ləğv et', icon: Ban },
+    { status: 'CONFIRMED', label: 'confirm', icon: Check },
+    { status: 'CANCELLED', label: 'cancel', icon: Ban },
   ],
   CONFIRMED: [
-    { status: 'COMPLETED', label: 'Tamamlandı', icon: CheckCheck },
-    { status: 'NO_SHOW', label: 'Gəlmədi', icon: UserX },
-    { status: 'CANCELLED', label: 'Ləğv et', icon: Ban },
+    { status: 'COMPLETED', label: 'complete', icon: CheckCheck },
+    { status: 'NO_SHOW', label: 'noShow', icon: UserX },
+    { status: 'CANCELLED', label: 'cancel', icon: Ban },
   ],
 }
 
@@ -78,6 +81,9 @@ export function AppointmentsBoard() {
 }
 
 function Board({ role }: { role: UserRole }) {
+  const t = useTranslations('panel')
+  const tc = useTranslations('common')
+  const locale = useLocale()
   const paths = panelPaths(role)
   const today = todayInBaku()
   const [view, setView] = useState<View>('day')
@@ -130,34 +136,32 @@ function Board({ role }: { role: UserRole }) {
   return (
     <>
       <PanelHeading
-        title="Randevular"
-        description={
-          role === 'ADMIN' ? 'Bütün mütəxəssislərin randevuları' : undefined
-        }
+        title={t('appointments')}
+        description={role === 'ADMIN' ? t('allProviders') : undefined}
       />
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Tabs value={view} onValueChange={(v) => setView(v as View)}>
           <TabsList>
-            <TabsTrigger value="day">Gün</TabsTrigger>
-            <TabsTrigger value="week">Həftə</TabsTrigger>
+            <TabsTrigger value="day">{t('day')}</TabsTrigger>
+            <TabsTrigger value="week">{t('week')}</TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="icon"
-            aria-label="Əvvəlki"
+            aria-label={t('previous')}
             onClick={() => setDate(addDays(date, -step))}
           >
             <ChevronLeft aria-hidden />
           </Button>
           <Button variant="outline" onClick={() => setDate(today)}>
-            Bu gün
+            {t('today')}
           </Button>
           <Button
             variant="outline"
             size="icon"
-            aria-label="Növbəti"
+            aria-label={t('next')}
             onClick={() => setDate(addDays(date, step))}
           >
             <ChevronRight aria-hidden />
@@ -165,8 +169,8 @@ function Board({ role }: { role: UserRole }) {
         </div>
         <span className="font-medium">
           {view === 'day'
-            ? formatDateLong(date)
-            : `${formatDateShort(from)} - ${formatDateShort(to)}`}
+            ? formatDateLong(date, locale)
+            : `${formatDateShort(from, locale)} - ${formatDateShort(to, locale)}`}
         </span>
       </div>
 
@@ -200,7 +204,7 @@ function Board({ role }: { role: UserRole }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Randevu</DialogTitle>
+            <DialogTitle>{t('appointment')}</DialogTitle>
           </DialogHeader>
           {selectedItem && (
             <AppointmentDetails
@@ -218,14 +222,18 @@ function Board({ role }: { role: UserRole }) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Randevunu ləğv edirsiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t('cancelTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {cancelling &&
-                `${cancelling.customerName}, ${formatDateLong(cancelling.appointment.date)} ${cancelling.appointment.time}. Vaxt yenidən boş olacaq.`}
+                t('cancelText', {
+                  customer: cancelling.customerName,
+                  date: formatDateLong(cancelling.appointment.date, locale),
+                  time: cancelling.appointment.time,
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İmtina</AlertDialogCancel>
+            <AlertDialogCancel>{tc('dismiss')}</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={() => {
@@ -233,7 +241,7 @@ function Board({ role }: { role: UserRole }) {
                 setCancelling(null)
               }}
             >
-              Ləğv et
+              {t('cancel')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -243,10 +251,11 @@ function Board({ role }: { role: UserRole }) {
 }
 
 function Empty() {
+  const t = useTranslations('panel')
   return (
     <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed p-10 text-center text-muted-foreground">
       <CalendarX aria-hidden className="size-8" />
-      Bu tarixdə randevu yoxdur.
+      {t('emptyDay')}
     </div>
   )
 }
@@ -287,6 +296,7 @@ export function AppointmentDetails({
   role: UserRole
   onAction: (item: PanelAppointment, status: AppointmentStatus) => void
 }) {
+  const t = useTranslations('panel')
   const a = item.appointment
   const actions = ACTIONS[a.status] ?? []
   return (
@@ -333,7 +343,7 @@ export function AppointmentDetails({
               onClick={() => onAction(item, action.status)}
             >
               <action.icon aria-hidden />
-              {action.label}
+              {t(action.label)}
             </Button>
           ))}
         </div>
@@ -353,6 +363,9 @@ function WeekGrid({
   items: PanelAppointment[]
   onSelect: (item: PanelAppointment) => void
 }) {
+  const t = useTranslations('panel')
+  const locale = useLocale()
+  const weekdays = dateNames(locale).weekdaysShort
   const days = Array.from({ length: 7 }, (_, i) => addDays(from, i))
   return (
     <div className="grid grid-cols-1 gap-3 lg:grid-cols-7">
@@ -367,13 +380,15 @@ function WeekGrid({
             )}
           >
             <h2 className="px-1 text-sm font-medium">
-              {WEEKDAYS_SHORT[i]}{' '}
+              {weekdays[i]}{' '}
               <span className="text-muted-foreground">
-                {formatDateShort(day)}
+                {formatDateShort(day, locale)}
               </span>
             </h2>
             {dayItems.length === 0 ? (
-              <p className="px-1 text-xs text-muted-foreground">Boşdur</p>
+              <p className="px-1 text-xs text-muted-foreground">
+                {t('emptySlot')}
+              </p>
             ) : (
               dayItems.map((item) => {
                 const a = item.appointment

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { CalendarOff, LoaderCircle, Plus, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,24 +9,16 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api/client'
 import type { AvailabilityView, DaySchedule, TimeOff } from '@/lib/api/types'
-import { formatDateLong, todayInBaku } from '@/lib/dates'
+import { dateNames, formatDateLong, todayInBaku } from '@/lib/dates'
 import { PanelHeading } from './panel-shell'
 import { Field } from './services-manager'
 import { useApi } from './use-api'
 
-const DAY_NAMES = [
-  'Bazar ertəsi',
-  'Çərşənbə axşamı',
-  'Çərşənbə',
-  'Cümə axşamı',
-  'Cümə',
-  'Şənbə',
-  'Bazar',
-]
-
 type Interval = { start: string; end: string }
 /** Index 0 is Monday, like ISO day 1. */
 type Week = Interval[][]
+
+export type WeekError = 'startBeforeEnd' | 'overlap'
 
 const hhmm = (time: string) => time.slice(0, 5)
 
@@ -41,20 +34,20 @@ function toWeek(weekly: DaySchedule[]): Week {
 /**
  * The same rules as AvailabilityService.replaceWeekly: every interval
  * starts before it ends and intervals of a day do not overlap. Returns the
- * first problem per day (index 0 = Monday).
+ * first problem per day (index 0 = Monday) as a message key.
  */
-export function validateWeek(week: Week): Record<number, string> {
-  const errors: Record<number, string> = {}
+export function validateWeek(week: Week): Record<number, WeekError> {
+  const errors: Record<number, WeekError> = {}
   week.forEach((intervals, day) => {
     const sorted = [...intervals].sort((a, b) => a.start.localeCompare(b.start))
     for (let i = 0; i < sorted.length; i++) {
       const { start, end } = sorted[i]
       if (!start || !end || start >= end) {
-        errors[day] = 'Başlama vaxtı bitmə vaxtından əvvəl olmalıdır'
+        errors[day] = 'startBeforeEnd'
         return
       }
       if (i > 0 && start < sorted[i - 1].end) {
-        errors[day] = 'İş saatları kəsişir'
+        errors[day] = 'overlap'
         return
       }
     }
@@ -62,17 +55,25 @@ export function validateWeek(week: Week): Record<number, string> {
   return errors
 }
 
+/** Monday-first weekday names in the page language, capitalised. */
+function useDayNames() {
+  const locale = useLocale()
+  const { weekdays } = dateNames(locale)
+  return Array.from({ length: 7 }, (_, day) => {
+    const name = weekdays[(day + 1) % 7]
+    return name.charAt(0).toUpperCase() + name.slice(1)
+  })
+}
+
 /** Weekly hours and days off (#40). */
 export function ScheduleEditor() {
+  const t = useTranslations('schedule')
   const { data, error, reload } = useApi<AvailabilityView>(
     '/provider/availability',
   )
   return (
     <>
-      <PanelHeading
-        title="İş qrafiki"
-        description="Boş saatlar bu qrafik və mövcud randevulardan hesablanır."
-      />
+      <PanelHeading title={t('title')} description={t('description')} />
       {error ? (
         <p className="text-destructive">{error}</p>
       ) : !data ? (
@@ -94,8 +95,10 @@ function WeeklyHours({
   initial: Week
   onSaved: () => void
 }) {
+  const t = useTranslations('schedule')
+  const dayNames = useDayNames()
   const [week, setWeek] = useState<Week>(initial)
-  const [errors, setErrors] = useState<Record<number, string>>({})
+  const [errors, setErrors] = useState<Record<number, WeekError>>({})
   const [message, setMessage] = useState<{ ok: boolean; text: string }>()
   const [busy, setBusy] = useState(false)
 
@@ -117,7 +120,7 @@ function WeeklyHours({
           ),
         }),
       })
-      setMessage({ ok: true, text: 'Qrafik yadda saxlanıldı' })
+      setMessage({ ok: true, text: t('saved') })
       onSaved()
     } catch (e) {
       setMessage({ ok: false, text: (e as Error).message })
@@ -129,19 +132,19 @@ function WeeklyHours({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Həftəlik iş saatları</CardTitle>
+        <CardTitle>{t('weeklyHours')}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <ul className="flex flex-col divide-y">
           {week.map((intervals, day) => (
             <li key={day} className="flex flex-col gap-2 py-3 sm:flex-row">
               <span className="w-36 shrink-0 pt-1.5 font-medium">
-                {DAY_NAMES[day]}
+                {dayNames[day]}
               </span>
               <div className="flex flex-1 flex-col gap-2">
                 {intervals.length === 0 && (
                   <span className="pt-1.5 text-sm text-muted-foreground">
-                    İstirahət günü
+                    {t('dayOff')}
                   </span>
                 )}
                 {intervals.map((x, i) => (
@@ -149,7 +152,7 @@ function WeeklyHours({
                     <Input
                       type="time"
                       step={900}
-                      aria-label={`${DAY_NAMES[day]} başlama`}
+                      aria-label={t('start', { day: dayNames[day] })}
                       value={x.start}
                       className="w-28"
                       onChange={(e) =>
@@ -165,7 +168,7 @@ function WeeklyHours({
                     <Input
                       type="time"
                       step={900}
-                      aria-label={`${DAY_NAMES[day]} bitmə`}
+                      aria-label={t('end', { day: dayNames[day] })}
                       value={x.end}
                       className="w-28"
                       onChange={(e) =>
@@ -180,7 +183,7 @@ function WeeklyHours({
                     <Button
                       variant="ghost"
                       size="icon-lg"
-                      aria-label="Aralığı sil"
+                      aria-label={t('removeInterval')}
                       onClick={() =>
                         update(
                           day,
@@ -193,7 +196,7 @@ function WeeklyHours({
                   </div>
                 ))}
                 {errors[day] && (
-                  <p className="text-xs text-destructive">{errors[day]}</p>
+                  <p className="text-xs text-destructive">{t(errors[day])}</p>
                 )}
                 <Button
                   variant="outline"
@@ -212,7 +215,7 @@ function WeeklyHours({
                   }}
                 >
                   <Plus aria-hidden />
-                  {intervals.length ? 'Aralıq əlavə et' : 'İş günü et'}
+                  {intervals.length ? t('addInterval') : t('makeWorkDay')}
                 </Button>
               </div>
             </li>
@@ -230,7 +233,7 @@ function WeeklyHours({
         )}
         <Button size="lg" className="h-11" disabled={busy} onClick={save}>
           {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-          Qrafiki yadda saxla
+          {t('saveSchedule')}
         </Button>
       </CardContent>
     </Card>
@@ -244,6 +247,8 @@ function DaysOff({
   items: TimeOff[]
   onChanged: () => void
 }) {
+  const t = useTranslations('schedule')
+  const locale = useLocale()
   const today = todayInBaku()
   const [startsOn, setStartsOn] = useState(today)
   const [endsOn, setEndsOn] = useState(today)
@@ -255,7 +260,7 @@ function DaysOff({
     event.preventDefault()
     setError(null)
     if (!startsOn || !endsOn || endsOn < startsOn) {
-      setError('Bitmə tarixi başlama tarixindən əvvəl ola bilməz')
+      setError(t('endBeforeStart'))
       return
     }
     setBusy(true)
@@ -290,13 +295,13 @@ function DaysOff({
   return (
     <Card className="self-start">
       <CardHeader>
-        <CardTitle>İstirahət günləri</CardTitle>
+        <CardTitle>{t('daysOff')}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {items.length === 0 ? (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <CalendarOff aria-hidden className="size-4" />
-            Planlanmış istirahət yoxdur.
+            {t('noDaysOff')}
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
@@ -308,8 +313,8 @@ function DaysOff({
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">
                     {item.startsOn === item.endsOn
-                      ? formatDateLong(item.startsOn)
-                      : `${formatDateLong(item.startsOn)} - ${formatDateLong(item.endsOn)}`}
+                      ? formatDateLong(item.startsOn, locale)
+                      : `${formatDateLong(item.startsOn, locale)} - ${formatDateLong(item.endsOn, locale)}`}
                   </p>
                   {item.reason && (
                     <p className="text-muted-foreground">{item.reason}</p>
@@ -318,7 +323,7 @@ function DaysOff({
                 <Button
                   variant="ghost"
                   size="icon-lg"
-                  aria-label="İstirahəti sil"
+                  aria-label={t('removeDayOff')}
                   onClick={() => remove(item.id)}
                 >
                   <Trash2 aria-hidden />
@@ -329,7 +334,7 @@ function DaysOff({
         )}
         <form onSubmit={add} className="flex flex-col gap-3 border-t pt-4">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Başlama" id="t-start">
+            <Field label={t('startsOn')} id="t-start">
               <Input
                 id="t-start"
                 type="date"
@@ -341,7 +346,7 @@ function DaysOff({
                 }}
               />
             </Field>
-            <Field label="Bitmə" id="t-end">
+            <Field label={t('endsOn')} id="t-end">
               <Input
                 id="t-end"
                 type="date"
@@ -351,7 +356,7 @@ function DaysOff({
               />
             </Field>
           </div>
-          <Field label="Səbəb (istəyə görə)" id="t-reason">
+          <Field label={t('reason')} id="t-reason">
             <Input
               id="t-reason"
               maxLength={255}
@@ -370,7 +375,7 @@ function DaysOff({
             ) : (
               <Plus aria-hidden />
             )}
-            İstirahət əlavə et
+            {t('addDayOff')}
           </Button>
         </form>
       </CardContent>

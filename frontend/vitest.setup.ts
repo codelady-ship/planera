@@ -37,13 +37,24 @@ vi.mock('@/i18n/navigation', async () => {
   }
 })
 
-// Texts come from the Azerbaijani messages, without a provider (#94).
-const translator = (namespace?: string) =>
-  createTranslator({
-    locale: 'az',
-    messages: az,
-    namespace: namespace as never,
-  })
+// Texts come from the Azerbaijani messages, without a provider (#94). One
+// translator per namespace, stable across renders like next-intl's own hook.
+const translators = new Map<
+  string | undefined,
+  ReturnType<typeof createTranslator>
+>()
+const translator = (namespace?: string) => {
+  let t = translators.get(namespace)
+  if (!t) {
+    t = createTranslator({
+      locale: 'az',
+      messages: az,
+      namespace: namespace as never,
+    })
+    translators.set(namespace, t)
+  }
+  return t
+}
 vi.mock('next-intl', async () => {
   const actual = await vi.importActual<typeof import('next-intl')>('next-intl')
   return {

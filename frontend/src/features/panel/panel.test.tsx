@@ -78,9 +78,9 @@ describe('form rules match the API', () => {
         durationMinutes: '4',
       }),
     ).toEqual({
-      name: 'Ad mütləqdir',
-      price: 'Ən çox 2 onluq rəqəm',
-      durationMinutes: 'Ən azı 5 dəqiqə',
+      name: 'nameRequired',
+      price: 'priceDecimals',
+      durationMinutes: 'durationMin',
     })
     expect(validateService({ ...ok, durationMinutes: '601' })).toHaveProperty(
       'durationMinutes',
@@ -103,8 +103,8 @@ describe('form rules match the API', () => {
       { start: '12:00', end: '18:00' },
     ]
     expect(validateWeek(week)).toEqual({
-      1: 'Başlama vaxtı bitmə vaxtından əvvəl olmalıdır',
-      2: 'İş saatları kəsişir',
+      1: 'startBeforeEnd',
+      2: 'overlap',
     })
   })
 })

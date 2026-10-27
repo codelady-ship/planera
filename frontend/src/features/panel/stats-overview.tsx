@@ -1,12 +1,13 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { CalendarCheck, CalendarDays, Percent, Wallet } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSession } from '@/features/auth/use-session'
 import type { Stats } from '@/lib/api/types'
-import { WEEKDAYS_SHORT, formatDateLong, formatPrice } from '@/lib/dates'
+import { dateNames, formatDateLong, formatPrice } from '@/lib/dates'
 import { cn } from '@/lib/utils'
 import { PanelHeading } from './panel-shell'
 import { panelPaths } from './paths'
@@ -14,6 +15,8 @@ import { useApi } from './use-api'
 
 /** Overview (#41): this week's numbers and the most booked services. */
 export function StatsOverview() {
+  const t = useTranslations('panel')
+  const locale = useLocale()
   const { user } = useSession()
   const { data, error } = useApi<Stats>(
     user ? panelPaths(user.role).stats : null,
@@ -22,11 +25,9 @@ export function StatsOverview() {
   return (
     <>
       <PanelHeading
-        title="Ümumi baxış"
+        title={t('overview')}
         description={
-          user?.role === 'ADMIN'
-            ? 'Bütün platforma üzrə bu həftə'
-            : 'Sizin bu həftəniz'
+          user?.role === 'ADMIN' ? t('thisWeekAll') : t('thisWeekYours')
         }
       />
       {error ? (
@@ -42,27 +43,27 @@ export function StatsOverview() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Tile
               icon={CalendarCheck}
-              label="Bu gün"
+              label={t('today')}
               value={String(data.todayCount)}
-              hint={formatDateLong(data.today)}
+              hint={formatDateLong(data.today, locale)}
             />
             <Tile
               icon={CalendarDays}
-              label="Bu həftə"
+              label={t('thisWeek')}
               value={String(data.weekCount)}
-              hint="randevu"
+              hint={t('appointmentsHint')}
             />
             <Tile
               icon={Wallet}
-              label="Həftəlik gəlir"
+              label={t('weekRevenue')}
               value={formatPrice(data.weekRevenue)}
-              hint="ləğv və gəlməyənlər daxil deyil"
+              hint={t('revenueHint')}
             />
             <Tile
               icon={Percent}
-              label="Ləğv faizi"
+              label={t('cancelRate')}
               value={`${data.cancellationRate}%`}
-              hint="bu həftənin randevularından"
+              hint={t('cancelHint')}
             />
           </div>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -102,16 +103,19 @@ function Tile({
 
 /** Flat bars, one per weekday; today is the teal one. */
 function WeekChart({ stats }: { stats: Stats }) {
+  const t = useTranslations('panel')
+  const locale = useLocale()
+  const weekdays = dateNames(locale).weekdaysShort
   const max = Math.max(1, ...stats.week.map((d) => d.count))
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Həftə üzrə randevular</CardTitle>
+        <CardTitle>{t('weekChart')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ol
           className="flex h-48 items-end gap-2"
-          aria-label="Günlər üzrə randevu sayı"
+          aria-label={t('weekChartLabel')}
         >
           {stats.week.map((day, i) => (
             <li
@@ -129,7 +133,7 @@ function WeekChart({ stats }: { stats: Stats }) {
                 style={{ height: `${(day.count / max) * 100}%`, minHeight: 2 }}
               />
               <span className="text-xs text-muted-foreground">
-                {WEEKDAYS_SHORT[i]}
+                {weekdays[i]}
               </span>
             </li>
           ))}
@@ -140,17 +144,16 @@ function WeekChart({ stats }: { stats: Stats }) {
 }
 
 function PopularServices({ stats }: { stats: Stats }) {
+  const t = useTranslations('panel')
   const max = Math.max(1, ...stats.popularServices.map((s) => s.count))
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ən populyar xidmətlər</CardTitle>
+        <CardTitle>{t('popular')}</CardTitle>
       </CardHeader>
       <CardContent>
         {stats.popularServices.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Son 30 gündə randevu olmayıb.
-          </p>
+          <p className="text-sm text-muted-foreground">{t('noRecent')}</p>
         ) : (
           <ol className="flex flex-col gap-3">
             {stats.popularServices.map((service) => (
@@ -171,7 +174,7 @@ function PopularServices({ stats }: { stats: Stats }) {
             ))}
           </ol>
         )}
-        <p className="mt-4 text-xs text-muted-foreground">Son 30 gün</p>
+        <p className="mt-4 text-xs text-muted-foreground">{t('last30')}</p>
       </CardContent>
     </Card>
   )

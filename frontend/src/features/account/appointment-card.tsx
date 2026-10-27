@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useState } from 'react'
 import { CalendarClock, Clock, LoaderCircle, Star, X } from 'lucide-react'
@@ -42,6 +43,8 @@ export function AppointmentCard({
   appointment: Appointment
   onChange: () => void
 }) {
+  const t = useTranslations('account')
+  const locale = useLocale()
   const [cancelOpen, setCancelOpen] = useState(false)
   const [moveOpen, setMoveOpen] = useState(false)
   const [reviewOpen, setReviewOpen] = useState(false)
@@ -66,11 +69,11 @@ export function AppointmentCard({
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
           <span className="flex items-center gap-1.5">
             <CalendarClock className="size-4" aria-hidden />
-            {formatDateLong(appointment.date)}, {appointment.time}
+            {formatDateLong(appointment.date, locale)}, {appointment.time}
           </span>
           <span className="flex items-center gap-1.5 text-muted-foreground">
             <Clock className="size-4" aria-hidden />
-            {formatDuration(appointment.durationMinutes)}
+            {formatDuration(appointment.durationMinutes, locale)}
           </span>
           <span className="font-medium">{formatPrice(appointment.price)}</span>
         </div>
@@ -81,7 +84,7 @@ export function AppointmentCard({
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setMoveOpen(true)}>
               <CalendarClock aria-hidden />
-              Vaxtını dəyiş
+              {t('reschedule')}
             </Button>
             <Button
               variant="outline"
@@ -89,7 +92,7 @@ export function AppointmentCard({
               onClick={() => setCancelOpen(true)}
             >
               <X aria-hidden />
-              Ləğv et
+              {t('cancel')}
             </Button>
           </div>
         )}
@@ -97,7 +100,7 @@ export function AppointmentCard({
           <div>
             <Button variant="outline" onClick={() => setReviewOpen(true)}>
               <Star aria-hidden />
-              Rəy yaz
+              {t('writeReview')}
             </Button>
           </div>
         )}
@@ -139,6 +142,9 @@ function CancelDialog({
   onOpenChange: (open: boolean) => void
   onDone: () => void
 }) {
+  const t = useTranslations('account')
+  const tc = useTranslations('common')
+  const locale = useLocale()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -153,7 +159,7 @@ function CancelDialog({
       onOpenChange(false)
       onDone()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Ləğv etmək olmadı')
+      setError(e instanceof Error ? e.message : t('cancelFailed'))
     } finally {
       setBusy(false)
     }
@@ -163,10 +169,13 @@ function CancelDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Randevunu ləğv edirsiniz?</AlertDialogTitle>
+          <AlertDialogTitle>{t('cancelTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {appointment.providerName}, {formatDateLong(appointment.date)}{' '}
-            {appointment.time}. Bu əməliyyatı geri qaytarmaq olmur.
+            {t('cancelText', {
+              provider: appointment.providerName,
+              date: formatDateLong(appointment.date, locale),
+              time: appointment.time,
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && (
@@ -175,10 +184,10 @@ function CancelDialog({
           </p>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel>İmtina</AlertDialogCancel>
+          <AlertDialogCancel>{tc('dismiss')}</AlertDialogCancel>
           <Button variant="destructive" disabled={busy} onClick={cancel}>
             {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-            Bəli, ləğv et
+            {t('cancelConfirm')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -195,6 +204,7 @@ function RescheduleDialog({
   onClose: () => void
   onDone: () => void
 }) {
+  const t = useTranslations('account')
   const today = todayInBaku()
   const [month, setMonth] = useState(today.slice(0, 7))
   const [date, setDate] = useState<string | null>(null)
@@ -223,7 +233,7 @@ function RescheduleDialog({
         setTime(null)
         setVersion((v) => v + 1)
       }
-      setError(e instanceof Error ? e.message : 'Vaxtı dəyişmək olmadı')
+      setError(e instanceof Error ? e.message : t('rescheduleFailed'))
     } finally {
       setBusy(false)
     }
@@ -233,7 +243,7 @@ function RescheduleDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Yeni vaxt seçin</DialogTitle>
+          <DialogTitle>{t('pickNewTime')}</DialogTitle>
         </DialogHeader>
         <MonthCalendar
           month={month}
@@ -260,7 +270,7 @@ function RescheduleDialog({
           onClick={save}
         >
           {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-          Yadda saxla
+          {t('save')}
         </Button>
       </DialogContent>
     </Dialog>

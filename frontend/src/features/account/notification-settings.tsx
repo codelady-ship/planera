@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   Bell,
   BellOff,
@@ -28,19 +29,17 @@ import {
   requestNativePermission,
   sendNativeTest,
 } from '@/features/mobile/native-alarms'
+import type { Locale } from '@/i18n/routing'
 import { api } from '@/lib/api/client'
 import type { NotificationSettings as Settings } from '@/lib/api/types'
 
 /** Reminder offsets a user may pick (#57); the API refuses any other value. */
-export const REMINDER_OPTIONS = [
-  { value: 1440, label: '1 gün əvvəl' },
-  { value: 60, label: '1 saat əvvəl' },
-  { value: 15, label: '15 dəqiqə əvvəl' },
-  { value: 0, label: 'Randevu saatında' },
-] as const
+export const REMINDER_OPTIONS = [1440, 60, 15, 0] as const
 
 /** Push notifications for this browser (#55) and reminder times (#57). */
 export function NotificationSettings() {
+  const t = useTranslations('notifications')
+  const locale = useLocale() as Locale
   const [status, setStatus] = useState<PushStatus | 'loading'>('loading')
   const [homeScreen, setHomeScreen] = useState(false)
   const [native, setNative] = useState(false)
@@ -74,7 +73,7 @@ export function NotificationSettings() {
     try {
       setMessage(await action())
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Xəta baş verdi')
+      setMessage(e instanceof Error ? e.message : t('error'))
     } finally {
       setBusy(false)
     }
@@ -83,37 +82,29 @@ export function NotificationSettings() {
   const enable = () =>
     run(async () => {
       if (native) {
-        const permission = await requestNativePermission()
+        const permission = await requestNativePermission(locale)
         setStatus(permission === 'granted' ? 'on' : 'denied')
-        return permission === 'granted'
-          ? 'Alarm bildirişləri bu cihazda açıldı.'
-          : 'İcazə verilmədi. Telefonun ayarlarından Planera üçün bildirişlərə icazə verin.'
+        return permission === 'granted' ? t('nativeOn') : t('nativeDenied')
       }
       const next = await enablePush()
       setStatus(next)
-      return next === 'on'
-        ? 'Bildirişlər bu cihazda açıldı.'
-        : next === 'denied'
-          ? 'İcazə verilmədi. Brauzer ayarlarından bildirişlərə icazə verin.'
-          : null
+      return next === 'on' ? t('on') : next === 'denied' ? t('denied') : null
     })
 
   const disable = () =>
     run(async () => {
       setStatus(await disablePush())
-      return 'Bildirişlər bu cihazda bağlandı.'
+      return t('off')
     })
 
   const sendTest = () =>
     run(async () => {
       if (native) {
-        await sendNativeTest()
-        return 'Test alarmı 3 saniyəyə gələcək.'
+        await sendNativeTest(locale)
+        return t('testNative')
       }
       const delivered = await sendTestPush()
-      return delivered > 0
-        ? 'Test bildirişi göndərildi.'
-        : 'Bildiriş çatmadı. Bildirişləri bağlayıb yenidən açın.'
+      return delivered > 0 ? t('testSent') : t('testFailed')
     })
 
   if (status === 'loading') return <Skeleton className="h-40 rounded-xl" />
@@ -136,19 +127,14 @@ export function NotificationSettings() {
           </div>
           <div className="space-y-1">
             <h2 id="notifications-title" className="font-medium">
-              Bu cihazda bildirişlər
+              {t('title')}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {status === 'on' &&
-                'Açıqdır. Randevudan əvvəl xatırlatma bu cihaza gələcək.'}
-              {status === 'off' &&
-                'Randevudan əvvəl bu cihaza bildiriş gəlsin. İcazə yalnız düyməyə basanda istənir.'}
-              {status === 'denied' &&
-                'Bu brauzerdə bildirişlərə icazə bağlanıb. Sayt ayarlarından icazə verin, sonra yenidən açın.'}
+              {status === 'on' && t('statusOn')}
+              {status === 'off' && t('statusOff')}
+              {status === 'denied' && t('statusDenied')}
               {status === 'unsupported' &&
-                (homeScreen
-                  ? 'iPhone-da bildirişlər üçün əvvəlcə saytı ana ekrana əlavə edin: Paylaş, sonra "Ana ekrana əlavə et".'
-                  : 'Bu brauzer bildirişləri dəstəkləmir.')}
+                (homeScreen ? t('homeScreen') : t('unsupported'))}
             </p>
           </div>
         </div>
@@ -162,18 +148,18 @@ export function NotificationSettings() {
                 ) : (
                   <Bell aria-hidden />
                 )}
-                Bildirişləri aç
+                {t('enable')}
               </Button>
             ) : (
               <>
                 <Button variant="outline" onClick={sendTest} disabled={busy}>
                   <Send aria-hidden />
-                  Test bildirişi göndər
+                  {t('sendTest')}
                 </Button>
                 {!native && (
                   <Button variant="ghost" onClick={disable} disabled={busy}>
                     <BellOff aria-hidden />
-                    Bağla
+                    {t('disable')}
                   </Button>
                 )}
               </>
@@ -196,6 +182,7 @@ export function NotificationSettings() {
 
 /** Which reminders to send; stored on the account, so every device agrees. */
 function ReminderTimes() {
+  const t = useTranslations('notifications')
   const [offsets, setOffsets] = useState<number[] | null>(null)
   const [saved, setSaved] = useState<number[] | null>(null)
   const [busy, setBusy] = useState(false)
@@ -211,12 +198,12 @@ function ReminderTimes() {
       })
       .catch((e: unknown) => {
         if (!active) return
-        setMessage(e instanceof Error ? e.message : 'Ayarları yükləmək olmadı')
+        setMessage(e instanceof Error ? e.message : t('loadFailed'))
       })
     return () => {
       active = false
     }
-  }, [])
+  }, [t])
 
   function toggle(value: number, checked: boolean) {
     setOffsets((current) => {
@@ -239,11 +226,11 @@ function ReminderTimes() {
       setSaved(result.reminderOffsets)
       setMessage(
         result.reminderOffsets.length === 0
-          ? 'Xatırlatmalar söndürüldü.'
-          : 'Xatırlatma vaxtları yadda saxlanıldı.',
+          ? t('remindersOff')
+          : t('remindersSaved'),
       )
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Yadda saxlamaq olmadı')
+      setMessage(e instanceof Error ? e.message : t('saveFailed'))
     } finally {
       setBusy(false)
     }
@@ -265,12 +252,9 @@ function ReminderTimes() {
         </div>
         <div className="space-y-1">
           <h2 id="reminder-times-title" className="font-medium">
-            Xatırlatma vaxtları
+            {t('remindersTitle')}
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Hər randevu üçün seçilmiş vaxtlarda bildiriş gəlir. Heç biri
-            seçilməyəndə xatırlatma göndərilmir.
-          </p>
+          <p className="text-sm text-muted-foreground">{t('remindersText')}</p>
         </div>
       </div>
 
@@ -278,14 +262,14 @@ function ReminderTimes() {
         <Skeleton className="h-28" />
       ) : (
         <div className="flex flex-col gap-3">
-          {REMINDER_OPTIONS.map((option) => (
-            <Label key={option.value} className="gap-3 py-1 font-normal">
+          {REMINDER_OPTIONS.map((value) => (
+            <Label key={value} className="gap-3 py-1 font-normal">
               <Checkbox
-                checked={offsets.includes(option.value)}
-                onCheckedChange={(checked) => toggle(option.value, checked)}
+                checked={offsets.includes(value)}
+                onCheckedChange={(checked) => toggle(value, checked)}
                 disabled={busy}
               />
-              {option.label}
+              {t(`offset${value}`)}
             </Label>
           ))}
         </div>
@@ -294,7 +278,7 @@ function ReminderTimes() {
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={save} disabled={busy || !dirty}>
           {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-          Yadda saxla
+          {t('save')}
         </Button>
         {message && (
           <p role="status" className="text-sm text-muted-foreground">

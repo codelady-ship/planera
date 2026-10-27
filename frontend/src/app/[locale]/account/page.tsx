@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AccountView } from '@/features/account/account-view'
@@ -7,9 +7,12 @@ import { AlarmReader } from '@/features/diary/alarm-reader'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
 
-export const metadata: Metadata = {
-  title: 'Kabinetim',
-  robots: { index: false },
+export async function generateMetadata({
+  params,
+}: PageProps<'/[locale]/account'>): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'account' })
+  return { title: t('title'), robots: { index: false } }
 }
 
 /** Signed-in only: proxy.ts redirects visitors without a session to /login. */

@@ -3,8 +3,11 @@ import {
   LocalNotifications,
   type LocalNotificationSchema,
 } from '@capacitor/local-notifications'
+import { appointmentAlarmText, noteAlarmText } from '@/features/diary/speech'
+import { currentLocale } from '@/i18n/current'
+import type { Locale } from '@/i18n/routing'
 import type { AgendaItem } from '@/lib/api/types'
-import { formatDateLong, todayInBaku } from '@/lib/dates'
+import { dateNames, formatDateLong, todayInBaku } from '@/lib/dates'
 
 // Native alarms (#65): inside the Android / iOS app the agenda is turned
 // into local notifications that fire at the exact time, with sound, even
@@ -14,6 +17,38 @@ export const CHANNEL_ID = 'planera-alarms'
 /** Reserved id range so the app's alarms never collide with other plugins. */
 const ID_BASE = 100_000
 const HORIZON_MS = 30 * 24 * 60 * 60 * 1000
+
+/** Notification titles and the Android channel in the page language (#94). */
+const TEXTS: Record<
+  Locale,
+  { note: string; appointment: string; channel: string; channelText: string }
+> = {
+  az: {
+    note: 'Qeyd xatırlatması',
+    appointment: 'Randevu xatırlatması',
+    channel: 'Xatırlatmalar',
+    channelText: 'Randevu və qeyd alarmları',
+  },
+  en: {
+    note: 'Note reminder',
+    appointment: 'Appointment reminder',
+    channel: 'Reminders',
+    channelText: 'Appointment and note alarms',
+  },
+  ru: {
+    note: 'Напоминание о заметке',
+    appointment: 'Напоминание о записи',
+    channel: 'Напоминания',
+    channelText: 'Будильники записей и заметок',
+  },
+}
+
+/** The sample sentence of the test alarm, like the voice settings use. */
+const SAMPLE_TITLE: Record<Locale, string> = {
+  az: 'həkimə getmək',
+  en: 'visit the doctor',
+  ru: 'сходить к врачу',
+}
 
 export function isNativeApp() {
   return Capacitor.isNativePlatform()
@@ -31,13 +66,15 @@ export async function checkNativePermission(): Promise<NativePermission> {
 }
 
 /** Asks only when called from a button press (#55 rule applies here too). */
-export async function requestNativePermission(): Promise<NativePermission> {
+export async function requestNativePermission(
+  locale: Locale = currentLocale(),
+): Promise<NativePermission> {
   const { display } = await LocalNotifications.requestPermissions()
   if (display === 'granted' && Capacitor.getPlatform() === 'android') {
     await LocalNotifications.createChannel({
       id: CHANNEL_ID,
-      name: 'Xatırlatmalar',
-      description: 'Randevu və qeyd alarmları',
+      name: TEXTS[locale].channel,
+      description: TEXTS[locale].channelText,
       importance: 5,
       visibility: 1,
       vibration: true,
@@ -48,16 +85,30 @@ export async function requestNativePermission(): Promise<NativePermission> {
 }
 
 /** The sentence the notification shows and the app reads aloud on tap (#62). */
-export function alarmSentence(item: AgendaItem, today = todayInBaku()) {
-  const when = item.date === today ? 'bu gün' : formatDateLong(item.date)
+export function alarmSentence(
+  item: AgendaItem,
+  today = todayInBaku(),
+  locale: Locale = currentLocale(),
+) {
+  const when =
+    item.date === today
+      ? dateNames(locale).today
+      : formatDateLong(item.date, locale)
   return item.type === 'NOTE'
-    ? `Sizin ${when} saat ${item.time}-da qeydiniz var: ${item.title}`
-    : `Sizin ${when} saat ${item.time}-da ${item.title} ilə randevunuz var: ${item.subtitle ?? ''}`.trim()
+    ? noteAlarmText(when, item.time, item.title, locale)
+    : appointmentAlarmText(
+        when,
+        item.time,
+        item.title,
+        item.subtitle ?? '',
+        locale,
+      )
 }
 
 export function toNotification(
   item: AgendaItem,
   now = Date.now(),
+  locale: Locale = currentLocale(),
 ): LocalNotificationSchema | null {
   const at = new Date(item.startsAt).getTime()
   if (at <= now || at - now > HORIZON_MS) return null
@@ -68,10 +119,11 @@ export function toNotification(
     item.status !== 'PENDING'
   )
     return null
-  const sentence = alarmSentence(item)
+  const sentence = alarmSentence(item, todayInBaku(), locale)
   return {
     id: ID_BASE + (item.type === 'NOTE' ? 2 * item.id : 2 * item.id + 1),
-    title: item.type === 'NOTE' ? 'Qeyd xatırlatması' : 'Randevu xatırlatması',
+    title:
+      item.type === 'NOTE' ? TEXTS[locale].note : TEXTS[locale].appointment,
     body: sentence,
     schedule: { at: new Date(at), allowWhileIdle: true },
     channelId: CHANNEL_ID,
@@ -85,7 +137,10 @@ export function toNotification(
  * Replaces the app's pending alarms with the current agenda. Called after
  * every load of the diary, so edits, deletions and new notes are reflected.
  */
-export async function syncNativeAlarms(items: AgendaItem[]) {
+export async function syncNativeAlarms(
+  items: AgendaItem[],
+  locale: Locale = currentLocale(),
+) {
   if (!isNativeApp()) return 0
   if ((await checkNativePermission()) !== 'granted') return 0
   const { notifications: pending } = await LocalNotifications.getPending()
@@ -96,7 +151,7 @@ export async function syncNativeAlarms(items: AgendaItem[]) {
     })
   }
   const notifications = items
-    .map((item) => toNotification(item))
+    .map((item) => toNotification(item, Date.now(), locale))
     .filter((n): n is LocalNotificationSchema => n !== null)
   if (notifications.length > 0) {
     await LocalNotifications.schedule({ notifications })
@@ -105,8 +160,13 @@ export async function syncNativeAlarms(items: AgendaItem[]) {
 }
 
 /** A notification a few seconds from now, so the user hears the sound and sees the icon. */
-export async function sendNativeTest() {
-  const sentence = 'Sizin bu gün saat 15:00-da qeydiniz var: həkimə getmək'
+export async function sendNativeTest(locale: Locale = currentLocale()) {
+  const sentence = noteAlarmText(
+    dateNames(locale).today,
+    '15:00',
+    SAMPLE_TITLE[locale],
+    locale,
+  )
   await LocalNotifications.schedule({
     notifications: [
       {

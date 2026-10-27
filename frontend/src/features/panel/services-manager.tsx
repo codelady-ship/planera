@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type FormEvent, type ReactNode } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Clock, LoaderCircle, Pencil, Plus, Trash2 } from 'lucide-react'
 import {
   AlertDialog,
@@ -34,24 +35,36 @@ export interface ServiceForm {
   durationMinutes: string
 }
 
+/** Message keys (namespace "services") for the form rules. */
+export type ServiceError =
+  | 'nameRequired'
+  | 'nameMax'
+  | 'descriptionMax'
+  | 'priceMin'
+  | 'priceDecimals'
+  | 'durationMin'
+  | 'durationMax'
+
 /** The same limits as ProviderDtos.ServiceRequest on the API (#40). */
-export function validateService(form: ServiceForm): Record<string, string> {
-  const errors: Record<string, string> = {}
+export function validateService(
+  form: ServiceForm,
+): Partial<Record<keyof ServiceForm, ServiceError>> {
+  const errors: Partial<Record<keyof ServiceForm, ServiceError>> = {}
   const name = form.name.trim()
-  if (!name) errors.name = 'Ad mütləqdir'
-  else if (name.length > 120) errors.name = 'Ən çox 120 simvol'
-  if (form.description.length > 500) errors.description = 'Ən çox 500 simvol'
+  if (!name) errors.name = 'nameRequired'
+  else if (name.length > 120) errors.name = 'nameMax'
+  if (form.description.length > 500) errors.description = 'descriptionMax'
   const price = Number(form.price)
   if (form.price.trim() === '' || Number.isNaN(price) || price < 0) {
-    errors.price = 'Qiymət 0 və ya daha çox olmalıdır'
+    errors.price = 'priceMin'
   } else if (!/^\d{1,8}(\.\d{1,2})?$/.test(form.price.trim())) {
-    errors.price = 'Ən çox 2 onluq rəqəm'
+    errors.price = 'priceDecimals'
   }
   const duration = Number(form.durationMinutes)
   if (!Number.isInteger(duration) || duration < 5) {
-    errors.durationMinutes = 'Ən azı 5 dəqiqə'
+    errors.durationMinutes = 'durationMin'
   } else if (duration > 600) {
-    errors.durationMinutes = 'Ən çox 600 dəqiqə'
+    errors.durationMinutes = 'durationMax'
   }
   return errors
 }
@@ -64,6 +77,9 @@ const EMPTY: ServiceForm = {
 }
 
 export function ServicesManager() {
+  const t = useTranslations('services')
+  const tc = useTranslations('common')
+  const locale = useLocale()
   const { data, error, reload } = useApi<ServiceView[]>('/provider/services')
   const [editing, setEditing] = useState<ServiceView | 'new' | null>(null)
   const [deleting, setDeleting] = useState<ServiceView | null>(null)
@@ -82,12 +98,12 @@ export function ServicesManager() {
   return (
     <>
       <PanelHeading
-        title="Xidmətlər"
-        description="Müştərilər bu xidmətləri profilinizdə görür."
+        title={t('title')}
+        description={t('description')}
         action={
           <Button size="lg" onClick={() => setEditing('new')}>
             <Plus aria-hidden />
-            Yeni xidmət
+            {t('new')}
           </Button>
         }
       />
@@ -105,7 +121,7 @@ export function ServicesManager() {
         </div>
       ) : data.length === 0 ? (
         <p className="rounded-xl border border-dashed p-10 text-center text-muted-foreground">
-          Hələ xidmət yoxdur. İlk xidmətinizi əlavə edin.
+          {t('empty')}
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -127,7 +143,7 @@ export function ServicesManager() {
                   </span>
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <Clock aria-hidden className="size-3.5" />
-                    {formatDuration(service.durationMinutes)}
+                    {formatDuration(service.durationMinutes, locale)}
                   </span>
                 </p>
               </div>
@@ -135,7 +151,7 @@ export function ServicesManager() {
                 <Button
                   variant="outline"
                   size="icon-lg"
-                  aria-label={`${service.name} - dəyiş`}
+                  aria-label={t('edit', { name: service.name })}
                   onClick={() => setEditing(service)}
                 >
                   <Pencil aria-hidden />
@@ -143,7 +159,7 @@ export function ServicesManager() {
                 <Button
                   variant="destructive"
                   size="icon-lg"
-                  aria-label={`${service.name} - sil`}
+                  aria-label={t('remove', { name: service.name })}
                   onClick={() => setDeleting(service)}
                 >
                   <Trash2 aria-hidden />
@@ -168,14 +184,13 @@ export function ServicesManager() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xidməti silirsiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleting?.name} profilinizdən çıxacaq. Artıq götürülmüş
-              randevular qüvvədə qalır.
+              {deleting && t('deleteText', { name: deleting.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İmtina</AlertDialogCancel>
+            <AlertDialogCancel>{tc('dismiss')}</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={() => {
@@ -183,7 +198,7 @@ export function ServicesManager() {
                 setDeleting(null)
               }}
             >
-              Sil
+              {t('delete')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -201,6 +216,7 @@ function ServiceDialog({
   onClose: () => void
   onSaved: () => void
 }) {
+  const t = useTranslations('services')
   const [form, setForm] = useState<ServiceForm>(
     service
       ? {
@@ -211,6 +227,7 @@ function ServiceDialog({
         }
       : EMPTY,
   )
+  // Local rules give a message key; the API answers with a ready sentence.
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -226,7 +243,11 @@ function ServiceDialog({
   async function submit(event: FormEvent) {
     event.preventDefault()
     const found = validateService(form)
-    setErrors(found)
+    setErrors(
+      Object.fromEntries(
+        Object.entries(found).map(([key, code]) => [key, t(code)]),
+      ),
+    )
     setFormError(null)
     if (Object.keys(found).length) return
     setBusy(true)
@@ -259,21 +280,25 @@ function ServiceDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{service ? 'Xidməti dəyiş' : 'Yeni xidmət'}</DialogTitle>
+          <DialogTitle>{service ? t('editTitle') : t('new')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
-          <Field label="Ad" id="s-name" error={errors.name}>
+          <Field label={t('name')} id="s-name" error={errors.name}>
             <Input {...field('name')} maxLength={120} autoFocus />
           </Field>
-          <Field label="Təsvir" id="s-description" error={errors.description}>
+          <Field
+            label={t('descriptionLabel')}
+            id="s-description"
+            error={errors.description}
+          >
             <Input {...field('description')} maxLength={500} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Qiymət (AZN)" id="s-price" error={errors.price}>
+            <Field label={t('price')} id="s-price" error={errors.price}>
               <Input {...field('price')} inputMode="decimal" placeholder="20" />
             </Field>
             <Field
-              label="Müddət (dəq)"
+              label={t('duration')}
               id="s-durationMinutes"
               error={errors.durationMinutes}
             >
@@ -294,7 +319,7 @@ function ServiceDialog({
           )}
           <Button type="submit" size="lg" className="h-11" disabled={busy}>
             {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-            Yadda saxla
+            {t('save')}
           </Button>
         </form>
       </DialogContent>

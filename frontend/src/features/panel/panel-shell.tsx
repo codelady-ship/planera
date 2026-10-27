@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import type { ReactNode } from 'react'
 import {
@@ -37,7 +38,7 @@ import { ThemeToggle } from '@/features/theme/theme-toggle'
 
 interface NavItem {
   href: string
-  label: string
+  label: 'overview' | 'appointments' | 'services' | 'schedule'
   icon: LucideIcon
   roles: UserRole[]
 }
@@ -46,37 +47,38 @@ interface NavItem {
 export const PANEL_NAV: NavItem[] = [
   {
     href: '/panel',
-    label: 'Ümumi baxış',
+    label: 'overview',
     icon: LayoutDashboard,
     roles: ['ADMIN', 'PROVIDER'],
   },
   {
     href: '/panel/appointments',
-    label: 'Randevular',
+    label: 'appointments',
     icon: CalendarDays,
     roles: ['ADMIN', 'PROVIDER'],
   },
   {
     href: '/panel/services',
-    label: 'Xidmətlər',
+    label: 'services',
     icon: ListChecks,
     roles: ['PROVIDER'],
   },
   {
     href: '/panel/schedule',
-    label: 'İş qrafiki',
+    label: 'schedule',
     icon: Clock,
     roles: ['PROVIDER'],
   },
 ]
 
-const ROLE_LABEL: Record<UserRole, string> = {
-  ADMIN: 'Admin',
-  PROVIDER: 'Mütəxəssis',
-  CUSTOMER: 'Müştəri',
-}
+const ROLE_KEY = {
+  ADMIN: 'roleAdmin',
+  PROVIDER: 'roleProvider',
+  CUSTOMER: 'roleCustomer',
+} as const
 
 export function PanelShell({ children }: { children: ReactNode }) {
+  const t = useTranslations('panel')
   const { status, user } = useSession()
 
   if (status === 'loading') {
@@ -92,17 +94,13 @@ export function PanelShell({ children }: { children: ReactNode }) {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-4 p-4 text-center">
         <ShieldAlert aria-hidden className="size-10 text-muted-foreground" />
-        <h1 className="text-xl font-semibold">
-          Bu bölmə mütəxəssis və admin üçündür
-        </h1>
-        <p className="text-muted-foreground">
-          Randevularınızı kabinetinizdən idarə edə bilərsiniz.
-        </p>
+        <h1 className="text-xl font-semibold">{t('forbiddenTitle')}</h1>
+        <p className="text-muted-foreground">{t('forbiddenText')}</p>
         <Link
           href={user ? '/account' : '/login?next=/panel'}
           className={buttonVariants()}
         >
-          {user ? 'Kabinetə keç' : 'Daxil ol'}
+          {user ? t('toAccount') : t('login')}
         </Link>
       </main>
     )
@@ -116,7 +114,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
             <SidebarTrigger className="-ml-1" />
             <span className="text-sm text-muted-foreground">
-              {ROLE_LABEL[user.role]} paneli
+              {t('panelOf', { role: t(ROLE_KEY[user.role]) })}
             </span>
             <ThemeToggle className="ml-auto" />
           </header>
@@ -130,6 +128,7 @@ export function PanelShell({ children }: { children: ReactNode }) {
 }
 
 function PanelSidebar({ role, name }: { role: UserRole; name: string }) {
+  const t = useTranslations('panel')
   const pathname = usePathname()
   const router = useRouter()
   const { setOpenMobile } = useSidebar()
@@ -156,7 +155,7 @@ function PanelSidebar({ role, name }: { role: UserRole; name: string }) {
                     }
                   >
                     <item.icon aria-hidden />
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -167,13 +166,13 @@ function PanelSidebar({ role, name }: { role: UserRole; name: string }) {
       <SidebarFooter className="border-t">
         <div className="px-2 py-1">
           <p className="truncate text-sm font-medium">{name}</p>
-          <p className="text-xs text-muted-foreground">{ROLE_LABEL[role]}</p>
+          <p className="text-xs text-muted-foreground">{t(ROLE_KEY[role])}</p>
         </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton render={<Link href="/" />}>
               <House aria-hidden />
-              <span>Sayta qayıt</span>
+              <span>{t('backToSite')}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -185,7 +184,7 @@ function PanelSidebar({ role, name }: { role: UserRole; name: string }) {
               }}
             >
               <LogOut aria-hidden />
-              <span>Çıxış</span>
+              <span>{t('logout')}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -217,11 +216,12 @@ export function PanelHeading({
 
 /** Services and hours belong to a provider; an admin gets a pointer instead. */
 export function ProviderOnly({ children }: { children: ReactNode }) {
+  const t = useTranslations('panel')
   const { user } = useSession()
   if (user?.role === 'PROVIDER') return children
   return (
     <p className="rounded-xl border border-dashed p-10 text-center text-muted-foreground">
-      Bu bölmə mütəxəssisin öz xidmət və qrafiki üçündür.
+      {t('providerOnly')}
     </p>
   )
 }
