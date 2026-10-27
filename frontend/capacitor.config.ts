@@ -11,8 +11,7 @@ const config: CapacitorConfig = {
   // Only the offline placeholder lives here; the real pages come from server.url.
   webDir: 'capacitor/www',
   server: {
-    url:
-      process.env.CAPACITOR_SERVER_URL ?? 'https://planera-az.vercel.app',
+    url: process.env.CAPACITOR_SERVER_URL ?? 'https://planera-az.vercel.app',
     cleartext: false,
   },
   android: {
