@@ -1,7 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import { usePathname, useRouter } from '@/i18n/navigation'
 import { SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import type { Category } from '@/lib/api/types'
 
 export const CITIES = ['Bakı', 'Sumqayıt', 'Gəncə', 'Lənkəran', 'Şəki']
@@ -25,6 +26,7 @@ const SELECT =
  * list can be shared, bookmarked and restored with the back button.
  */
 export function SearchFilters({ categories }: { categories: Category[] }) {
+  const t = useTranslations('search')
   const params = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -40,12 +42,12 @@ export function SearchFilters({ categories }: { categories: Category[] }) {
   const fields = (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="f-q">Axtarış</Label>
+        <Label htmlFor="f-q">{t('query')}</Label>
         <Input
           id="f-q"
           key={params.get('q') ?? ''}
           defaultValue={params.get('q') ?? ''}
-          placeholder="Xidmət və ya ad"
+          placeholder={t('queryPlaceholder')}
           className="h-10"
           onKeyDown={(e) => {
             if (e.key === 'Enter') update('q', e.currentTarget.value.trim())
@@ -57,14 +59,14 @@ export function SearchFilters({ categories }: { categories: Category[] }) {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="f-category">Kateqoriya</Label>
+        <Label htmlFor="f-category">{t('category')}</Label>
         <select
           id="f-category"
           className={SELECT}
           value={params.get('category') ?? ''}
           onChange={(e) => update('category', e.target.value)}
         >
-          <option value="">Hamısı</option>
+          <option value="">{t('allCategories')}</option>
           {categories.map((c) => (
             <option key={c.slug} value={c.slug}>
               {c.name}
@@ -73,14 +75,14 @@ export function SearchFilters({ categories }: { categories: Category[] }) {
         </select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="f-city">Şəhər</Label>
+        <Label htmlFor="f-city">{t('city')}</Label>
         <select
           id="f-city"
           className={SELECT}
           value={params.get('city') ?? ''}
           onChange={(e) => update('city', e.target.value)}
         >
-          <option value="">Bütün şəhərlər</option>
+          <option value="">{t('allCities')}</option>
           {CITIES.map((city) => (
             <option key={city} value={city}>
               {city}
@@ -89,36 +91,36 @@ export function SearchFilters({ categories }: { categories: Category[] }) {
         </select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="f-price">Qiymət (maks.)</Label>
+        <Label htmlFor="f-price">{t('maxPrice')}</Label>
         <select
           id="f-price"
           className={SELECT}
           value={params.get('maxPrice') ?? ''}
           onChange={(e) => update('maxPrice', e.target.value)}
         >
-          <option value="">İstənilən</option>
+          <option value="">{t('anyPrice')}</option>
           {[20, 30, 50, 100].map((p) => (
             <option key={p} value={p}>
-              {p} AZN-dək
+              {t('upTo', { price: p })}
             </option>
           ))}
         </select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="f-sort">Sıralama</Label>
+        <Label htmlFor="f-sort">{t('sort')}</Label>
         <select
           id="f-sort"
           className={SELECT}
           value={params.get('sort') ?? 'rating'}
           onChange={(e) => update('sort', e.target.value)}
         >
-          <option value="rating">Reytinqə görə</option>
-          <option value="price">Qiymətə görə</option>
+          <option value="rating">{t('byRating')}</option>
+          <option value="price">{t('byPrice')}</option>
         </select>
       </div>
       {params.size > 0 && (
         <Button variant="outline" onClick={() => router.push(pathname)}>
-          Filtrləri sıfırla
+          {t('reset')}
         </Button>
       )}
     </div>
@@ -134,11 +136,11 @@ export function SearchFilters({ categories }: { categories: Category[] }) {
           }
         >
           <SlidersHorizontal aria-hidden />
-          Filtrlər
+          {t('filters')}
         </SheetTrigger>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Filtrlər</SheetTitle>
+            <SheetTitle>{t('filters')}</SheetTitle>
           </SheetHeader>
           <div className="px-4 pb-6">{fields}</div>
         </SheetContent>

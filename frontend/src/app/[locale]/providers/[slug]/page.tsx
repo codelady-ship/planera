@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,15 +12,18 @@ import { getProvider } from '@/lib/api/catalog'
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/providers/[slug]'>): Promise<Metadata> {
-  const { slug } = await params
+  const { locale, slug } = await params
+  const t = await getTranslations({ locale, namespace: 'provider' })
   const provider = await getProvider(slug)
-  if (!provider || provider === 'unavailable') return { title: 'Mütəxəssis' }
+  if (!provider || provider === 'unavailable') {
+    return { title: t('fallbackTitle') }
+  }
   const { summary } = provider
   return {
     title: `${summary.name} - ${summary.title}`,
     description:
       provider.bio ??
-      `${summary.name}, ${summary.city}. Boş saatı seçin və onlayn randevu götürün.`,
+      t('metaDescription', { name: summary.name, city: summary.city }),
   }
 }
 

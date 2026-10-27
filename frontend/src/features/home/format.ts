@@ -1,12 +1,4 @@
-const WEEKDAYS = [
-  'bazar',
-  'bazar ertəsi',
-  'çərşənbə axşamı',
-  'çərşənbə',
-  'cümə axşamı',
-  'cümə',
-  'şənbə',
-]
+import { dateNames } from '@/lib/dates'
 
 export function formatPrice(azn: number): string {
   return `${azn} AZN`
@@ -18,13 +10,18 @@ export function formatPrice(azn: number): string {
  * Works on the plain strings so the result does not depend on the viewer's
  * time zone.
  */
-export function formatNextSlot(slot: string, today: string): string {
+export function formatNextSlot(
+  slot: string,
+  today: string,
+  locale = 'az',
+): string {
   const [date, time] = slot.split('T')
+  const n = dateNames(locale)
   const days = Math.round(
     (Date.parse(`${date}T00:00Z`) - Date.parse(`${today}T00:00Z`)) / 86_400_000,
   )
-  if (days === 0) return `bu gün ${time}`
-  if (days === 1) return `sabah ${time}`
-  const weekday = WEEKDAYS[new Date(`${date}T00:00Z`).getUTCDay()]
+  if (days === 0) return `${n.today} ${time}`
+  if (days === 1) return `${n.tomorrow} ${time}`
+  const weekday = n.weekdays[new Date(`${date}T00:00Z`).getUTCDay()]
   return `${weekday} ${time}`
 }

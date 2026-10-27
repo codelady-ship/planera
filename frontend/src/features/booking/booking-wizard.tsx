@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { useState } from 'react'
@@ -28,7 +29,7 @@ import { cn } from '@/lib/utils'
 import { MonthCalendar, SlotGrid } from './month-calendar'
 import { useAvailableDates, useSlots } from './use-slots'
 
-const STEPS = ['Xidmət', 'Tarix', 'Saat', 'Təsdiq']
+const STEPS = ['service', 'date', 'time', 'confirm'] as const
 
 /** Bookings open 90 days ahead (SlotService.HORIZON_DAYS). */
 const HORIZON_MONTHS = 3
@@ -39,6 +40,8 @@ const HORIZON_MONTHS = 3
  * through the login page never loses them.
  */
 export function BookingWizard({ provider }: { provider: ProviderDetail }) {
+  const t = useTranslations('booking')
+  const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -105,9 +108,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
         setAlternatives(e.problem.alternatives ?? [])
         setSlotsVersion((v) => v + 1)
       }
-      setError(
-        e instanceof Error ? e.message : 'Xəta baş verdi, yenidən cəhd edin.',
-      )
+      setError(e instanceof Error ? e.message : t('failed'))
     } finally {
       setBusy(false)
     }
@@ -119,7 +120,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <ol className="grid grid-cols-4 gap-2" aria-label="Addımlar">
+      <ol className="grid grid-cols-4 gap-2" aria-label={t('steps')}>
         {STEPS.map((label, i) => (
           <li
             key={label}
@@ -135,7 +136,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
                 i < step ? 'bg-success' : i === step ? 'bg-cta' : 'bg-muted',
               )}
             />
-            {i + 1}. {label}
+            {i + 1}. {t(label)}
           </li>
         ))}
       </ol>
@@ -143,13 +144,13 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
       {step > 0 && (
         <Button variant="ghost" className="self-start" onClick={back}>
           <ArrowLeft aria-hidden />
-          Geri
+          {t('back')}
         </Button>
       )}
 
       {step === 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Xidməti seçin</h2>
+          <h2 className="text-lg font-semibold">{t('pickService')}</h2>
           <ul className="flex flex-col gap-2">
             {provider.services.map((s) => (
               <li key={s.id}>
@@ -162,7 +163,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
                     <span className="block font-medium">{s.name}</span>
                     <span className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="size-3.5" aria-hidden />
-                      {formatDuration(s.durationMinutes)}
+                      {formatDuration(s.durationMinutes, locale)}
                     </span>
                   </span>
                   <span className="shrink-0 font-medium">
@@ -177,7 +178,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
 
       {step === 1 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Tarixi seçin</h2>
+          <h2 className="text-lg font-semibold">{t('pickDate')}</h2>
           <MonthCalendar
             month={month}
             active={activeDates}
@@ -193,9 +194,9 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
       {step === 2 && date && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">
-            Saatı seçin
+            {t('pickTime')}
             <span className="block text-sm font-normal text-muted-foreground">
-              {formatDateLong(date)}
+              {formatDateLong(date, locale)}
             </span>
           </h2>
           <SlotGrid
@@ -208,32 +209,31 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
 
       {step === 3 && service && date && time && (
         <section className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Təsdiq</h2>
+          <h2 className="text-lg font-semibold">{t('confirm')}</h2>
           <Card>
             <CardContent>
               <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-                <dt className="text-muted-foreground">Mütəxəssis</dt>
+                <dt className="text-muted-foreground">{t('provider')}</dt>
                 <dd>{provider.summary.name}</dd>
-                <dt className="text-muted-foreground">Xidmət</dt>
+                <dt className="text-muted-foreground">{t('service')}</dt>
                 <dd>{service.name}</dd>
-                <dt className="text-muted-foreground">Tarix</dt>
-                <dd>{formatDateLong(date)}</dd>
-                <dt className="text-muted-foreground">Saat</dt>
+                <dt className="text-muted-foreground">{t('date')}</dt>
+                <dd>{formatDateLong(date, locale)}</dd>
+                <dt className="text-muted-foreground">{t('time')}</dt>
                 <dd>{time}</dd>
-                <dt className="text-muted-foreground">Müddət</dt>
-                <dd>{formatDuration(service.durationMinutes)}</dd>
-                <dt className="text-muted-foreground">Qiymət</dt>
+                <dt className="text-muted-foreground">{t('duration')}</dt>
+                <dd>{formatDuration(service.durationMinutes, locale)}</dd>
+                <dt className="text-muted-foreground">{t('price')}</dt>
                 <dd className="font-medium">{formatPrice(service.price)}</dd>
               </dl>
               <p className="mt-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
-                Ləğv qaydası: randevuya {provider.cancellationHours} saatdan çox
-                qalana qədər pulsuz ləğv edə və ya vaxtını dəyişə bilərsiniz.
+                {t('cancellationRule', { hours: provider.cancellationHours })}
               </p>
             </CardContent>
           </Card>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="note">Qeyd (istəyə bağlı)</Label>
+            <Label htmlFor="note">{t('note')}</Label>
             <textarea
               id="note"
               value={note}
@@ -249,7 +249,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
               <p className="text-sm text-destructive">{error}</p>
               {alternatives.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm">Bu gün üçün boş saatlar:</p>
+                  <p className="text-sm">{t('alternatives')}</p>
                   <div className="flex flex-wrap gap-2">
                     {alternatives.map((t) => (
                       <Button
@@ -271,7 +271,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
               href={loginHref}
               className={buttonVariants({ size: 'lg', className: 'h-11' })}
             >
-              Daxil olub təsdiqləyin
+              {t('loginToConfirm')}
             </Link>
           ) : (
             <Button
@@ -281,7 +281,7 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
               onClick={confirm}
             >
               {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-              Randevunu təsdiqlə
+              {t('confirmButton')}
             </Button>
           )}
         </section>
@@ -291,13 +291,15 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
 }
 
 function Confirmation({ appointment }: { appointment: Appointment }) {
+  const t = useTranslations('booking')
+  const locale = useLocale()
   return (
     <Card>
       <CardHeader className="items-center text-center">
         <CircleCheck className="mx-auto size-12 text-success" aria-hidden />
-        <CardTitle className="text-xl">Randevunuz qəbul olundu</CardTitle>
+        <CardTitle className="text-xl">{t('accepted')}</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Randevu nömrəsi:{' '}
+          {t('code')}{' '}
           <span className="font-mono font-medium text-foreground">
             {appointment.code}
           </span>
@@ -305,22 +307,22 @@ function Confirmation({ appointment }: { appointment: Appointment }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-          <dt className="text-muted-foreground">Xidmət</dt>
+          <dt className="text-muted-foreground">{t('service')}</dt>
           <dd>{appointment.serviceName}</dd>
-          <dt className="text-muted-foreground">Tarix</dt>
-          <dd>{formatDateLong(appointment.date)}</dd>
-          <dt className="text-muted-foreground">Saat</dt>
+          <dt className="text-muted-foreground">{t('date')}</dt>
+          <dd>{formatDateLong(appointment.date, locale)}</dd>
+          <dt className="text-muted-foreground">{t('time')}</dt>
           <dd>{appointment.time}</dd>
-          <dt className="text-muted-foreground">Status</dt>
+          <dt className="text-muted-foreground">{t('status')}</dt>
           <dd>
             <Badge className="bg-success text-success-foreground">
-              Təsdiqlənib
+              {t('confirmed')}
             </Badge>
           </dd>
         </dl>
         <Link href="/account" className={buttonVariants({ size: 'lg' })}>
           <CalendarCheck aria-hidden />
-          Randevularım
+          {t('myAppointments')}
         </Link>
       </CardContent>
     </Card>

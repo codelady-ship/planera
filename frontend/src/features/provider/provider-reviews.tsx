@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from 'next-intl'
 import { MessageSquareText, Star } from 'lucide-react'
 import type { Review } from '@/lib/api/types'
 import { formatDateShort } from '@/lib/dates'
@@ -11,11 +12,12 @@ export function Stars({
   rating: number
   className?: string
 }) {
+  const t = useTranslations('provider')
   return (
     <span
       className={cn('flex items-center gap-0.5', className)}
       role="img"
-      aria-label={`${rating} / 5 ulduz`}
+      aria-label={t('stars', { rating })}
     >
       {[1, 2, 3, 4, 5].map((value) => (
         <Star
@@ -39,12 +41,13 @@ export function ProviderReviews({
   reviews: Review[]
   reviewCount: number
 }) {
+  const t = useTranslations('provider')
+  const locale = useLocale()
   if (reviews.length === 0) {
     return (
       <div className="flex items-center gap-3 rounded-xl border bg-card p-4 text-sm text-muted-foreground">
         <MessageSquareText className="size-5 shrink-0" aria-hidden />
-        Hələ rəy yoxdur. Randevudan sonra kabinetinizdən ilk rəyi siz yaza
-        bilərsiniz.
+        {t('noReviews')}
       </div>
     )
   }
@@ -61,7 +64,7 @@ export function ProviderReviews({
               <span className="text-sm font-medium">{review.customerName}</span>
             </div>
             <span className="text-xs text-muted-foreground">
-              {formatDateShort(review.createdAt.slice(0, 10))}
+              {formatDateShort(review.createdAt.slice(0, 10), locale)}
             </span>
           </div>
           {review.comment && (
@@ -71,7 +74,7 @@ export function ProviderReviews({
       ))}
       {reviewCount > reviews.length && (
         <li className="text-sm text-muted-foreground">
-          Son {reviews.length} rəy göstərilir, cəmi {reviewCount}.
+          {t('latest', { shown: reviews.length, total: reviewCount })}
         </li>
       )}
     </ul>

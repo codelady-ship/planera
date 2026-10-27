@@ -1,4 +1,4 @@
-import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 import {
   Dumbbell,
   GraduationCap,
@@ -8,6 +8,7 @@ import {
   Stethoscope,
   type LucideIcon,
 } from 'lucide-react'
+import { Link } from '@/i18n/navigation'
 import type { Category } from '@/lib/api/types'
 
 const ICONS: Record<string, LucideIcon> = {
@@ -20,11 +21,12 @@ const ICONS: Record<string, LucideIcon> = {
 }
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {
+  const t = useTranslations('catalog')
   if (categories.length === 0) return null
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
       <h2 className="text-2xl font-semibold tracking-tight">
-        Populyar kateqoriyalar
+        {t('categories')}
       </h2>
       <ul className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         {categories.map((category) => {
@@ -41,7 +43,7 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
                   {category.description}
                 </span>
                 <span className="mt-auto text-xs text-muted-foreground">
-                  {category.providerCount} mütəxəssis
+                  {t('providers', { count: category.providerCount })}
                 </span>
               </Link>
             </li>
