@@ -33,7 +33,7 @@ export function HowItWorks() {
     >
       <div className="mx-auto max-w-6xl px-4 py-16">
         <h2 className="text-2xl font-semibold tracking-tight">Necə işləyir?</h2>
-        <ol className="mt-8 grid gap-8 md:grid-cols-3">
+        <ol className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           {STEPS.map((step, i) => (
             <li key={step.title} className="flex flex-col gap-3">
               <span className="flex items-center gap-3">

@@ -98,7 +98,7 @@ export function TopProviders({
           Mütəxəssislər bir azdan görünəcək. Server oyanır, səhifəni yeniləyin.
         </p>
       ) : (
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {providers.map((provider) => (
             <li key={provider.slug}>
               <ProviderCard provider={provider} today={today} />

@@ -32,14 +32,14 @@ export function StatsOverview() {
       {error ? (
         <p className="text-destructive">{error}</p>
       ) : !data ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-28" />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Tile
               icon={CalendarCheck}
               label="Bu gün"
@@ -65,7 +65,7 @@ export function StatsOverview() {
               hint="bu həftənin randevularından"
             />
           </div>
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <WeekChart stats={data} />
             <PopularServices stats={data} />
           </div>

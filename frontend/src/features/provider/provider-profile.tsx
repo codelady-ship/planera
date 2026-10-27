@@ -22,7 +22,7 @@ const hhmm = (time: string) => time.slice(0, 5)
 export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
   const { summary } = provider
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_20rem]">
       <div className="flex flex-col gap-6">
         <section className="flex items-start gap-4">
           <div
