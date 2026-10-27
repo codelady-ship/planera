@@ -1,6 +1,7 @@
 package az.planera.personal;
 
 import az.planera.common.BusinessRuleException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.common.TooManyRequestsException;
 import az.planera.config.TimeConfig;
@@ -73,11 +74,11 @@ public class PersonalReminderService {
 
     public ReminderView create(String email, CreateRequest request) {
         if (!limiter.allow("notes:day:" + email.toLowerCase() + ":" + LocalDate.now(clock), NOTES_PER_DAY, Duration.ofDays(1))) {
-            throw new TooManyRequestsException("Gündəlik qeyd limiti dolub.", Duration.ofHours(1));
+            throw new TooManyRequestsException(Messages.key("note.dailyLimit"), Duration.ofHours(1));
         }
         Instant startsAt = instant(request.date(), request.time());
         if (!startsAt.isAfter(clock.instant())) {
-            throw new BusinessRuleException("Keçmiş vaxta qeyd yazmaq olmaz");
+            throw new BusinessRuleException(Messages.key("note.past"));
         }
         List<Integer> offsets = request.reminderOffsets() == null ? DEFAULT_OFFSETS : request.reminderOffsets();
         checkOffsets(offsets);
@@ -168,7 +169,7 @@ public class PersonalReminderService {
     }
 
     private PersonalReminder owned(String email, Long id) {
-        PersonalReminder note = notes.findById(id).orElseThrow(() -> new NotFoundException("Qeyd tapılmadı: " + id));
+        PersonalReminder note = notes.findById(id).orElseThrow(() -> new NotFoundException(Messages.key("note.notFound", id)));
         if (!note.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new AccessDeniedException("Bu qeyd sizə aid deyil");
         }
@@ -176,7 +177,7 @@ public class PersonalReminderService {
     }
 
     private User user(String email) {
-        return users.findByEmailIgnoreCase(email).orElseThrow(() -> new NotFoundException("İstifadəçi tapılmadı"));
+        return users.findByEmailIgnoreCase(email).orElseThrow(() -> new NotFoundException(Messages.key("user.notFound")));
     }
 
     private record Range(Instant from, Instant to) {}
@@ -186,7 +187,7 @@ public class PersonalReminderService {
         LocalDate start = from != null ? from : LocalDate.now(clock.withZone(TimeConfig.BAKU));
         LocalDate end = to != null ? to : start.plusDays(DEFAULT_RANGE_DAYS);
         if (end.isBefore(start) || ChronoUnit.DAYS.between(start, end) > MAX_RANGE_DAYS) {
-            throw new BusinessRuleException("Tarix aralığı 0-" + MAX_RANGE_DAYS + " gün olmalıdır");
+            throw new BusinessRuleException(Messages.key("range.invalid", MAX_RANGE_DAYS));
         }
         return new Range(instant(start, LocalTime.MIDNIGHT), instant(end.plusDays(1), LocalTime.MIDNIGHT));
     }
@@ -199,7 +200,7 @@ public class PersonalReminderService {
     private static void checkOffsets(List<Integer> offsets) {
         for (Integer offset : offsets) {
             if (offset == null || !ReminderService.ALLOWED_OFFSETS.contains(offset)) {
-                throw new BusinessRuleException("Xatırlatma vaxtı yalnız 1 gün, 1 saat, 15 dəqiqə və ya qeyd saatı ola bilər");
+                throw new BusinessRuleException(Messages.key("note.offsets"));
             }
         }
     }

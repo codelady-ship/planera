@@ -1,5 +1,6 @@
 package az.planera.config;
 
+import az.planera.common.Messages;
 import az.planera.redis.RateLimiter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.http.HttpHeaders;
@@ -45,12 +47,14 @@ public class RequestLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        // Before the DispatcherServlet there is no LocaleContext yet: read the header directly (#94).
+        Locale locale = Messages.locale(request.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
         if (request.getContentLengthLong() > MAX_BODY_BYTES) {
-            problem(response, HttpStatus.PAYLOAD_TOO_LARGE, "Sorğu həddindən artıq böyükdür", null);
+            problem(response, HttpStatus.PAYLOAD_TOO_LARGE, Messages.get("error.tooLarge", locale), null);
             return;
         }
         if (!limiter.allow("client:" + clientKey(request), PER_MINUTE, Duration.ofMinutes(1))) {
-            problem(response, HttpStatus.TOO_MANY_REQUESTS, "Çox sayda sorğu. Bir dəqiqə sonra yenidən cəhd edin.", Duration.ofMinutes(1));
+            problem(response, HttpStatus.TOO_MANY_REQUESTS, Messages.get("error.tooMany", locale), Duration.ofMinutes(1));
             return;
         }
         chain.doFilter(request, response);

@@ -1,5 +1,6 @@
 package az.planera.provider;
 
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.domain.ProviderProfile;
 import az.planera.domain.ProviderProfileRepository;
@@ -77,11 +78,11 @@ public class ServiceOfferingService {
 
     private ProviderProfile provider(Long providerId) {
         return providers.findById(providerId)
-                .orElseThrow(() -> new NotFoundException("Mütəxəssis tapılmadı: " + providerId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("provider.notFound", providerId)));
     }
 
     private ServiceOffering service(Long providerId, Long serviceId) {
         return services.findByIdAndProviderId(serviceId, providerId)
-                .orElseThrow(() -> new NotFoundException("Xidmət tapılmadı: " + serviceId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("service.notFound", serviceId)));
     }
 }

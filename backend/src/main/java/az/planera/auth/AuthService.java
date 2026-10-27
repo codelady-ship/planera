@@ -5,6 +5,8 @@ import az.planera.auth.AuthDtos.RegisterRequest;
 import az.planera.auth.AuthDtos.TokenResponse;
 import az.planera.auth.AuthDtos.UserView;
 import az.planera.common.ConflictException;
+import az.planera.common.MessageKey;
+import az.planera.common.Messages;
 import az.planera.common.TooManyRequestsException;
 import az.planera.common.UnauthorizedException;
 import az.planera.domain.ProviderProfile;
@@ -50,8 +52,8 @@ public class AuthService {
     static final Duration REFRESH_TTL = Duration.ofDays(14);
     static final int LOGIN_ATTEMPTS_PER_MINUTE = 5;
 
-    private static final String BAD_CREDENTIALS = "E-poçt və ya şifrə yanlışdır";
-    private static final String BAD_REFRESH = "Sessiyanın vaxtı bitib, yenidən daxil olun";
+    private static final MessageKey BAD_CREDENTIALS = Messages.key("auth.badCredentials");
+    private static final MessageKey BAD_REFRESH = Messages.key("auth.badRefresh");
 
     private final UserRepository users;
     private final ProviderProfileRepository providers;
@@ -85,7 +87,7 @@ public class AuthService {
     public TokenResponse register(RegisterRequest request) {
         String email = normalize(request.email());
         if (users.existsByEmailIgnoreCase(email)) {
-            throw new ConflictException("Bu e-poçt ilə artıq hesab var");
+            throw new ConflictException(Messages.key("auth.emailTaken"));
         }
         User user = new User(email, request.fullName().strip(), UserRole.CUSTOMER);
         user.setPhone(request.phone());
@@ -96,7 +98,7 @@ public class AuthService {
     public TokenResponse login(LoginRequest request) {
         String email = normalize(request.email());
         if (!limiter.allow("login:" + email, LOGIN_ATTEMPTS_PER_MINUTE, Duration.ofMinutes(1))) {
-            throw new TooManyRequestsException("Çox sayda cəhd. Bir dəqiqə sonra yenidən yoxlayın.", Duration.ofMinutes(1));
+            throw new TooManyRequestsException(Messages.key("error.tooManyLogin"), Duration.ofMinutes(1));
         }
         User user = users.findByEmailIgnoreCase(email).orElse(null);
         String hash = user == null || user.getPasswordHash() == null ? dummyHash : user.getPasswordHash();

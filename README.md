@@ -7,6 +7,7 @@ randevunu bir neçə kliklə götür.
 
 - Frontend: Next.js + TypeScript + TailwindCSS + shadcn/ui (`/frontend`)
 - Backend: Java 21 + Spring Boot 4 + PostgreSQL 16 (`/backend`)
+- Dillər: Azərbaycan (əsas, `/`), İngilis (`/en`) və Rus (`/ru`); seçim başlıqdakı dil menyusundan, API xəta mesajları `Accept-Language` ilə eyni dildə
 
 Şüar: **Vaxtını seç, rahatlığını yaşa.**
 

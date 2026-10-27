@@ -53,6 +53,6 @@ public final class ProviderDtos {
             @NotBlank @Size(max = 120) String name,
             @Size(max = 500) String description,
             @NotNull @DecimalMin("0.00") @Digits(integer = 8, fraction = 2) BigDecimal price,
-            @Min(value = 5, message = "Ən azı 5 dəqiqə") @Max(value = 600, message = "Ən çox 600 dəqiqə") int durationMinutes,
+            @Min(value = 5, message = "{validation.durationMin}") @Max(value = 600, message = "{validation.durationMax}") int durationMinutes,
             Boolean active) {}
 }

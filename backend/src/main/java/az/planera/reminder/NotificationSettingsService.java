@@ -2,6 +2,7 @@ package az.planera.reminder;
 
 import az.planera.appointment.AppointmentChanged;
 import az.planera.common.BusinessRuleException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.domain.Appointment;
 import az.planera.domain.AppointmentRepository;
@@ -39,7 +40,7 @@ public class NotificationSettingsService {
     public SettingsView update(String email, List<Integer> offsets) {
         for (Integer offset : offsets) {
             if (offset == null || !ReminderService.ALLOWED_OFFSETS.contains(offset)) {
-                throw new BusinessRuleException("Xatırlatma vaxtı yalnız 1 gün, 1 saat, 15 dəqiqə və ya randevu saatı ola bilər");
+                throw new BusinessRuleException(Messages.key("reminder.offsets"));
             }
         }
         User user = user(email);
@@ -51,6 +52,6 @@ public class NotificationSettingsService {
     }
 
     private User user(String email) {
-        return users.findByEmailIgnoreCase(email).orElseThrow(() -> new NotFoundException("İstifadəçi tapılmadı"));
+        return users.findByEmailIgnoreCase(email).orElseThrow(() -> new NotFoundException(Messages.key("user.notFound")));
     }
 }

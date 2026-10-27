@@ -18,7 +18,7 @@ Bu qaydalar hər GitHub issue-nun sonuna footer kimi əlavə olunub:
 - **UI kitabxanası: shadcn/ui** (`base-nova` stili, Base UI əsasında). Əvvəlcə shadcn komponenti,
   qarşılığı yoxdursa custom komponent.
 - **UI-da qradient və bənövşəyi-mavi qarışıqları qadağandır.** Qradient yalnız loqonun özündədir (`docs/brand`); düymə, fon və kartlar düz rəngdir.
-- **İnterfeys dili: Azərbaycan dili.** Qiymətlər AZN, vaxt zonası `Asia/Baku`.
+- **İnterfeys dili: Azərbaycan dili (əsas), İngilis və Rus.** Mətnlər koda yazılmır: frontend `frontend/messages/{az,en,ru}.json` (`next-intl`, URL `/`, `/en`, `/ru`), API xəta mesajları `backend/src/main/resources/messages*.properties` (`Accept-Language`). Qiymətlər AZN, vaxt zonası `Asia/Baku`.
 - **Brend:** ad həmişə `Planera` (böyük P ilə). Loqo və ikonlar: `docs/brand`, `frontend/public/brand`.
 - Mobil-first: hər səhifə 360px enində rahat işləməlidir.
 - Dizayn tokenləri və rəng palitrası: [docs/DESIGN.md](./docs/DESIGN.md).

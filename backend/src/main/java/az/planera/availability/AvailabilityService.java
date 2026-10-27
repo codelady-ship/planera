@@ -5,6 +5,7 @@ import az.planera.availability.AvailabilityDtos.RuleRequest;
 import az.planera.availability.AvailabilityDtos.TimeOffRequest;
 import az.planera.availability.AvailabilityDtos.TimeOffView;
 import az.planera.common.BusinessRuleException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.domain.AvailabilityRule;
 import az.planera.domain.AvailabilityRuleRepository;
@@ -61,11 +62,11 @@ public class AvailabilityService {
         RuleRequest previous = null;
         for (RuleRequest r : sorted) {
             if (!r.start().isBefore(r.end())) {
-                throw new BusinessRuleException("Başlama vaxtı bitmə vaxtından əvvəl olmalıdır");
+                throw new BusinessRuleException(Messages.key("availability.startBeforeEnd"));
             }
             if (previous != null && previous.day() == r.day() && r.start().isBefore(previous.end())) {
-                throw new BusinessRuleException("İş saatları kəsişir: " + previous.start() + "-" + previous.end()
-                        + " və " + r.start() + "-" + r.end());
+                throw new BusinessRuleException(
+                        Messages.key("availability.overlap", previous.start(), previous.end(), r.start(), r.end()));
             }
             previous = r;
         }
@@ -81,10 +82,10 @@ public class AvailabilityService {
     public TimeOffView addTimeOff(Long providerId, TimeOffRequest request) {
         ProviderProfile provider = provider(providerId);
         if (request.endsOn().isBefore(request.startsOn())) {
-            throw new BusinessRuleException("Bitmə tarixi başlama tarixindən əvvəl ola bilməz");
+            throw new BusinessRuleException(Messages.key("timeOff.endBeforeStart"));
         }
         if (!timeOff.findOverlapping(providerId, request.startsOn(), request.endsOn()).isEmpty()) {
-            throw new BusinessRuleException("Bu tarixlərdə artıq istirahət günü var");
+            throw new BusinessRuleException(Messages.key("timeOff.overlap"));
         }
         TimeOff saved = timeOff.save(new TimeOff(provider, request.startsOn(), request.endsOn(), request.reason()));
         events.publishEvent(new AvailabilityChanged(providerId));
@@ -93,14 +94,14 @@ public class AvailabilityService {
 
     public void deleteTimeOff(Long providerId, Long timeOffId) {
         TimeOff entry = timeOff.findByIdAndProviderId(timeOffId, providerId)
-                .orElseThrow(() -> new NotFoundException("İstirahət günü tapılmadı: " + timeOffId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("timeOff.notFound", timeOffId)));
         timeOff.delete(entry);
         events.publishEvent(new AvailabilityChanged(providerId));
     }
 
     private ProviderProfile provider(Long providerId) {
         return providers.findById(providerId)
-                .orElseThrow(() -> new NotFoundException("Mütəxəssis tapılmadı: " + providerId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("provider.notFound", providerId)));
     }
 
     private static TimeOffView view(TimeOff t) {

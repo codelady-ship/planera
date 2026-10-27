@@ -125,4 +125,32 @@ class JwtSecurityTest {
                 .extractingPath("$.errors.password")
                 .isEqualTo("Şifrə 8-72 simvol olmalıdır");
     }
+
+    /** Field and detail texts follow Accept-Language (#94); a language without a bundle gets Azerbaijani. */
+    @Test
+    void validationMessagesFollowAcceptLanguage() {
+        String body = "{\"fullName\":\"A\",\"email\":\"yanlis\",\"password\":\"123\"}";
+        assertThat(mvc.post().uri("/api/auth/register")
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, "en-GB,en;q=0.8")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("$.errors.password")
+                .isEqualTo("The password must be 8-72 characters");
+        assertThat(mvc.post().uri("/api/auth/register")
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, "ru")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .bodyJson()
+                .extractingPath("$.detail")
+                .isEqualTo("Данные неверны");
+        assertThat(mvc.post().uri("/api/auth/register")
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, "tr")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .bodyJson()
+                .extractingPath("$.errors.email")
+                .isEqualTo("E-poçt düzgün deyil");
+    }
 }

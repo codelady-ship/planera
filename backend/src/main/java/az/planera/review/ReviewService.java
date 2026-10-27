@@ -2,6 +2,7 @@ package az.planera.review;
 
 import az.planera.common.BusinessRuleException;
 import az.planera.common.ConflictException;
+import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.common.PageResponse;
 import az.planera.domain.Appointment;
@@ -46,15 +47,15 @@ public class ReviewService {
 
     public ReviewView create(String email, Long appointmentId, CreateRequest request) {
         Appointment a = appointments.findById(appointmentId)
-                .orElseThrow(() -> new NotFoundException("Randevu tapılmadı: " + appointmentId));
+                .orElseThrow(() -> new NotFoundException(Messages.key("appointment.notFound", appointmentId)));
         if (!a.getCustomer().getEmail().equalsIgnoreCase(email)) {
             throw new AccessDeniedException("Bu randevu sizə aid deyil");
         }
         if (a.getStatus() != AppointmentStatus.COMPLETED) {
-            throw new BusinessRuleException("Rəy yalnız tamamlanmış randevuya yazılır");
+            throw new BusinessRuleException(Messages.key("review.onlyCompleted"));
         }
         if (reviews.existsByAppointmentId(appointmentId)) {
-            throw new ConflictException("Bu randevuya artıq rəy yazılıb");
+            throw new ConflictException(Messages.key("review.exists"));
         }
         String comment = request.comment() == null ? null : request.comment().strip();
         Review review = reviews.save(new Review(a, request.rating(), comment == null || comment.isEmpty() ? null : comment));
@@ -70,7 +71,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public PageResponse<ReviewView> forProvider(String slug, int page, int size) {
         ProviderProfile p = providers.findBySlugAndActiveTrue(slug)
-                .orElseThrow(() -> new NotFoundException("Mütəxəssis tapılmadı: " + slug));
+                .orElseThrow(() -> new NotFoundException(Messages.key("provider.notFound", slug)));
         PageRequest pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE));
         return PageResponse.of(reviews.findByProviderIdOrderByCreatedAtDesc(p.getId(), pageable), ReviewService::view);
     }
