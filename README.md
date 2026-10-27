@@ -29,7 +29,7 @@ flowchart LR
         R[("Redis<br/>boş saat keşi, kilid, rate limit")]
         J["Xatırlatma job-u<br/>(hər dəqiqə, skip locked)"]
     end
-    D[("PostgreSQL 16 (Neon)<br/>Flyway miqrasiyaları")]
+    D[("PostgreSQL 16 (Render)<br/>Flyway miqrasiyaları")]
     P["Push servisləri<br/>(FCM / APNs / Mozilla)"]
 
     B -->|HTTPS| N
@@ -120,20 +120,21 @@ Bütün demo hesabların şifrəsi: `Planera123`
 
 ### Backend (Render, Docker)
 
-`render.yaml` Blueprint iki servis yaradır: `planera-api` (`backend/Dockerfile`) və `planera-redis` (Key Value). PostgreSQL 16 bazası Neon-dadır (pulsuz, silinmir, Frankfurt).
+ Blueprint üç resurs yaradır:  (PostgreSQL 16),  (Key Value) və  (), hamısı Frankfurt, pulsuz plan. Bazanın host, port, ad, istifadəçi və şifrəsi Blueprint-də  ilə API-yə avtomatik bağlanır; heç bir bağlantı məlumatı əl ilə yazılmır.
 
 1. https://render.com - GitHub ilə daxil ol.
-2. New -> Blueprint -> `codelady-ship/planera` reposunu seç -> Apply.
-3. Render -> `planera-api` -> Environment: Neon -> Connect bölməsindən (birbaşa bağlantı, `-pooler` olmayan host):
-   - `SPRING_DATASOURCE_URL` = `jdbc:postgresql://<host>/<database>?sslmode=require`
-   - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
-4. Web Push üçün bir dəfə `npx web-push generate-vapid-keys` işlədin və Environment-ə `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` yazın (`VAPID_SUBJECT` `mailto:` ünvandır). Açarlar boşdursa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
-5. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
+2. https://render.com/deploy?repo=https://github.com/codelady-ship/planera -> Blueprint adı  -> Deploy Blueprint. Pulsuz planda bir Key Value və bir PostgreSQL ola bilər; köhnə  /  qalıbsa əvvəl silin.
+3. Web Push üçün yalnız  dashboard-da yazılır (public açar -dadır, eyni cütün gizli yarısı: Usage: 
+
+  web-push send-notification --endpoint=<url> [--key=<browser key>] [--auth=<auth secret>] [--payload=<message>] [--ttl=<seconds>] [--encoding=<encoding type>] [--vapid-subject=<vapid subject>] [--vapid-pubkey=<public key url base64>] [--vapid-pvtkey=<private key url base64>] [--proxy=<http proxy uri, e.g: http://127.0.0.1:8889>] [--gcm-api-key=<api key>]
+
+  web-push generate-vapid-keys [--json]). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
+4. Yoxlama: . İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
 - **Production API:** https://randevum-api-uu30.onrender.com
-- Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
+- Vercel-də  bu ünvana baxır; brauzer API-yə birbaşa yox, saytın  keçidi ilə müraciət edir.
 
-Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Neon pulsuz planında ayda 100 CU-saat var; API boş bağlantıları 2 dəqiqəyə bağlayır ki, baza yata bilsin. Backup: Neon pulsuz planda bazanı son saatların istənilən anına qaytarmağa (restore) imkan verir; daha uzun saxlama ödənişli plandadır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
+Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Render-in pulsuz PostgreSQL-i yaradıldıqdan 30 gün sonra silinir (dashboard xəbərdarlıq edir); daimi baza üçün Neon və ya ödənişli plan: , ,  dəyişənləri dashboard-da yazılanda  əvəzinə o baza işlənir (). API boş bağlantıları 2 dəqiqəyə bağlayır.  xaricindəki dəyişikliklər backend deploy-unu işə salmır.
 
 ## Mobil tətbiq (Capacitor, Android və iOS)
 
@@ -157,5 +158,5 @@ Tətbiq production saytı native WebView-da açır (`frontend/capacitor.config.t
 | Rate limit | Ümumi: hər müştəri (daxil olubsa hesab, yoxsa ünvan) üzrə dəqiqədə 120 sorğu; randevu yaratma: dəqiqədə 10, gündə 20; qeyd yaratma: gündə 50; bir hesabda ən çox 20 push cihazı (429 + `Retry-After`, 422). Sorğu gövdəsi 64 KB-dan böyük olanda 413. Redis düşəndə limitlər açıq qalır (fail-open). |
 | Secret scan | Hər PR-da gitleaks bütün tarixçəni yoxlayır (CI `secrets` job). Açarlar yalnız Render / Vercel / GitHub Secrets-dədir; frontend-də `NEXT_PUBLIC_*` yoxdur. |
 | Loops | Xatırlatma job-u sətirləri `for update skip locked` ilə götürür və eyni tranzaksiyada `sent_at` yazır (bir cəhd, təkrar yoxdur); 404/410 push abunəliyi silinir; frontend effektlərində təkrar sorğu dövrü yoxdur. |
-| Database | Neon-a yalnız API-nin bilinən istifadəçi adı/şifrəsi ilə, `sslmode=require` ilə girilir; pulsuz planda IP məhdudiyyəti yoxdur, ona görə bağlantı məlumatları yalnız Render Environment-dədir. |
+| Database | Render PostgreSQL yalnız daxili şəbəkədən (`ipAllowList: []`) və Blueprint-in bağladığı istifadəçi/şifrə ilə açılır; bağlantı məlumatları repoda yoxdur. |
 | Logging | Şifrə, token və şəxsi qeydlər loglanmır; secret-lər yalnız env dəyişənlərindədir, `.env*` git-ə düşmür. |

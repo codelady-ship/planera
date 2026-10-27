@@ -1,6 +1,15 @@
-# Render Blueprint (#49, #48): backend API (Docker) and Key Value (Redis).
-# PostgreSQL lives on Neon (free, no expiry); its connection details are
-# entered in the Render dashboard (sync: false), never committed.
+# Render Blueprint (#49, #48): backend API (Docker), Key Value (Redis) and
+# PostgreSQL. Everything the API needs is wired here, so a new Blueprint
+# deploys without typing any connection details. The one secret that must
+# not live in the repository, the Web Push private key, is entered in the
+# dashboard (sync: false); until then the API uses a random pair per start.
+databases:
+  - name: planera-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "16"
+    ipAllowList: [] # internal network only
+
 services:
   - type: web
     name: planera-api
@@ -19,17 +28,32 @@ services:
         value: demo
       - key: JWT_SECRET
         generateValue: true # random secret, stays the same across deploys
-      # Neon -> Connect -> direct connection (not the -pooler host):
-      # jdbc:postgresql://<host>/<database>?sslmode=require
-      - key: SPRING_DATASOURCE_URL
-        sync: false
+      # application.yml builds jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME from these.
+      # To use another PostgreSQL (e.g. Neon) set SPRING_DATASOURCE_URL in the dashboard instead.
+      - key: DB_HOST
+        fromDatabase:
+          name: planera-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: planera-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: planera-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
-        sync: false
+        fromDatabase:
+          name: planera-db
+          property: user
       - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
-      # Web Push (#55): `npx web-push generate-vapid-keys`, keep the pair forever.
+        fromDatabase:
+          name: planera-db
+          property: password
+      # Web Push (#55): the public key is public by nature; the private half of the
+      # same pair (`npx web-push generate-vapid-keys`) is set in the dashboard.
       - key: VAPID_PUBLIC_KEY
-        sync: false
+        value: BMZYiM6ja8Z8yqvyd1HyoLVCP1uPDGPvmMeNWBJ_QCPc6i4KvxCMqus7M24h06yZyYKCMn4pIJfJWq-ujb3VpcM
       - key: VAPID_PRIVATE_KEY
         sync: false
       - key: VAPID_SUBJECT
