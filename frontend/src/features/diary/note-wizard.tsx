@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   ArrowLeft,
   ArrowRight,
@@ -33,20 +34,17 @@ import {
   todayInBaku,
 } from '@/lib/dates'
 import { cn } from '@/lib/utils'
+import { TimePicker } from './time-picker'
 import { useSpeechInput } from './use-speech-input'
 
-const STEPS = ['Tarix', 'Saat', 'Qeyd', 'Xatırlatma']
+const STEPS = ['stepDate', 'stepTime', 'stepNote', 'stepReminder'] as const
 
 /** Notes can be planned three months ahead, like bookings. */
 const HORIZON_MONTHS = 3
 const HORIZON_DAYS = 92
 
-export const NOTE_REMINDER_OPTIONS = [
-  { value: 0, label: 'Qeyd saatında' },
-  { value: 15, label: '15 dəqiqə əvvəl' },
-  { value: 60, label: '1 saat əvvəl' },
-  { value: 1440, label: '1 gün əvvəl' },
-] as const
+/** Reminder offsets for a note (#60), in the order they are shown. */
+export const NOTE_REMINDER_OPTIONS = [0, 15, 60, 1440] as const
 
 /**
  * New or edited note (#60, #61, #68): date on the calendar, then the time,
@@ -65,6 +63,8 @@ export function NoteWizard({
   onClose: () => void
   onSaved: (note: PersonalNote) => void
 }) {
+  const t = useTranslations('diary')
+  const locale = useLocale()
   const today = todayInBaku()
   const [step, setStep] = useState(0)
   const [date, setDate] = useState<string | null>(initial?.date ?? null)
@@ -133,7 +133,7 @@ export function NoteWizard({
           ? (Object.values(e.problem.errors ?? {})[0] ?? e.message)
           : e instanceof Error
             ? e.message
-            : 'Yadda saxlamaq olmadı',
+            : t('saveFailed'),
       )
     } finally {
       setBusy(false)
@@ -151,25 +151,23 @@ export function NoteWizard({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {initial ? 'Qeydi redaktə et' : 'Yeni qeyd'}
-          </DialogTitle>
+          <DialogTitle>{initial ? t('editTitle') : t('newNote')}</DialogTitle>
           <DialogDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="flex items-center gap-1">
               <CalendarDays className="size-4" aria-hidden />
-              {date ? formatDateLong(date) : 'Tarix seçilməyib'}
+              {date ? formatDateLong(date, locale) : t('noDate')}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="size-4" aria-hidden />
-              {time ?? 'Saat seçilməyib'}
+              {time ?? t('noTime')}
             </span>
           </DialogDescription>
         </DialogHeader>
 
-        <ol className="grid grid-cols-4 gap-2" aria-label="Addımlar">
-          {STEPS.map((label, i) => (
+        <ol className="grid grid-cols-4 gap-2" aria-label={t('steps')}>
+          {STEPS.map((key, i) => (
             <li
-              key={label}
+              key={key}
               aria-current={i === step ? 'step' : undefined}
               className={cn(
                 'flex flex-col gap-1.5 text-xs font-medium',
@@ -182,7 +180,7 @@ export function NoteWizard({
                   i < step ? 'bg-success' : i === step ? 'bg-cta' : 'bg-muted',
                 )}
               />
-              {i + 1}. {label}
+              {i + 1}. {t(key)}
             </li>
           ))}
         </ol>
@@ -202,24 +200,24 @@ export function NoteWizard({
           />
         )}
 
-        {step === 1 && <TimePickerStep value={time} onChange={setTime} />}
+        {step === 1 && <TimePicker value={time} onChange={setTime} />}
 
         {step === 2 && (
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="note-title">Qeyd</Label>
+              <Label htmlFor="note-title">{t('titleLabel')}</Label>
               <Input
                 id="note-title"
                 value={title}
                 maxLength={200}
-                placeholder="Məsələn: həkimə getmək"
+                placeholder={t('titlePlaceholder')}
                 className="h-11"
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-2">
-                <Label htmlFor="note-text">Ətraflı (istəyə bağlı)</Label>
+                <Label htmlFor="note-text">{t('details')}</Label>
                 {speech.supported && (
                   <Button
                     type="button"
@@ -233,7 +231,7 @@ export function NoteWizard({
                     ) : (
                       <Mic aria-hidden />
                     )}
-                    {speech.listening ? 'Dayandır' : 'Səslə de'}
+                    {speech.listening ? t('stop') : t('dictate')}
                   </Button>
                 )}
               </div>
@@ -242,11 +240,11 @@ export function NoteWizard({
                 value={note}
                 maxLength={2000}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Yazın və ya mikrofona deyin; danışıq yalnız mətnə çevrilir"
+                placeholder={t('notePlaceholder')}
               />
               {speech.listening && (
                 <p className="text-sm text-muted-foreground" aria-live="polite">
-                  {interim ? `Eşidilir: ${interim}` : 'Dinlənilir...'}
+                  {interim ? t('hearing', { text: interim }) : t('listening')}
                 </p>
               )}
               {speech.error && (
@@ -261,18 +259,15 @@ export function NoteWizard({
         {step === 3 && (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-muted-foreground">
-              Bildiriş nə vaxt gəlsin? Heç biri seçilməyəndə yalnız gündəlikdə
-              qalır.
+              {t('reminderQuestion')}
             </p>
-            {NOTE_REMINDER_OPTIONS.map((option) => (
-              <Label key={option.value} className="gap-3 py-1 font-normal">
+            {NOTE_REMINDER_OPTIONS.map((value) => (
+              <Label key={value} className="gap-3 py-1 font-normal">
                 <Checkbox
-                  checked={offsets.includes(option.value)}
-                  onCheckedChange={(checked) =>
-                    toggleOffset(option.value, checked)
-                  }
+                  checked={offsets.includes(value)}
+                  onCheckedChange={(checked) => toggleOffset(value, checked)}
                 />
-                {option.label}
+                {t(`offset${value}`)}
               </Label>
             ))}
           </div>
@@ -291,14 +286,14 @@ export function NoteWizard({
             onClick={() => setStep((s) => s - 1)}
           >
             <ArrowLeft aria-hidden />
-            Geri
+            {t('back')}
           </Button>
           {step < 3 ? (
             <Button
               disabled={!canContinue}
               onClick={() => setStep((s) => s + 1)}
             >
-              Davam et
+              {t('continue')}
               <ArrowRight aria-hidden />
             </Button>
           ) : (
@@ -308,7 +303,7 @@ export function NoteWizard({
               onClick={save}
             >
               {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-              Yadda saxla
+              {t('save')}
             </Button>
           )}
         </div>
@@ -316,16 +311,3 @@ export function NoteWizard({
     </Dialog>
   )
 }
-
-function TimePickerStep({
-  value,
-  onChange,
-}: {
-  value: string | null
-  onChange: (time: string) => void
-}) {
-  // Lazy import keeps this file readable; the picker is its own component.
-  return <TimePicker value={value} onChange={onChange} />
-}
-
-import { TimePicker } from './time-picker'

@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import type { Locale } from '@/i18n/routing'
 import {
   createRecognizer,
   isRecognitionSupported,
@@ -13,6 +15,8 @@ import {
  * page load. Speech becomes text only; nothing is interpreted.
  */
 export function useSpeechInput(onText: (text: string, final: boolean) => void) {
+  const t = useTranslations('diary')
+  const locale = useLocale() as Locale
   const supported = useSyncExternalStore(
     () => () => {},
     isRecognitionSupported,
@@ -30,7 +34,7 @@ export function useSpeechInput(onText: (text: string, final: boolean) => void) {
   useEffect(() => () => recognizer.current?.abort(), [])
 
   function start() {
-    const r = createRecognizer()
+    const r = createRecognizer(locale)
     if (!r) return
     recognizer.current = r
     r.onresult = (event) => {
@@ -48,10 +52,10 @@ export function useSpeechInput(onText: (text: string, final: boolean) => void) {
     r.onerror = (event) => {
       setError(
         event.error === 'not-allowed' || event.error === 'service-not-allowed'
-          ? 'Mikrofon icazəsi verilmədi.'
+          ? t('micDenied')
           : event.error === 'no-speech'
-            ? 'Səs eşidilmədi, yenidən cəhd edin.'
-            : 'Danışıq tanınmadı.',
+            ? t('noSpeech')
+            : t('notRecognized'),
       )
       setListening(false)
     }

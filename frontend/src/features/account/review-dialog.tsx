@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { LoaderCircle, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,7 +18,6 @@ import type { Appointment, Review } from '@/lib/api/types'
 import { cn } from '@/lib/utils'
 
 const STARS = [1, 2, 3, 4, 5] as const
-const STAR_LABELS = ['Çox pis', 'Pis', 'Normal', 'Yaxşı', 'Əla'] as const
 
 /** Rating 1-5 and an optional comment for a completed appointment (#44). */
 export function ReviewDialog({
@@ -29,10 +29,13 @@ export function ReviewDialog({
   onClose: () => void
   onDone: () => void
 }) {
+  const t = useTranslations('account')
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const starLabel = (value: number) => t(`star${value}` as 'star1')
 
   async function submit() {
     if (rating === 0) return
@@ -51,7 +54,7 @@ export function ReviewDialog({
           ? (e.problem.errors?.rating ?? e.message)
           : e instanceof Error
             ? e.message
-            : 'Rəyi göndərmək olmadı',
+            : t('reviewFailed'),
       )
     } finally {
       setBusy(false)
@@ -62,16 +65,18 @@ export function ReviewDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Rəy yazın</DialogTitle>
+          <DialogTitle>{t('reviewTitle')}</DialogTitle>
           <DialogDescription>
-            {appointment.providerName}, {appointment.serviceName}. Rəy
-            mütəxəssisin səhifəsində adınızın qısa forması ilə görünür.
+            {t('reviewText', {
+              provider: appointment.providerName,
+              service: appointment.serviceName,
+            })}
           </DialogDescription>
         </DialogHeader>
 
         <div
           role="radiogroup"
-          aria-label="Reytinq"
+          aria-label={t('rating')}
           className="flex items-center gap-1"
         >
           {STARS.map((value) => (
@@ -80,7 +85,10 @@ export function ReviewDialog({
               type="button"
               role="radio"
               aria-checked={rating === value}
-              aria-label={`${value} ulduz: ${STAR_LABELS[value - 1]}`}
+              aria-label={t('starLabel', {
+                count: value,
+                label: starLabel(value),
+              })}
               onClick={() => setRating(value)}
               className={cn(
                 'rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
@@ -94,18 +102,18 @@ export function ReviewDialog({
             </button>
           ))}
           <span className="ml-2 text-sm text-muted-foreground">
-            {rating > 0 ? STAR_LABELS[rating - 1] : 'Ulduz seçin'}
+            {rating > 0 ? starLabel(rating) : t('pickStars')}
           </span>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="review-comment">Şərh (istəyə bağlı)</Label>
+          <Label htmlFor="review-comment">{t('comment')}</Label>
           <Textarea
             id="review-comment"
             value={comment}
             maxLength={1000}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Təəssüratınızı yazın"
+            placeholder={t('commentPlaceholder')}
           />
         </div>
 
@@ -122,7 +130,7 @@ export function ReviewDialog({
           onClick={submit}
         >
           {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-          Rəyi göndər
+          {t('sendReview')}
         </Button>
       </DialogContent>
     </Dialog>

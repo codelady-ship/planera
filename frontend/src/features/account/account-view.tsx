@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { CalendarX, LoaderCircle } from 'lucide-react'
@@ -17,21 +18,14 @@ import { AppointmentCard } from './appointment-card'
 import { NotificationSettings } from './notification-settings'
 
 const SCOPES = [
-  {
-    value: 'upcoming',
-    label: 'Qarşıdakı',
-    empty: 'Qarşıdakı randevunuz yoxdur.',
-  },
-  { value: 'past', label: 'Keçmiş', empty: 'Keçmiş randevu yoxdur.' },
-  {
-    value: 'cancelled',
-    label: 'Ləğv edilmiş',
-    empty: 'Ləğv edilmiş randevu yoxdur.',
-  },
+  { value: 'upcoming', empty: 'emptyUpcoming' },
+  { value: 'past', empty: 'emptyPast' },
+  { value: 'cancelled', empty: 'emptyCancelled' },
 ] as const
 
 /** Personal account (#32): appointments by scope and profile details. */
 export function AccountView() {
+  const t = useTranslations('account')
   // ?tab=agenda&new=1&text=... comes from a deep link or shortcut (#66).
   const params = useSearchParams()
   const [tab, setTab] = useState<string>(() =>
@@ -44,19 +38,19 @@ export function AccountView() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">Kabinetim</h1>
+        <h1 className="text-2xl font-semibold">{t('title')}</h1>
         {user && <p className="text-muted-foreground">{user.fullName}</p>}
       </div>
       <Tabs value={tab} onValueChange={(value) => setTab(String(value))}>
         <TabsList className="w-full overflow-x-auto overflow-y-hidden sm:w-auto">
-          <TabsTrigger value="agenda">Gündəlik</TabsTrigger>
+          <TabsTrigger value="agenda">{t('agenda')}</TabsTrigger>
           {SCOPES.map((s) => (
             <TabsTrigger key={s.value} value={s.value}>
-              {s.label}
+              {t(s.value)}
             </TabsTrigger>
           ))}
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="notifications">Bildirişlər</TabsTrigger>
+          <TabsTrigger value="profile">{t('profile')}</TabsTrigger>
+          <TabsTrigger value="notifications">{t('notifications')}</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda" className="pt-4">
           {tab === 'agenda' && (
@@ -66,7 +60,7 @@ export function AccountView() {
         {SCOPES.map((s) => (
           <TabsContent key={s.value} value={s.value} className="pt-4">
             {tab === s.value && (
-              <AppointmentList scope={s.value} empty={s.empty} />
+              <AppointmentList scope={s.value} empty={t(s.empty)} />
             )}
           </TabsContent>
         ))}
@@ -82,6 +76,7 @@ export function AccountView() {
 }
 
 function AppointmentList({ scope, empty }: { scope: string; empty: string }) {
+  const t = useTranslations('account')
   const router = useRouter()
   const [items, setItems] = useState<Appointment[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -97,10 +92,10 @@ function AppointmentList({ scope, empty }: { scope: string; empty: string }) {
           router.replace('/login?next=/account')
           return
         }
-        setError(e instanceof Error ? e.message : 'Yükləmək olmadı')
+        setError(e instanceof Error ? e.message : t('loadFailed'))
         setItems([])
       })
-  }, [scope, router])
+  }, [scope, router, t])
 
   useEffect(load, [load])
 
@@ -126,7 +121,7 @@ function AppointmentList({ scope, empty }: { scope: string; empty: string }) {
         <p className="text-muted-foreground">{empty}</p>
         {scope === 'upcoming' && (
           <Link href="/search" className={buttonVariants()}>
-            Mütəxəssis tap
+            {t('findProvider')}
           </Link>
         )}
       </div>
@@ -144,6 +139,7 @@ function AppointmentList({ scope, empty }: { scope: string; empty: string }) {
 }
 
 function ProfileForm({ user }: { user: SessionUser }) {
+  const t = useTranslations('account')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -164,10 +160,10 @@ function ProfileForm({ user }: { user: SessionUser }) {
         }),
       })
       setSessionUser(updated)
-      setMessage('Yadda saxlanıldı')
+      setMessage(t('saved'))
     } catch (e) {
       if (e instanceof ApiError) setErrors(e.problem.errors ?? {})
-      setMessage(e instanceof Error ? e.message : 'Yadda saxlamaq olmadı')
+      setMessage(e instanceof Error ? e.message : t('saveFailed'))
     } finally {
       setBusy(false)
     }
@@ -176,11 +172,11 @@ function ProfileForm({ user }: { user: SessionUser }) {
   return (
     <form onSubmit={submit} className="flex max-w-md flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email">E-poçt</Label>
+        <Label htmlFor="email">{t('email')}</Label>
         <Input id="email" value={user.email} disabled className="h-11" />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="fullName">Ad və soyad</Label>
+        <Label htmlFor="fullName">{t('fullName')}</Label>
         <Input
           id="fullName"
           name="fullName"
@@ -194,7 +190,7 @@ function ProfileForm({ user }: { user: SessionUser }) {
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="phone">Telefon</Label>
+        <Label htmlFor="phone">{t('phone')}</Label>
         <Input
           id="phone"
           name="phone"
@@ -214,7 +210,7 @@ function ProfileForm({ user }: { user: SessionUser }) {
       )}
       <Button type="submit" size="lg" className="h-11" disabled={busy}>
         {busy && <LoaderCircle className="animate-spin" aria-hidden />}
-        Yadda saxla
+        {t('save')}
       </Button>
     </form>
   )

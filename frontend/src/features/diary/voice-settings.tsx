@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useSyncExternalStore } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Volume2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import type { Locale } from '@/i18n/routing'
+import { dateNames } from '@/lib/dates'
 import {
   getVoiceGender,
   isSpeechSupported,
@@ -13,13 +16,12 @@ import {
 } from './speech'
 import { cn } from '@/lib/utils'
 
-const OPTIONS: { value: VoiceGender; label: string }[] = [
-  { value: 'female', label: 'Qadın' },
-  { value: 'male', label: 'Kişi' },
-]
+const OPTIONS: VoiceGender[] = ['female', 'male']
 
 /** Which voice reads the alarm (#62): female by default, male if chosen. */
 export function VoiceSettings() {
+  const t = useTranslations('voice')
+  const locale = useLocale() as Locale
   const supported = useSyncExternalStore(
     () => () => {},
     isSpeechSupported,
@@ -34,6 +36,13 @@ export function VoiceSettings() {
     setGender(next)
   }
 
+  const sample = noteAlarmText(
+    dateNames(locale).today,
+    '15:00',
+    t('sampleTitle'),
+    locale,
+  )
+
   return (
     <section
       aria-labelledby="voice-title"
@@ -45,44 +54,39 @@ export function VoiceSettings() {
         </div>
         <div className="space-y-1">
           <h2 id="voice-title" className="font-medium">
-            Alarm səsi
+            {t('title')}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Qeydin vaxtı çatanda xatırlatma bu səslə oxunur: &quot;Sizin bu gün
-            saat 15:00-da qeydiniz var: həkimə getmək&quot;.
+            {t('text', { sample })}
           </p>
         </div>
       </div>
       {supported ? (
         <div className="flex flex-wrap items-center gap-2">
-          <div role="radiogroup" aria-label="Səs" className="flex gap-2">
+          <div role="radiogroup" aria-label={t('voice')} className="flex gap-2">
             {OPTIONS.map((option) => (
               <Button
-                key={option.value}
+                key={option}
                 role="radio"
-                aria-checked={gender === option.value}
-                variant={gender === option.value ? 'default' : 'outline'}
-                className={cn(gender === option.value && 'bg-primary')}
-                onClick={() => choose(option.value)}
+                aria-checked={gender === option}
+                variant={gender === option ? 'default' : 'outline'}
+                className={cn(gender === option && 'bg-primary')}
+                onClick={() => choose(option)}
               >
-                {option.label}
+                {t(option)}
               </Button>
             ))}
           </div>
           <Button
             variant="outline"
-            onClick={() =>
-              speak(noteAlarmText('bu gün', '15:00', 'həkimə getmək'), gender)
-            }
+            onClick={() => speak(sample, gender, locale)}
           >
             <Volume2 aria-hidden />
-            Səsi yoxla
+            {t('test')}
           </Button>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          Bu brauzer mətni səsləndirmir; xatırlatma yalnız bildiriş kimi gəlir.
-        </p>
+        <p className="text-sm text-muted-foreground">{t('unsupported')}</p>
       )}
     </section>
   )

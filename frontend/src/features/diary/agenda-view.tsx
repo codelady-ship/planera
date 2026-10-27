@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   CalendarClock,
   LoaderCircle,
@@ -24,13 +25,14 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/features/account/status-badge'
 import { syncNativeAlarms } from '@/features/mobile/native-alarms'
+import type { Locale } from '@/i18n/routing'
 import { api } from '@/lib/api/client'
 import type {
   AgendaItem,
   AppointmentStatus,
   PersonalNote,
 } from '@/lib/api/types'
-import { addDays, formatDateLong, todayInBaku } from '@/lib/dates'
+import { addDays, dateNames, formatDateLong, todayInBaku } from '@/lib/dates'
 import { NoteWizard } from './note-wizard'
 import { noteAlarmText, speak } from './speech'
 
@@ -47,6 +49,9 @@ export function AgendaView({
   openNew?: boolean
   initialText?: string
 } = {}) {
+  const t = useTranslations('diary')
+  const tc = useTranslations('common')
+  const locale = useLocale() as Locale
   const [items, setItems] = useState<AgendaItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<PersonalNote | 'new' | null>(
@@ -66,22 +71,22 @@ export function AgendaView({
         setError(null)
       })
       .catch((e: unknown) => {
-        setError(e instanceof Error ? e.message : 'Gündəliyi yükləmək olmadı')
+        setError(e instanceof Error ? e.message : t('loadFailed'))
         setItems([])
       })
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void load()
   }, [load])
 
-  useAlarms(items)
+  useAlarms(items, locale, t('alarmTitle'))
 
   async function edit(item: AgendaItem) {
     try {
       setEditing(await api<PersonalNote>(`/me/reminders/${item.id}`))
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Qeydi açmaq olmadı')
+      setError(e instanceof Error ? e.message : t('openFailed'))
     }
   }
 
@@ -93,7 +98,7 @@ export function AgendaView({
         body: JSON.stringify({ status: 'CANCELLED' }),
       })
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Silmək olmadı')
+      setError(e instanceof Error ? e.message : t('deleteFailed'))
       return
     }
     setItems((list) => (list ?? []).filter((i) => i !== item))
@@ -118,7 +123,7 @@ export function AgendaView({
         body: JSON.stringify({ status: 'ACTIVE' }),
       })
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Geri almaq olmadı')
+      setError(e instanceof Error ? e.message : t('restoreFailed'))
     }
     void load()
   }
@@ -127,15 +132,22 @@ export function AgendaView({
   const tomorrow = addDays(today, 1)
   const days = groupByDay(items ?? [])
 
+  const dayHeading = (date: string) => {
+    const long = formatDateLong(date, locale)
+    if (date === today) return t('dayToday', { date: long })
+    if (date === tomorrow) return t('dayTomorrow', { date: long })
+    return long
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Növbəti {RANGE_DAYS} günün randevuları və şəxsi qeydləriniz.
+          {t('intro', { days: RANGE_DAYS })}
         </p>
         <Button onClick={() => setEditing('new')}>
           <Plus aria-hidden />
-          Yeni qeyd
+          {t('newNote')}
         </Button>
       </div>
 
@@ -144,10 +156,10 @@ export function AgendaView({
           role="status"
           className="flex items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 text-sm"
         >
-          <span>Qeyd silindi.</span>
+          <span>{t('deleted')}</span>
           <Button variant="outline" size="sm" onClick={restore}>
             <Undo2 aria-hidden />
-            Geri al
+            {t('undo')}
           </Button>
         </div>
       )}
@@ -166,21 +178,14 @@ export function AgendaView({
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-10 text-center">
           <NotebookPen className="size-8 text-muted-foreground" aria-hidden />
-          <p className="text-muted-foreground">
-            Gündəlik boşdur. İlk qeydinizi yazın və ya səslə deyin.
-          </p>
+          <p className="text-muted-foreground">{t('empty')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           {days.map(([date, list]) => (
             <section key={date} aria-labelledby={`day-${date}`}>
               <h2 id={`day-${date}`} className="mb-2 text-sm font-semibold">
-                {date === today
-                  ? 'Bu gün, '
-                  : date === tomorrow
-                    ? 'Sabah, '
-                    : ''}
-                {formatDateLong(date)}
+                {dayHeading(date)}
               </h2>
               <ul className="flex flex-col gap-2">
                 {list.map((item) => (
@@ -203,7 +208,7 @@ export function AgendaView({
                         <span className="font-medium">{item.title}</span>
                         {item.type === 'NOTE' ? (
                           <Badge variant="secondary" className="h-6 px-2.5">
-                            {item.status === 'DONE' ? 'Edildi' : 'Qeyd'}
+                            {item.status === 'DONE' ? t('done') : t('note')}
                           </Badge>
                         ) : (
                           <StatusBadge
@@ -224,7 +229,7 @@ export function AgendaView({
                             onClick={() => edit(item)}
                           >
                             <Pencil aria-hidden />
-                            Redaktə et
+                            {t('edit')}
                           </Button>
                           <Button
                             variant="outline"
@@ -233,7 +238,7 @@ export function AgendaView({
                             onClick={() => setDeleting(item)}
                           >
                             <Trash2 aria-hidden />
-                            Sil
+                            {t('delete')}
                           </Button>
                         </div>
                       )}
@@ -261,23 +266,24 @@ export function AgendaView({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Qeydi silirsiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleting?.title}
-              {deleting
-                ? `, ${formatDateLong(deleting.date)} ${deleting.time}`
-                : ''}
-              . Silindikdən sonra {UNDO_MS / 1000} saniyə ərzində geri ala
-              bilərsiniz.
+              {deleting &&
+                t('deleteText', {
+                  title: deleting.title,
+                  date: formatDateLong(deleting.date, locale),
+                  time: deleting.time,
+                  seconds: UNDO_MS / 1000,
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İmtina</AlertDialogCancel>
+            <AlertDialogCancel>{tc('dismiss')}</AlertDialogCancel>
             <Button
               variant="destructive"
               onClick={() => deleting && remove(deleting)}
             >
-              Bəli, sil
+              {t('deleteConfirm')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -297,11 +303,11 @@ function groupByDay(items: AgendaItem[]): [string, AgendaItem[]][] {
 }
 
 /** The in-page alarm (#62): at a note's time the sentence is read aloud and shown as a notification. */
-function useAlarms(items: AgendaItem[] | null) {
+function useAlarms(items: AgendaItem[] | null, locale: Locale, title: string) {
   useEffect(() => {
     if (!items) return
     // In the Android / iOS app the same items become exact local alarms (#65).
-    void syncNativeAlarms(items)
+    void syncNativeAlarms(items, locale)
     const now = Date.now()
     const today = todayInBaku()
     const timers = items
@@ -311,24 +317,27 @@ function useAlarms(items: AgendaItem[] | null) {
       .map(({ item, delay }) =>
         window.setTimeout(() => {
           const text = noteAlarmText(
-            item.date === today ? 'bu gün' : formatDateLong(item.date),
+            item.date === today
+              ? dateNames(locale).today
+              : formatDateLong(item.date, locale),
             item.time,
             item.title,
+            locale,
           )
-          speak(text)
-          void showAlarmNotification(text)
+          speak(text, undefined, locale)
+          void showAlarmNotification(title, text)
         }, delay),
       )
     return () => timers.forEach((t) => window.clearTimeout(t))
-  }, [items])
+  }, [items, locale, title])
 }
 
-async function showAlarmNotification(text: string) {
+async function showAlarmNotification(title: string, text: string) {
   if (!('Notification' in window) || Notification.permission !== 'granted')
     return
   const registration = await navigator.serviceWorker?.getRegistration('/')
   if (registration) {
-    await registration.showNotification('Qeyd xatırlatması', {
+    await registration.showNotification(title, {
       body: text,
       icon: '/icons/icon-192.png',
       tag: 'note-alarm',

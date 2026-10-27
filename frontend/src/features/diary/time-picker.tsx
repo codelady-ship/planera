@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 const HOURS = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, '0'))
@@ -24,14 +25,14 @@ export function TimePicker({
   value: string | null
   onChange: (time: string) => void
 }) {
+  const t = useTranslations('diary')
   const hour = value ? value.slice(0, 2) : null
   const minute = value ? value.slice(3, 5) : null
 
   return (
     <div className="flex items-stretch justify-center gap-3">
       <Wheel
-        label="Saat"
-        unit="Saat"
+        label={t('hour')}
         items={HOURS}
         selected={hour}
         onSelect={(h) => onChange(`${h}:${minute ?? '00'}`)}
@@ -43,8 +44,7 @@ export function TimePicker({
         :
       </span>
       <Wheel
-        label="Dəqiqə"
-        unit="Dəqiqə"
+        label={t('minute')}
         items={MINUTES}
         selected={minute}
         onSelect={(m) => onChange(`${hour ?? '00'}:${m}`)}
@@ -55,13 +55,11 @@ export function TimePicker({
 
 function Wheel({
   label,
-  unit,
   items,
   selected,
   onSelect,
 }: {
   label: string
-  unit: string
   items: string[]
   selected: string | null
   onSelect: (item: string) => void
@@ -118,7 +116,7 @@ function Wheel({
               type="button"
               role="option"
               aria-selected={selected === item}
-              aria-label={`${unit} ${item}`}
+              aria-label={`${label} ${item}`}
               onClick={() => {
                 onSelect(item)
                 list.current?.scrollTo?.({
