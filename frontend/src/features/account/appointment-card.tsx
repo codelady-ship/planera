@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useState } from 'react'
 import { CalendarClock, Clock, LoaderCircle, Star, X } from 'lucide-react'
 import {

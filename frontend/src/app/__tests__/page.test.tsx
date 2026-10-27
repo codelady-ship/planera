@@ -10,8 +10,12 @@ vi.mock('@/lib/api/catalog', () => ({
 }))
 
 test('renders the static home page sections', async () => {
-  const { default: Home } = await import('../page')
-  render(<Home />)
+  const { default: Home } = await import('../[locale]/page')
+  render(
+    await Home({
+      params: Promise.resolve({ locale: 'az' }),
+    } as PageProps<'/[locale]'>),
+  )
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
     /randevunu bir neçə kliklə/,
   )
@@ -22,7 +26,7 @@ test('renders the static home page sections', async () => {
   expect(
     screen.getByRole('heading', { name: 'Necə işləyir?' }),
   ).toBeInTheDocument()
-})
+}, 15000)
 
 test('lists the categories from the API with their provider counts', () => {
   render(

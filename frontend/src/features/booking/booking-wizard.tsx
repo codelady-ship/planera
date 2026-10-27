@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { useState } from 'react'
 import {
   ArrowLeft,

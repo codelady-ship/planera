@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { CalendarX, LoaderCircle } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'

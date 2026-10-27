@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "title": "Planera - Pick your time, enjoy the ease",
+    "description": "Pick a free slot with a barber, doctor, tutor or any other service and book in a few clicks."
+  },
+  "common": {
+    "back": "Back",
+    "continue": "Continue",
+    "save": "Save",
+    "close": "Close",
+    "error": "Something went wrong, please try again."
+  },
+  "header": {
+    "home": "Planera home",
+    "services": "Services",
+    "howItWorks": "How it works",
+    "openMenu": "Open menu",
+    "menu": "Menu",
+    "login": "Sign in",
+    "register": "Sign up",
+    "panel": "Panel",
+    "logout": "Sign out",
+    "language": "Language"
+  },
+  "theme": {
+    "mode": "Theme",
+    "system": "System",
+    "light": "Day",
+    "dark": "Night",
+    "current": "Theme: {mode}",
+    "switchTo": "Theme: {mode}. Switch to {next}"
+  },
+  "footer": {
+    "logoAlt": "Planera - Pick your time, enjoy the ease.",
+    "services": "Services",
+    "join": "Join as a professional",
+    "note": "All prices in AZN, all times in Baku time."
+  },
+  "home": {
+    "slogan": "Pick your time, enjoy the ease.",
+    "title": "Pick a free slot, book in a few clicks",
+    "lead": "See the real-time availability of barbers, doctors, tutors and consultants. No calls, no messaging.",
+    "tagline": "Appointments, notes, live reminders: in one place.",
+    "book": "Book now",
+    "note": "Write a note",
+    "searchPlaceholder": "What service are you looking for?",
+    "city": "City",
+    "date": "Date",
+    "search": "Search",
+    "live": {
+      "title": "Live reminders, nothing forgotten",
+      "reminderTitle": "Live reminder",
+      "reminderText": "A notification reaches your phone a day, an hour and 15 minutes before the appointment; in the app the alarm reads it aloud.",
+      "voiceTitle": "Voice notes",
+      "voiceText": "Pick the date and time on the calendar, then say the note: speech becomes text, the time is yours to choose.",
+      "diaryTitle": "One diary",
+      "diaryText": "Appointments and personal notes in one list, with editing and deleting."
+    },
+    "how": {
+      "title": "How it works",
+      "step": "Step {n}",
+      "findTitle": "Find a service",
+      "findText": "Choose a professional by category, city, price and rating.",
+      "slotTitle": "Pick a free slot",
+      "slotText": "Only genuinely free slots are shown, with the service duration taken into account.",
+      "confirmTitle": "Confirm",
+      "confirmText": "Get your booking number; reschedule or cancel from your account."
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create an account",
+    "demoHint": "Demo: {email}, password {password}",
+    "email": "Email",
+    "password": "Password",
+    "passwordNew": "Password (at least 8 characters)",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "optional": "(optional)",
+    "login": "Sign in",
+    "createAccount": "Create account",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "registerLink": "Sign up",
+    "loginLink": "Sign in",
+    "failed": "Something went wrong, please try again.",
+    "offline": "Could not reach the server. Check your connection."
+  },
+  "offline": {
+    "title": "No internet connection",
+    "text": "Appointments and free slots are only available online. Try again once you are connected.",
+    "retry": "Try again"
+  },
+  "install": {
+    "label": "Install the app",
+    "title": "Add Planera to your home screen",
+    "iosSteps": "In Safari tap <share>Share</share>, then <add>Add to Home Screen</add>. Reminders only arrive in the installed app.",
+    "share": "Share",
+    "otherText": "Your appointments and reminders one tap away, like an app.",
+    "install": "Install",
+    "close": "Close"
+  }
+}
