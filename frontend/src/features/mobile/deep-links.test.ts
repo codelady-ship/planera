@@ -28,7 +28,7 @@ describe('deep links', () => {
   })
 
   test('other links are ignored', () => {
-    expect(pathForDeepLink('https://randevum-seven.vercel.app/')).toBeNull()
+    expect(pathForDeepLink('https://planera-az.vercel.app/')).toBeNull()
     expect(pathForDeepLink('planera://settings')).toBeNull()
     expect(pathForDeepLink('not a url')).toBeNull()
   })

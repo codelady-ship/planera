@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
   webDir: 'capacitor/www',
   server: {
     url:
-      process.env.CAPACITOR_SERVER_URL ?? 'https://randevum-seven.vercel.app',
+      process.env.CAPACITOR_SERVER_URL ?? 'https://planera-az.vercel.app',
     cleartext: false,
   },
   android: {
