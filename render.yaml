@@ -3,7 +3,7 @@
 # entered in the Render dashboard (sync: false), never committed.
 services:
   - type: web
-    name: randevum-api
+    name: planera-api
     runtime: docker
     plan: free
     region: frankfurt
@@ -37,11 +37,11 @@ services:
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: randevum-redis
+          name: planera-redis
           property: connectionString
 
   - type: keyvalue
-    name: randevum-redis
+    name: planera-redis
     plan: free
     region: frankfurt
     maxmemoryPolicy: allkeys-lru
