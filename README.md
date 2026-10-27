@@ -56,8 +56,8 @@ Gecə rejimi header-dəki düymə ilə (sistem / gündüz / gecə), 360px enind�
 
 ## API sənədi
 
-- OpenAPI: `https://randevum-api-uu30.onrender.com/v3/api-docs`
-- Swagger UI (yalnız oxuma, "Try it out" bağlıdır): `https://randevum-api-uu30.onrender.com/swagger-ui.html`
+- OpenAPI: `https://planera-api.onrender.com/v3/api-docs`
+- Swagger UI (yalnız oxuma, "Try it out" bağlıdır): `https://planera-api.onrender.com/swagger-ui.html`
 - Lokalda: `http://localhost:8080/swagger-ui.html`. Qorunan endpoint-lər üçün `POST /api/auth/login` cavabındakı `accessToken` Bearer kimi göndərilir.
 
 ## Lokal işə salma
@@ -127,7 +127,7 @@ Bütün demo hesabların şifrəsi: `Planera123`
 3. Web Push üçün yalnız `VAPID_PRIVATE_KEY` dashboard-da yazılır (public açar `render.yaml`-dadır, eyni cütün gizli yarısı: `npx web-push generate-vapid-keys`). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
 4. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
-- **Production API:** https://randevum-api-uu30.onrender.com
+- **Production API:** https://planera-api.onrender.com
 - Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
 
 Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Render-in pulsuz PostgreSQL-i yaradıldıqdan 30 gün sonra silinir (dashboard xəbərdarlıq edir); daimi baza üçün Neon və ya ödənişli plan: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` dəyişənləri dashboard-da yazılanda `planera-db` əvəzinə o baza işlənir (`jdbc:postgresql://<host>/<db>?sslmode=require`). API boş bağlantıları 2 dəqiqəyə bağlayır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
