@@ -1,0 +1,92 @@
+# iOS release to TestFlight (#67). Needs an Apple Developer account and an
+# App Store Connect API key (App Manager role) in GitHub Secrets:
+#   APPLE_TEAM_ID, ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64 (the .p8 file)
+# Xcode's cloud-managed signing creates the distribution certificate and
+# profile with that key, so no certificate has to be exported by hand.
+name: Release iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: Version shown in the store, e.g. 1.0.3
+        required: true
+        default: "1.0.0"
+
+jobs:
+  ios:
+    name: Archive and upload to TestFlight
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Check the App Store Connect secrets
+        env:
+          KEY: ${{ secrets.ASC_KEY_BASE64 }}
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -z "$KEY" ] || [ -z "$TEAM" ]; then
+            echo "::error::ASC_KEY_BASE64 / APPLE_TEAM_ID are not set (docs/store/README.md)." >&2
+            exit 1
+          fi
+      - name: Sync the native project
+        run: |
+          npm ci
+          npx cap sync ios
+      - name: Restore the API key
+        env:
+          KEY: ${{ secrets.ASC_KEY_BASE64 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          echo "$KEY" | base64 -d > "$RUNNER_TEMP/keys/AuthKey.p8"
+      - name: Set the version
+        working-directory: frontend/ios/App
+        run: |
+          xcrun agvtool new-marketing-version "${{ inputs.version_name }}"
+          xcrun agvtool new-version -all "${{ github.run_number }}"
+      - name: Archive
+        working-directory: frontend/ios/App
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Planera.xcarchive" \
+            -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic -quiet archive
+      - name: Export and upload to TestFlight
+        working-directory: frontend/ios/App
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/export.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>uploadSymbols</key><true/>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Planera.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" -quiet
+      - name: Remove the API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"

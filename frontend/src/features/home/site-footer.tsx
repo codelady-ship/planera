@@ -33,6 +33,9 @@ export function SiteFooter() {
           >
             {t('join')}
           </Link>
+          <Link href="/privacy" className="hover:text-foreground">
+            {t('privacy')}
+          </Link>
           <a
             href="https://github.com/codelady-ship/planera"
             className="hover:text-foreground"

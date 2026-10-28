@@ -139,7 +139,7 @@ Tətbiq production saytı native WebView-da açır (`frontend/capacitor.config.t
 
 - **Android (lokal):** Android Studio ilə `frontend/android` qovluğunu açın və ya `cd frontend && npx cap sync android && cd android && ./gradlew assembleDebug`; APK `android/app/build/outputs/apk/debug/app-debug.apk`.
 - **CI:** `.github/workflows/mobile.yml` hər dəyişiklikdə Android debug APK-nı artifact kimi yükləyir və iOS-u macOS runner-də simulyator üçün build edir (imzasız). Actions -> Mobile -> Run workflow ilə əl ilə də işə salınır.
-- **iOS cihaz / TestFlight:** Apple Developer hesabı tələb edir (#67); o vaxta qədər iPhone-da PWA işləyir.
+- **Mağazaya yayım (#67):** `docs/store/README.md`. Android: `scripts/android-keystore.sh` ilə upload açarı yaradılır, GitHub Secrets-ə yazılır, Actions -> `Release Android` imzalı AAB/APK verir və `PLAY_SERVICE_ACCOUNT_JSON` varsa Play-in internal track-inə yükləyir. iOS: Actions -> `Release iOS` App Store Connect API açarı ilə arxiv yaradıb TestFlight-a göndərir (Apple Developer hesabı lazımdır); o vaxta qədər iPhone-da PWA işləyir. Gizlilik siyasəti: `/privacy`.
 - Başqa ünvana baxan build üçün: `CAPACITOR_SERVER_URL=https://... npx cap sync`.
 
 ## Təhlükəsizlik (OWASP əsas yoxlamaları)
