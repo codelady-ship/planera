@@ -126,6 +126,23 @@ class JwtSecurityTest {
                 .isEqualTo("Şifrə 8-72 simvol olmalıdır");
     }
 
+    @Test
+    void theLanguageIsRememberedOnTheAccount() {
+        given(auth.view("musteri@planera.az"))
+                .willReturn(new UserView(2L, "musteri@planera.az", "Aynur Qasımova", null, UserRole.CUSTOMER, null));
+        assertThat(mvc.patch().uri("/api/me/locale")
+                        .header(HttpHeaders.AUTHORIZATION, valid("musteri@planera.az", "CUSTOMER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"locale\":\"ru\"}"))
+                .hasStatusOk();
+        Mockito.verify(auth).updateLocale("musteri@planera.az", "ru");
+        assertThat(mvc.patch().uri("/api/me/locale")
+                        .header(HttpHeaders.AUTHORIZATION, valid("musteri@planera.az", "CUSTOMER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"locale\":\"de\"}"))
+                .hasStatus(HttpStatus.BAD_REQUEST);
+    }
+
     /** Field and detail texts follow Accept-Language (#94); a language without a bundle gets Azerbaijani. */
     @Test
     void validationMessagesFollowAcceptLanguage() {

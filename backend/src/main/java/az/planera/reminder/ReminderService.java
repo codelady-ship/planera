@@ -1,6 +1,7 @@
 package az.planera.reminder;
 
 import az.planera.appointment.AppointmentChanged;
+import az.planera.common.Messages;
 import az.planera.config.TimeConfig;
 import az.planera.domain.Appointment;
 import az.planera.domain.AppointmentRepository;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -27,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Planning happens in the booking transaction (via {@link AppointmentChanged});
  * {@link ReminderJob} calls {@link #sendDue()} every minute. A reminder is
  * marked sent in the same transaction that locked it, so it goes out once
- * even with several API instances.
+ * even with several API instances. Texts come from {@code messages*.properties}
+ * in the user's saved language (#123).
  */
 @Service
 public class ReminderService {
@@ -35,15 +38,9 @@ public class ReminderService {
     /** Offsets a user may choose (#57): a day, an hour, a quarter, and the start itself. */
     public static final List<Integer> ALLOWED_OFFSETS = List.of(1440, 60, 15, 0);
     static final int BATCH = 100;
-    static final String TITLE = "Randevu xatırlatması";
-    static final String NOTE_TITLE = "Qeyd xatırlatması";
 
     private static final Logger log = LoggerFactory.getLogger(ReminderService.class);
     private static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
-    private static final String[] MONTHS = {
-        "yanvar", "fevral", "mart", "aprel", "may", "iyun",
-        "iyul", "avqust", "sentyabr", "oktyabr", "noyabr", "dekabr"
-    };
 
     private final ReminderRepository reminders;
     private final AppointmentRepository appointments;
@@ -104,17 +101,22 @@ public class ReminderService {
             Appointment a = reminder.getAppointment();
             PersonalReminder note = reminder.getPersonalReminder();
             if (a != null && a.getStatus().isActive()) {
+                Locale locale = a.getCustomer().getLocale();
                 PushMessage message = new PushMessage(
-                        TITLE,
-                        body(a.getStartsAt(), a.getProvider().getDisplayName(), a.getService().getName(), clock),
+                        Messages.get("reminder.title", locale),
+                        body(a.getStartsAt(), a.getProvider().getDisplayName(), a.getService().getName(), clock, locale),
                         "/account",
                         "appointment-" + a.getId());
                 int delivered = push.sendToUser(a.getCustomer().getId(), message);
                 log.info("Reminder {} for appointment {} sent to {} device(s)", reminder.getId(), a.getId(), delivered);
                 sent++;
             } else if (note != null && note.getStatus() == PersonalReminder.Status.ACTIVE) {
+                Locale locale = note.getUser().getLocale();
                 PushMessage message = new PushMessage(
-                        NOTE_TITLE, noteBody(note.getStartsAt(), note.getTitle(), clock), "/account", "note-" + note.getId());
+                        Messages.get("reminder.noteTitle", locale),
+                        noteBody(note.getStartsAt(), note.getTitle(), clock, locale),
+                        "/account",
+                        "note-" + note.getId());
                 int delivered = push.sendToUser(note.getUser().getId(), message);
                 log.info("Reminder {} for note {} sent to {} device(s)", reminder.getId(), note.getId(), delivered);
                 sent++;
@@ -129,24 +131,36 @@ public class ReminderService {
      * "Sizin bu gün saat 15:00-da Elvin Məmmədov ilə randevunuz var: Saç kəsimi".
      */
     static String body(Instant startsAt, String providerName, String serviceName, Clock clock) {
-        return "Sizin " + when(startsAt, clock) + " " + providerName + " ilə randevunuz var: " + serviceName;
+        return body(startsAt, providerName, serviceName, clock, Messages.DEFAULT);
+    }
+
+    static String body(Instant startsAt, String providerName, String serviceName, Clock clock, Locale locale) {
+        return Messages.get(
+                Messages.key("reminder.body", when(startsAt, clock, locale), providerName, serviceName), locale);
     }
 
     /** "Sizin bu gün saat 15:00-da qeydiniz var: həkimə getmək" (#59, #62). */
     static String noteBody(Instant startsAt, String title, Clock clock) {
-        return "Sizin " + when(startsAt, clock) + " qeydiniz var: " + title;
+        return noteBody(startsAt, title, clock, Messages.DEFAULT);
+    }
+
+    static String noteBody(Instant startsAt, String title, Clock clock, Locale locale) {
+        return Messages.get(Messages.key("reminder.noteBody", when(startsAt, clock, locale), title), locale);
     }
 
     /** "bu gün saat 15:00-da", "sabah saat 09:30-da" or "30 oktyabr saat 18:00-da", in Baku time. */
-    static String when(Instant startsAt, Clock clock) {
+    static String when(Instant startsAt, Clock clock, Locale locale) {
         ZonedDateTime start = startsAt.atZone(TimeConfig.BAKU);
         LocalDate today = LocalDate.now(clock.withZone(TimeConfig.BAKU));
         LocalDate day = start.toLocalDate();
-        String when = day.equals(today)
-                ? "bu gün"
-                : day.equals(today.plusDays(1))
-                        ? "sabah"
-                        : day.getDayOfMonth() + " " + MONTHS[day.getMonthValue() - 1];
-        return when + " saat " + HH_MM.format(start) + "-da";
+        String time = HH_MM.format(start);
+        if (day.equals(today)) {
+            return Messages.get(Messages.key("reminder.today", time), locale);
+        }
+        if (day.equals(today.plusDays(1))) {
+            return Messages.get(Messages.key("reminder.tomorrow", time), locale);
+        }
+        String month = Messages.get("month." + day.getMonthValue(), locale);
+        return Messages.get(Messages.key("reminder.onDate", day.getDayOfMonth(), month, time), locale);
     }
 }

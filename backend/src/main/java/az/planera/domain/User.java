@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table(name = "users")
@@ -32,6 +33,10 @@ public class User extends BaseEntity {
     private String reminderOffsets = DEFAULT_REMINDER_OFFSETS;
 
     public static final String DEFAULT_REMINDER_OFFSETS = "60,15,0";
+
+    /** Interface language (#123): "az", "en" or "ru"; reminders sent later use it. */
+    @Column(nullable = false)
+    private String locale = "az";
 
     protected User() {}
 
@@ -59,5 +64,13 @@ public class User extends BaseEntity {
 
     public void setReminderOffsets(Collection<Integer> offsets) {
         this.reminderOffsets = Offsets.join(offsets);
+    }
+
+    public Locale getLocale() {
+        return Locale.forLanguageTag(locale);
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
     }
 }

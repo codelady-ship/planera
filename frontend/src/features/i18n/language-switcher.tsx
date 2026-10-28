@@ -4,6 +4,8 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Languages } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from '@/i18n/navigation'
+import { useSession } from '@/features/auth/use-session'
+import { api } from '@/lib/api/client'
 import { LOCALE_LABELS, routing, type Locale } from '@/i18n/routing'
 import { cn } from '@/lib/utils'
 
@@ -15,8 +17,16 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const t = useTranslations('header')
   const locale = useLocale()
   const router = useRouter()
+  const { user } = useSession()
 
   function choose(next: Locale) {
+    // Reminders are sent later without a request, so the account keeps the language (#123).
+    if (user) {
+      void api('/me/locale', {
+        method: 'PATCH',
+        body: JSON.stringify({ locale: next }),
+      }).catch(() => {})
+    }
     // Read at click time: URL hooks here would make every page dynamic.
     const { pathname, search } = window.location
     const path = pathname.replace(/^\/(en|ru)(?=\/|$)/, '') || '/'
