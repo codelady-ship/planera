@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,8 @@ public class ReminderService {
 
     /** Offsets a user may choose (#57): a day, an hour, a quarter, and the start itself. */
     public static final List<Integer> ALLOWED_OFFSETS = List.of(1440, 60, 15, 0);
+    /** The day-before reminder also goes by e-mail (#43), whether or not the push at that offset was chosen. */
+    static final int EMAIL_OFFSET = 1440;
     static final int BATCH = 100;
 
     private static final Logger log = LoggerFactory.getLogger(ReminderService.class);
@@ -45,13 +48,19 @@ public class ReminderService {
     private final ReminderRepository reminders;
     private final AppointmentRepository appointments;
     private final PushService push;
+    private final ApplicationEventPublisher events;
     private final Clock clock;
 
     public ReminderService(
-            ReminderRepository reminders, AppointmentRepository appointments, PushService push, Clock clock) {
+            ReminderRepository reminders,
+            AppointmentRepository appointments,
+            PushService push,
+            ApplicationEventPublisher events,
+            Clock clock) {
         this.reminders = reminders;
         this.appointments = appointments;
         this.push = push;
+        this.events = events;
         this.clock = clock;
     }
 
@@ -62,13 +71,22 @@ public class ReminderService {
     @EventListener
     @Transactional
     public void onAppointmentChanged(AppointmentChanged event) {
+        if (event.kind() == AppointmentChanged.Kind.REMINDER_DUE) {
+            // Published by sendDue() itself while it holds the due row: nothing to re-plan.
+            return;
+        }
         reminders.deleteByAppointmentId(event.appointmentId());
         Appointment a = appointments.findById(event.appointmentId()).orElse(null);
         if (a == null || !a.getStatus().isActive()) {
             return;
         }
         Instant now = clock.instant();
-        for (int offset : a.getCustomer().getReminderOffsets()) {
+        List<Integer> offsets = a.getCustomer().getReminderOffsets();
+        if (!offsets.isEmpty() && !offsets.contains(EMAIL_OFFSET)) {
+            offsets = new java.util.ArrayList<>(offsets);
+            offsets.addFirst(EMAIL_OFFSET);
+        }
+        for (int offset : offsets) {
             Instant due = a.getStartsAt().minus(Duration.ofMinutes(offset));
             if (due.isAfter(now)) {
                 reminders.save(new Reminder(a, offset, due));
@@ -102,13 +120,20 @@ public class ReminderService {
             PersonalReminder note = reminder.getPersonalReminder();
             if (a != null && a.getStatus().isActive()) {
                 Locale locale = a.getCustomer().getLocale();
-                PushMessage message = new PushMessage(
-                        Messages.get("reminder.title", locale),
-                        body(a.getStartsAt(), a.getProvider().getDisplayName(), a.getService().getName(), clock, locale),
-                        "/account",
-                        "appointment-" + a.getId());
-                int delivered = push.sendToUser(a.getCustomer().getId(), message);
-                log.info("Reminder {} for appointment {} sent to {} device(s)", reminder.getId(), a.getId(), delivered);
+                boolean emailOnly = reminder.getOffsetMinutes() == EMAIL_OFFSET
+                        && !a.getCustomer().getReminderOffsets().contains(EMAIL_OFFSET);
+                if (reminder.getOffsetMinutes() == EMAIL_OFFSET) {
+                    events.publishEvent(new AppointmentChanged(a.getId(), AppointmentChanged.Kind.REMINDER_DUE));
+                }
+                if (!emailOnly) {
+                    PushMessage message = new PushMessage(
+                            Messages.get("reminder.title", locale),
+                            body(a.getStartsAt(), a.getProvider().getDisplayName(), a.getService().getName(), clock, locale),
+                            "/account",
+                            "appointment-" + a.getId());
+                    int delivered = push.sendToUser(a.getCustomer().getId(), message);
+                    log.info("Reminder {} for appointment {} sent to {} device(s)", reminder.getId(), a.getId(), delivered);
+                }
                 sent++;
             } else if (note != null && note.getStatus() == PersonalReminder.Status.ACTIVE) {
                 Locale locale = note.getUser().getLocale();
@@ -149,7 +174,7 @@ public class ReminderService {
     }
 
     /** "bu gün saat 15:00-da", "sabah saat 09:30-da" or "30 oktyabr saat 18:00-da", in Baku time. */
-    static String when(Instant startsAt, Clock clock, Locale locale) {
+    public static String when(Instant startsAt, Clock clock, Locale locale) {
         ZonedDateTime start = startsAt.atZone(TimeConfig.BAKU);
         LocalDate today = LocalDate.now(clock.withZone(TimeConfig.BAKU));
         LocalDate day = start.toLocalDate();

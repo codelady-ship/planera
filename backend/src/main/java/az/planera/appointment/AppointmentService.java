@@ -127,17 +127,17 @@ public class AppointmentService {
                         code(), s.getProvider(), users.getReferenceById(customer.getId()), s,
                         startsAt, startsAt.plus(Duration.ofMinutes(s.getDurationMinutes())));
                 a.setCustomerNote(request.note());
-                return view(changed(a));
+                return view(changed(a, AppointmentChanged.Kind.CREATED));
             });
             cache.evictDay(providerId, request.date());
             return view;
         }
     }
 
-    /** Saves and tells listeners in the same transaction that the appointment changed (reminders, #56). */
-    private Appointment changed(Appointment a) {
+    /** Saves and tells listeners in the same transaction what happened (reminders #56, e-mails #43, waitlist #45). */
+    private Appointment changed(Appointment a, AppointmentChanged.Kind kind) {
         Appointment saved = appointments.saveAndFlush(a);
-        events.publishEvent(new AppointmentChanged(saved.getId()));
+        events.publishEvent(new AppointmentChanged(saved.getId(), kind));
         return saved;
     }
 
@@ -163,7 +163,7 @@ public class AppointmentService {
             Appointment a = owned(actor, id);
             requireChangeable(actor, a);
             a.cancel(clock.instant(), reason);
-            return view(changed(a));
+            return view(changed(a, AppointmentChanged.Kind.CANCELLED));
         });
         cache.evictDay(providerId(id), view.date());
         return view;
@@ -183,7 +183,7 @@ public class AppointmentService {
             Appointment a = appointments.findById(id).orElseThrow();
             Instant startsAt = instant(date, time);
             a.reschedule(startsAt, startsAt.plus(Duration.ofMinutes(a.getService().getDurationMinutes())));
-            return view(changed(a));
+            return view(changed(a, AppointmentChanged.Kind.RESCHEDULED));
         });
         Long providerId = providerId(id);
         cache.evictDay(providerId, before.date());
@@ -214,7 +214,9 @@ public class AppointmentService {
             } else {
                 a.setStatus(next);
             }
-            return view(changed(a));
+            return view(changed(a, next == AppointmentStatus.CANCELLED
+                    ? AppointmentChanged.Kind.CANCELLED
+                    : AppointmentChanged.Kind.STATUS));
         });
         cache.evictDay(providerId(id), view.date());
         return view;

@@ -130,7 +130,11 @@ class ReminderIntegrationTest {
     }
 
     private Appointment book(LocalTime start) {
-        Instant startsAt = baku(MONDAY, start);
+        return book(MONDAY, start);
+    }
+
+    private Appointment book(LocalDate day, LocalTime start) {
+        Instant startsAt = baku(day, start);
         Appointment a = appointments.save(new Appointment(
                 "RV-T-" + start.toSecondOfDay(), barber, customer, haircut, startsAt, startsAt.plus(Duration.ofMinutes(30))));
         service.onAppointmentChanged(new AppointmentChanged(a.getId()));
@@ -181,6 +185,20 @@ class ReminderIntegrationTest {
         assertThat(plannedOffsets(a)).containsExactly(0);
 
         assertThat(settings.update(customer.getEmail(), List.of()).reminderOffsets()).isEmpty();
+        assertThat(plannedOffsets(a)).isEmpty();
+    }
+
+    @Test
+    void theDayBeforeReminderIsPlannedForEmailEvenWhenNotChosenForPush() {
+        Appointment a = book(MONDAY.plusDays(2), LocalTime.of(15, 0));
+        assertThat(plannedOffsets(a)).containsExactly(1440, 60, 15, 0);
+
+        CLOCK.now = baku(MONDAY.plusDays(1), LocalTime.of(15, 0));
+        assertThat(service.sendDue()).isEqualTo(1);
+        assertThat(SENT).isEmpty();
+
+        // Reminders off: nothing is planned, not even the e-mail.
+        settings.update(customer.getEmail(), List.of());
         assertThat(plannedOffsets(a)).isEmpty();
     }
 

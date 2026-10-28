@@ -124,8 +124,9 @@ Bütün demo hesabların şifrəsi: `Planera123`
 
 1. https://render.com - GitHub ilə daxil ol.
 2. https://render.com/deploy?repo=https://github.com/codelady-ship/planera -> Blueprint adı `planera` -> Deploy Blueprint. Pulsuz planda bir Key Value və bir PostgreSQL ola bilər; köhnə `planera-redis` / `planera-db` qalıbsa əvvəl silin.
-3. Web Push üçün yalnız `VAPID_PRIVATE_KEY` dashboard-da yazılır (public açar `render.yaml`-dadır, eyni cütün gizli yarısı: `npx web-push generate-vapid-keys`). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
-4. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
+3. E-poçt bildirişləri (#43) `RESEND_API_KEY` yazılanda göndərilir (https://resend.com, pulsuz plan), `MAIL_FROM` göndərən ünvandır (standart `Planera <onboarding@resend.dev>`, öz domeniniz təsdiqlənəndə dəyişin), `SITE_URL` məktubdakı linklərdir. Açar yoxdursa məktublar yalnız loga yazılır.
+4. Web Push üçün yalnız `VAPID_PRIVATE_KEY` dashboard-da yazılır (public açar `render.yaml`-dadır, eyni cütün gizli yarısı: `npx web-push generate-vapid-keys`). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
+5. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
 - **Production API:** https://planera-api.onrender.com
 - Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
