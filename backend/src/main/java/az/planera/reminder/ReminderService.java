@@ -71,6 +71,10 @@ public class ReminderService {
     @EventListener
     @Transactional
     public void onAppointmentChanged(AppointmentChanged event) {
+        if (event.kind() == AppointmentChanged.Kind.REMINDER_DUE) {
+            // Published by sendDue() itself while it holds the due row: nothing to re-plan.
+            return;
+        }
         reminders.deleteByAppointmentId(event.appointmentId());
         Appointment a = appointments.findById(event.appointmentId()).orElse(null);
         if (a == null || !a.getStatus().isActive()) {
