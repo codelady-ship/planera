@@ -17,13 +17,20 @@ export class ApiUnavailableError extends Error {
   }
 }
 
+const PUBLIC_TIMEOUT_MS = 10_000
+
 /** Fetches a public JSON endpoint; null on 404. */
 export async function getPublic<T>(path: string): Promise<T | null> {
   const url = apiUrl(path)
   if (!url) throw new ApiUnavailableError()
   let response: Response
   try {
-    response = await fetch(url, { headers: { Accept: 'application/json' } })
+    // A sleeping free-tier API must not stall a build: after the timeout the
+    // page renders its 'unavailable' state and retries within seconds.
+    response = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(PUBLIC_TIMEOUT_MS),
+    })
   } catch {
     throw new ApiUnavailableError()
   }
