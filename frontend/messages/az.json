@@ -38,7 +38,8 @@
     "logoAlt": "Planera - Vaxtını seç, rahatlığını yaşa.",
     "services": "Xidmətlər",
     "join": "Mütəxəssis kimi qoşul",
-    "note": "Bütün qiymətlər AZN, vaxt Bakı vaxtı ilədir."
+    "note": "Bütün qiymətlər AZN, vaxt Bakı vaxtı ilədir.",
+    "privacy": "Gizlilik siyasəti"
   },
   "home": {
     "slogan": "Vaxtını seç, rahatlığını yaşa.",
@@ -445,5 +446,32 @@
     "title": "Gözləmə siyahısı",
     "listHint": "Bu günlərdə vaxt boşalanda sizə xəbər verəcəyik.",
     "leave": "Çıx"
+  },
+  "privacy": {
+    "title": "Gizlilik siyasəti",
+    "updated": "Son yenilənmə: 28 oktyabr 2026",
+    "intro": "Planera onlayn randevu platforması və şəxsi gündəlik asistentidir. Bu səhifə sayt, PWA və Android/iOS tətbiqinin hansı məlumatları topladığını, nə üçün istifadə etdiyini və onları necə sildirə biləcəyinizi izah edir.",
+    "collectTitle": "Hansı məlumatları toplayırıq",
+    "collect1": "Hesab: ad və soyad, e-poçt, telefon (istəyə bağlı), şifrənin hash-i, seçdiyiniz interfeys dili.",
+    "collect2": "Randevular: mütəxəssis, xidmət, tarix və saat, qeydiniz, status, rəyləriniz.",
+    "collect3": "Şəxsi qeydlər: başlıq, mətn, tarix və saat, xatırlatma vaxtları. Səslə yazılan qeyd yalnız cihazınızda mətnə çevrilir; səs yazısı saxlanılmır və serverə göndərilmir.",
+    "collect4": "Bildirişlər: push abunəliyinin ünvanı və açarları (yalnız bu cihaza bildiriş göndərmək üçün), sevimli mütəxəssislər, gözləmə siyahısı qeydləri.",
+    "collect5": "Texniki: sorğu logları (IP ünvanı, vaxt, ünvan) sui-istifadənin qarşısını almaq üçün qısa müddət saxlanılır. Analitika və reklam izləyiciləri yoxdur.",
+    "useTitle": "Nə üçün istifadə edirik",
+    "use1": "Randevu götürmək, idarə etmək və mütəxəssisə göstərmək.",
+    "use2": "Xatırlatmalar: push bildirişi, tətbiqdə alarm və e-poçt (randevu qəbulu, dəyişiklik, ləğv, bir gün əvvəl xatırlatma, gözləmə siyahısında boşalan vaxt).",
+    "use3": "Hesabınızın təhlükəsizliyi: giriş, sessiya, sorğu limitləri.",
+    "storageTitle": "Harada saxlanılır",
+    "storage1": "Server və verilənlər bazası Render (Frankfurt, Almaniya), sayt Vercel üzərindədir. E-poçtlar Resend vasitəsilə göndərilir. Bu xidmətlər məlumatı yalnız Planera-nın tapşırığı ilə emal edir.",
+    "storage2": "Məlumat üçüncü tərəflərə satılmır və reklam məqsədilə paylaşılmır. Mütəxəssis yalnız ona götürülən randevunun adı, telefonu və qeydini görür.",
+    "permissionsTitle": "Tətbiq icazələri",
+    "perm1": "Bildirişlər: xatırlatmalar üçün, yalnız siz düyməyə basanda istənir.",
+    "perm2": "Mikrofon: qeydi səslə yazmaq üçün, yalnız \"Səslə de\" düyməsinə basanda; danışıq cihazın öz səs tanıma xidməti ilə mətnə çevrilir.",
+    "perm3": "Dəqiq alarm (Android): qeydin vaxtında alarmın çalması üçün.",
+    "deleteTitle": "Saxlama müddəti və silinmə",
+    "delete1": "Hesab məlumatları hesab mövcud olduğu müddətdə saxlanılır. Push abunəliyini kabinetdən istənilən vaxt bağlaya, qeydləri və rəyləri silə bilərsiniz.",
+    "delete2": "Hesabı və ona bağlı bütün məlumatları (randevular, qeydlər, bildiriş abunəlikləri, sevimlilər) silmək üçün qeydiyyatdakı e-poçtdan {email} ünvanına yazın; 7 gün ərzində silinir və təsdiq məktubu göndərilir.",
+    "contactTitle": "Əlaqə",
+    "contact": "Suallar üçün: {email}. Siyasət dəyişəndə bu səhifədəki tarix yenilənir."
   }
 }

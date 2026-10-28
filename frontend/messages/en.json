@@ -38,7 +38,8 @@
     "logoAlt": "Planera - Pick your time, enjoy the ease.",
     "services": "Services",
     "join": "Join as a professional",
-    "note": "All prices in AZN, all times in Baku time."
+    "note": "All prices in AZN, all times in Baku time.",
+    "privacy": "Privacy policy"
   },
   "home": {
     "slogan": "Pick your time, enjoy the ease.",
@@ -445,5 +446,32 @@
     "title": "Waitlist",
     "listHint": "We will tell you when a slot opens on these days.",
     "leave": "Leave"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "updated": "Last updated: 28 October 2026",
+    "intro": "Planera is an online booking platform and a personal diary assistant. This page explains which data the site, the PWA and the Android/iOS app collect, why, and how you can have it deleted.",
+    "collectTitle": "What we collect",
+    "collect1": "Account: full name, e-mail, phone (optional), a hash of your password, your interface language.",
+    "collect2": "Appointments: professional, service, date and time, your note, status, your reviews.",
+    "collect3": "Personal notes: title, text, date and time, reminder times. A dictated note is turned into text on your device only; no audio is stored or sent to the server.",
+    "collect4": "Notifications: the push subscription endpoint and keys (used only to notify this device), favourite professionals, waitlist entries.",
+    "collect5": "Technical: request logs (IP address, time, path) kept briefly to prevent abuse. There are no analytics or advertising trackers.",
+    "useTitle": "Why we use it",
+    "use1": "To book, manage and show appointments to the professional.",
+    "use2": "Reminders: push notifications, the in-app alarm and e-mails (booking, changes, cancellation, the day-before reminder, a freed slot on the waitlist).",
+    "use3": "Account security: sign-in, sessions, request limits.",
+    "storageTitle": "Where it is stored",
+    "storage1": "The API and database run on Render (Frankfurt, Germany), the site on Vercel. E-mails are sent through Resend. These providers process data only on behalf of Planera.",
+    "storage2": "Data is never sold or shared for advertising. A professional sees only the name, phone and note of appointments booked with them.",
+    "permissionsTitle": "App permissions",
+    "perm1": "Notifications: for reminders, requested only when you press the button.",
+    "perm2": "Microphone: to dictate a note, only when you press \"Dictate\"; speech is turned into text by the device's own speech service.",
+    "perm3": "Exact alarms (Android): so the alarm rings at the time of the note.",
+    "deleteTitle": "Retention and deletion",
+    "delete1": "Account data is kept while the account exists. You can turn off push on any device, and delete notes and reviews, from your account at any time.",
+    "delete2": "To delete the account and everything tied to it (appointments, notes, push subscriptions, favourites), write to {email} from the e-mail you registered with; it is deleted within 7 days and you get a confirmation.",
+    "contactTitle": "Contact",
+    "contact": "Questions: {email}. When the policy changes, the date on this page is updated."
   }
 }
