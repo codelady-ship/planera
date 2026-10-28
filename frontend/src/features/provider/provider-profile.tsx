@@ -2,6 +2,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Clock, MapPin, Phone, Star } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FavoriteButton } from '@/features/favorites/favorite-button'
 import { Link } from '@/i18n/navigation'
 import type { ProviderDetail } from '@/lib/api/types'
 import { dateNames, formatDuration, formatPrice } from '@/lib/dates'
@@ -30,10 +31,13 @@ export function ProviderProfile({ provider }: { provider: ProviderDetail }) {
           >
             {summary.initials}
           </div>
-          <div className="flex min-w-0 flex-col gap-1">
-            <h1 className="text-2xl font-semibold md:text-3xl">
-              {summary.name}
-            </h1>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="text-2xl font-semibold md:text-3xl">
+                {summary.name}
+              </h1>
+              <FavoriteButton slug={summary.slug} />
+            </div>
             <p className="text-muted-foreground">
               {summary.title} · {summary.categoryName}
             </p>
