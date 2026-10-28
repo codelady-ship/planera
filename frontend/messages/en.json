@@ -427,5 +427,13 @@
     "priceDecimals": "At most 2 decimals",
     "durationMin": "At least 5 minutes",
     "durationMax": "At most 600 minutes"
+  },
+  "favorites": {
+    "add": "Add to favourites",
+    "remove": "Remove from favourites",
+    "tab": "Favourites",
+    "empty": "No favourite professionals yet.",
+    "find": "Find a professional",
+    "loadFailed": "Could not load the favourites"
   }
 }

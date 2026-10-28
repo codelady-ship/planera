@@ -427,5 +427,13 @@
     "priceDecimals": "Ən çox 2 onluq rəqəm",
     "durationMin": "Ən azı 5 dəqiqə",
     "durationMax": "Ən çox 600 dəqiqə"
+  },
+  "favorites": {
+    "add": "Sevimlilərə əlavə et",
+    "remove": "Sevimlilərdən çıxar",
+    "tab": "Sevimlilər",
+    "empty": "Hələ sevimli mütəxəssis yoxdur.",
+    "find": "Mütəxəssis tap",
+    "loadFailed": "Sevimliləri yükləmək olmadı"
   }
 }

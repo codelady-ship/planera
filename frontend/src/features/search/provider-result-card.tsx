@@ -3,6 +3,7 @@ import { Clock, MapPin, Star } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { FavoriteButton } from '@/features/favorites/favorite-button'
 import { Link } from '@/i18n/navigation'
 import type { ProviderSummary } from '@/lib/api/types'
 import { formatPrice } from '@/lib/dates'
@@ -24,7 +25,7 @@ export function ProviderResultCard({
           >
             {provider.initials}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <Link
               href={`/providers/${provider.slug}`}
               className="block truncate font-medium hover:underline"
@@ -35,6 +36,7 @@ export function ProviderResultCard({
               {provider.title} · {provider.categoryName}
             </p>
           </div>
+          <FavoriteButton slug={provider.slug} />
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
           <span className="flex items-center gap-1 font-medium">

@@ -14,6 +14,7 @@ import { setSessionUser, useSession } from '@/features/auth/use-session'
 import { ApiError, api } from '@/lib/api/client'
 import type { Appointment, SessionUser } from '@/lib/api/types'
 import { AgendaView } from '@/features/diary/agenda-view'
+import { FavoritesList } from '@/features/favorites/favorites-list'
 import { AppointmentCard } from './appointment-card'
 import { NotificationSettings } from './notification-settings'
 
@@ -26,10 +27,13 @@ const SCOPES = [
 /** Personal account (#32): appointments by scope and profile details. */
 export function AccountView() {
   const t = useTranslations('account')
+  const tf = useTranslations('favorites')
   // ?tab=agenda&new=1&text=... comes from a deep link or shortcut (#66).
   const params = useSearchParams()
   const [tab, setTab] = useState<string>(() =>
-    params.get('tab') === 'agenda' ? 'agenda' : 'upcoming',
+    params.get('tab') === 'agenda' || params.get('tab') === 'favorites'
+      ? (params.get('tab') as string)
+      : 'upcoming',
   )
   const openNew = params.get('new') === '1'
   const initialText = params.get('text') ?? undefined
@@ -49,6 +53,7 @@ export function AccountView() {
               {t(s.value)}
             </TabsTrigger>
           ))}
+          <TabsTrigger value="favorites">{tf('tab')}</TabsTrigger>
           <TabsTrigger value="profile">{t('profile')}</TabsTrigger>
           <TabsTrigger value="notifications">{t('notifications')}</TabsTrigger>
         </TabsList>
@@ -64,6 +69,9 @@ export function AccountView() {
             )}
           </TabsContent>
         ))}
+        <TabsContent value="favorites" className="pt-4">
+          {tab === 'favorites' && <FavoritesList />}
+        </TabsContent>
         <TabsContent value="profile" className="pt-4">
           {user ? <ProfileForm user={user} /> : <Skeleton className="h-48" />}
         </TabsContent>
