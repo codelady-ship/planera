@@ -435,5 +435,15 @@
     "empty": "Hələ sevimli mütəxəssis yoxdur.",
     "find": "Mütəxəssis tap",
     "loadFailed": "Sevimliləri yükləmək olmadı"
+  },
+  "waitlist": {
+    "offer": "Bu gün dolub. Siyahıya qoşulun: bir vaxt boşalan kimi e-poçt və bildiriş göndərək.",
+    "join": "Gözləmə siyahısına qoşul",
+    "loginToJoin": "Daxil olub siyahıya qoşulun",
+    "joined": "Siyahıya qoşuldunuz. Bu gündə vaxt boşalan kimi e-poçt və bildiriş gələcək.",
+    "failed": "Siyahıya qoşulmaq olmadı",
+    "title": "Gözləmə siyahısı",
+    "listHint": "Bu günlərdə vaxt boşalanda sizə xəbər verəcəyik.",
+    "leave": "Çıx"
   }
 }

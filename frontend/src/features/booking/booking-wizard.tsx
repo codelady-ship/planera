@@ -16,6 +16,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { useSession } from '@/features/auth/use-session'
+import { WaitlistJoin } from '@/features/waitlist/waitlist-join'
 import { ApiError, api } from '@/lib/api/client'
 import type { Appointment, ProviderDetail } from '@/lib/api/types'
 import {
@@ -204,6 +205,14 @@ export function BookingWizard({ provider }: { provider: ProviderDetail }) {
             selected={time}
             onSelect={(t) => go({ time: t })}
           />
+          {service && slots !== null && slots.length === 0 && (
+            <WaitlistJoin
+              slug={slug}
+              serviceId={service.id}
+              date={date}
+              loginHref={loginHref}
+            />
+          )}
         </section>
       )}
 

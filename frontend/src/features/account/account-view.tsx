@@ -15,6 +15,7 @@ import { ApiError, api } from '@/lib/api/client'
 import type { Appointment, SessionUser } from '@/lib/api/types'
 import { AgendaView } from '@/features/diary/agenda-view'
 import { FavoritesList } from '@/features/favorites/favorites-list'
+import { WaitlistList } from '@/features/waitlist/waitlist-list'
 import { AppointmentCard } from './appointment-card'
 import { NotificationSettings } from './notification-settings'
 
@@ -65,7 +66,10 @@ export function AccountView() {
         {SCOPES.map((s) => (
           <TabsContent key={s.value} value={s.value} className="pt-4">
             {tab === s.value && (
-              <AppointmentList scope={s.value} empty={t(s.empty)} />
+              <div className="flex flex-col gap-4">
+                <AppointmentList scope={s.value} empty={t(s.empty)} />
+                {s.value === 'upcoming' && <WaitlistList />}
+              </div>
             )}
           </TabsContent>
         ))}
