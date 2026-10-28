@@ -52,11 +52,12 @@ yalnız aşağıdakı addımlar qalır.
 
 ## Ekran şəkilləri
 
-Hər iki mağaza telefon ölçüsündə şəkil istəyir (Play: ən azı 2, 16:9 və ya 9:16, 320-3840 px;
-App Store: 6.7" 1290x2796 və 6.5" 1284x2778). Chrome DevTools-da "Pixel 7" / "iPhone 15 Pro Max"
-emulyasiyası ilə bu səhifələri çəkin: ana səhifə, axtarış, mütəxəssis profili, randevu sihirbazı
-(saat seçimi), kabinet -> gündəlik, bildiriş ayarları. Mətnlər sayt dilində olduğu üçün az/en/ru
-üçün ayrıca dəst çəkilə bilər.
+Hazır dəstlər: `docs/store/screenshots/{az,en,ru}/` (Pixel 7 eni, 1082x2152, hər dildə 7 şəkil:
+ana səhifə, axtarış, profil, randevu, gündəlik, yeni qeyd, bildirişlər). Play üçün birbaşa yüklənir;
+App Store 6.7" (1290x2796) istəyir, eyni şəkilləri yükləyəndə App Store Connect ölçüyə görə qəbul
+etmirsə `node scripts/store-screenshots.mjs` skriptində `devices['iPhone 15 Pro Max']` ilə çəkin.
+Yenidən çəkmək: `cd frontend && npm run build && API_URL=https://planera-api.onrender.com npx next start`,
+sonra başqa terminalda `node scripts/store-screenshots.mjs` (demo müştəri ilə daxil olur).
 
 ## Versiya
 
