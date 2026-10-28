@@ -2,6 +2,16 @@
 
 export type UserRole = 'ADMIN' | 'PROVIDER' | 'CUSTOMER'
 
+/** A day the customer waits for (#45). */
+export interface WaitlistEntry {
+  id: number
+  providerSlug: string
+  providerName: string
+  serviceId: number
+  serviceName: string
+  date: string
+}
+
 export interface SessionUser {
   id: number
   email: string

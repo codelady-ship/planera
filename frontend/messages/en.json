@@ -435,5 +435,15 @@
     "empty": "No favourite professionals yet.",
     "find": "Find a professional",
     "loadFailed": "Could not load the favourites"
+  },
+  "waitlist": {
+    "offer": "This day is full. Join the waitlist and we will e-mail and notify you as soon as a slot opens.",
+    "join": "Join the waitlist",
+    "loginToJoin": "Sign in to join the waitlist",
+    "joined": "You are on the waitlist. You will get an e-mail and a notification as soon as a slot opens that day.",
+    "failed": "Could not join the waitlist",
+    "title": "Waitlist",
+    "listHint": "We will tell you when a slot opens on these days.",
+    "leave": "Leave"
   }
 }
