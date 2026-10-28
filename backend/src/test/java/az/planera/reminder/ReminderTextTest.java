@@ -32,6 +32,16 @@ class ReminderTextTest {
     }
 
     @Test
+    void followsTheUsersLanguage() {
+        assertThat(ReminderService.body(baku(26, 15, 0), "Elvin Məmmədov", "Haircut", MONDAY_10_10, java.util.Locale.ENGLISH))
+                .isEqualTo("You have an appointment with Elvin Məmmədov today at 15:00: Haircut");
+        assertThat(ReminderService.body(baku(30, 18, 0), "Elvin Məmmədov", "Haircut", MONDAY_10_10, java.util.Locale.ENGLISH))
+                .isEqualTo("You have an appointment with Elvin Məmmədov on 30 October at 18:00: Haircut");
+        assertThat(ReminderService.noteBody(baku(27, 9, 30), "сходить к врачу", MONDAY_10_10, java.util.Locale.forLanguageTag("ru")))
+                .isEqualTo("У вас завтра в 09:30 заметка: сходить к врачу");
+    }
+
+    @Test
     void personalNotesHaveTheirOwnSentence() {
         assertThat(ReminderService.noteBody(baku(26, 15, 0), "həkimə getmək", MONDAY_10_10))
                 .isEqualTo("Sizin bu gün saat 15:00-da qeydiniz var: həkimə getmək");

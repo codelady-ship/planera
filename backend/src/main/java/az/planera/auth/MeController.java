@@ -36,4 +36,13 @@ public class MeController {
     public UserView update(Authentication authentication, @Valid @RequestBody ProfileRequest request) {
         return auth.updateProfile(authentication.getName(), request.fullName(), request.phone());
     }
+
+    public record LocaleRequest(@NotBlank @Pattern(regexp = "az|en|ru") String locale) {}
+
+    /** Remembers the interface language for push reminders (#123). */
+    @PatchMapping("/locale")
+    public UserView updateLocale(Authentication authentication, @Valid @RequestBody LocaleRequest request) {
+        auth.updateLocale(authentication.getName(), request.locale());
+        return auth.view(authentication.getName());
+    }
 }

@@ -28,6 +28,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -91,6 +92,7 @@ public class AuthService {
         }
         User user = new User(email, request.fullName().strip(), UserRole.CUSTOMER);
         user.setPhone(request.phone());
+        user.setLocale(requestLanguage());
         user.setPasswordHash(passwords.encode(request.password()));
         return issue(users.save(user));
     }
@@ -106,6 +108,7 @@ public class AuthService {
         if (user == null || user.getPasswordHash() == null || !matches) {
             throw new UnauthorizedException(BAD_CREDENTIALS);
         }
+        user.setLocale(requestLanguage());
         return issue(user);
     }
 
@@ -140,6 +143,17 @@ public class AuthService {
         user.setFullName(fullName.strip());
         user.setPhone(phone);
         return view(user);
+    }
+
+    /** The language the reminders are sent in (#123); the switcher calls this when a signed-in user changes it. */
+    public void updateLocale(String email, String locale) {
+        User user = users.findByEmailIgnoreCase(email).orElseThrow(() -> new UnauthorizedException(BAD_REFRESH));
+        user.setLocale(Messages.locale(locale).getLanguage());
+    }
+
+    /** The interface language of the current request: Accept-Language, Azerbaijani when unsupported. */
+    private static String requestLanguage() {
+        return Messages.locale(LocaleContextHolder.getLocale().toLanguageTag()).getLanguage();
     }
 
     UserView view(User user) {
