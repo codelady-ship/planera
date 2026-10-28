@@ -14,6 +14,8 @@ export MSYS_NO_PATHCONV=1
 
 out="${1:-$HOME/planera-keys}"
 mkdir -p "$out"
+# Git Bash: openssl is a Windows program and needs C:/... paths.
+if command -v cygpath >/dev/null 2>&1; then out="$(cygpath -m "$out")"; fi
 store="$out/planera-upload.p12"
 alias="planera"
 if [ -f "$store" ]; then
