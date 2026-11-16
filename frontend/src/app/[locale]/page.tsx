@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { setRequestLocale } from 'next-intl/server'
 import { ScrollScene } from '@/components/motion/scroll-scene'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WakingServerHint } from '@/features/common/waking-server'
 import { CategoryGrid } from '@/features/home/category-grid'
 import { HeroSearch } from '@/features/home/hero-search'
 import { HowItWorks } from '@/features/home/how-it-works'
@@ -20,9 +21,10 @@ async function Providers() {
   return <TopProviders providers={providers} today={today} />
 }
 
-function SectionSkeleton() {
+function SectionSkeleton({ hint = false }: { hint?: boolean }) {
   return (
     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
+      {hint && <WakingServerHint />}
       {Array.from({ length: 4 }, (_, i) => (
         <Skeleton key={i} className="h-40" />
       ))}
@@ -41,7 +43,7 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
       <main className="flex-1">
         <HeroSearch />
         <LiveReminders />
-        <Suspense fallback={<SectionSkeleton />}>
+        <Suspense fallback={<SectionSkeleton hint />}>
           <Categories />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>

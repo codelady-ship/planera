@@ -1,5 +1,6 @@
 import { currentLocale } from '@/i18n/current'
 import { gatewayText } from './gateway-messages'
+import { trackSlow } from './slow-requests'
 import type { Problem } from './types'
 
 /** A non-2xx API answer, carrying its problem details. */
@@ -17,12 +18,14 @@ export class ApiError extends Error {
  * `/me/appointments`.
  */
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`/api/backend${path}`, {
-    ...init,
-    headers: init.body
-      ? { 'Content-Type': 'application/json', ...init.headers }
-      : init.headers,
-  })
+  const response = await trackSlow(
+    fetch(`/api/backend${path}`, {
+      ...init,
+      headers: init.body
+        ? { 'Content-Type': 'application/json', ...init.headers }
+        : init.headers,
+    }),
+  )
   if (!response.ok) {
     const problem = (await response.json().catch(() => ({}))) as Problem
     throw new ApiError({ ...problem, status: response.status })

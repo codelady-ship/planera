@@ -199,3 +199,15 @@
     opacity: 1;
   }
 }
+
+/* "Waking the server" hint in loading fallbacks: shown only after 3 s. */
+.waking-hint {
+  opacity: 0;
+  animation: waking-hint-in 0.3s ease-out 3s forwards;
+}
+
+@keyframes waking-hint-in {
+  to {
+    opacity: 1;
+  }
+}

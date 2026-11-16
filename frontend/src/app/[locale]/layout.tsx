@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import '../globals.css'
+import { WakingServerNotice } from '@/features/common/waking-server'
 import { InstallBanner } from '@/features/pwa/install-banner'
 import { ServiceWorkerRegistration } from '@/features/pwa/service-worker'
 import { THEME_INIT_SCRIPT } from '@/features/theme/theme'
@@ -74,6 +75,7 @@ export default async function RootLayout({
             <InstallBanner />
           </Suspense>
           <ServiceWorkerRegistration />
+          <WakingServerNotice />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -12,7 +12,8 @@
     "sidebarSections": "Panel sections",
     "toggleMenu": "Open or close the menu",
     "dismiss": "Cancel",
-    "menu": "Menu"
+    "menu": "Menu",
+    "wakingServer": "Waking up the server. This can take up to a minute, please keep the page open."
   },
   "header": {
     "home": "Planera home",
