@@ -24,9 +24,21 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({TestcontainersConfiguration.class, ProviderService.class, az.planera.review.ReviewService.class, ServiceOfferingService.class, CategoryService.class})
+@Import({TestcontainersConfiguration.class, ProviderService.class, az.planera.review.ReviewService.class, ServiceOfferingService.class, CategoryService.class,
+        az.planera.slot.SlotService.class, az.planera.redis.SlotCache.class, az.planera.redis.RedisSupport.class, CatalogIntegrationTest.FixedClock.class})
 @ActiveProfiles("dev")
 class CatalogIntegrationTest {
+
+    /** "Now" is Monday 26 Oct 2026, 10:10 Baku, like SlotIntegrationTest. */
+    @org.springframework.boot.test.context.TestConfiguration
+    static class FixedClock {
+        @org.springframework.context.annotation.Bean
+        java.time.Clock clock() {
+            return java.time.Clock.fixed(
+                    java.time.ZonedDateTime.of(2026, 10, 26, 10, 10, 0, 0, az.planera.config.TimeConfig.BAKU).toInstant(),
+                    az.planera.config.TimeConfig.BAKU);
+        }
+    }
 
     @Autowired ProviderService providers;
     @Autowired ServiceOfferingService services;
@@ -74,6 +86,16 @@ class CatalogIntegrationTest {
         assertThat(cheap).extracting(ProviderSummary::priceFrom).allMatch(p -> p.compareTo(new BigDecimal("20")) <= 0);
         assertThat(cheap).extracting(ProviderSummary::priceFrom).isSorted();
         assertThat(cheap.getFirst().slug()).isEqualTo("elvin-barber");
+    }
+
+    @Test
+    void searchFillsTheNextFreeSlot() {
+        // #19: the barber works on Monday, so the first free start after 10:10 is 10:15 the same day.
+        assertThat(providers.search(search(null, null, null, null, null)).content())
+                .filteredOn(p -> p.slug().equals("elvin-barber"))
+                .singleElement()
+                .extracting(ProviderSummary::nextSlot)
+                .isEqualTo("2026-10-26T10:15");
     }
 
     @Test

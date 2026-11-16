@@ -16,7 +16,7 @@ public final class ProviderDtos {
 
     private ProviderDtos() {}
 
-    /** One card in the catalog. {@code nextSlot} is filled once slots exist (#19). */
+    /** One card in the catalog. {@code nextSlot}: earliest free start in the next 14 days (Baku time, {@code yyyy-MM-ddTHH:mm}) or null (#19). */
     public record ProviderSummary(
             String slug,
             String name,

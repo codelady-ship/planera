@@ -19,12 +19,14 @@ import az.planera.slot.SlotCalculator.Window;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,18 +126,64 @@ public class SlotService {
 
         List<DayStarts> days = new ArrayList<>();
         for (LocalDate d = first; !d.isAfter(last); d = d.plusDays(1)) {
-            LocalDate day = d;
-            boolean off = daysOff.stream().anyMatch(t -> t.covers(day));
-            List<Window> windows = off
-                    ? List.of()
-                    : weekly.stream()
-                            .filter(r -> r.getDayOfWeek() == day.getDayOfWeek())
-                            .map(r -> new Window(r.getStartTime(), r.getEndTime()))
-                            .toList();
-            days.add(new DayStarts(day, SlotCalculator.freeStarts(
-                    day, windows, service.getDurationMinutes(), provider.getSlotStepMinutes(), busy, now, TimeConfig.BAKU)));
+            days.add(new DayStarts(d, dayStarts(
+                    d, weekly, daysOff, busy, service.getDurationMinutes(), provider.getSlotStepMinutes(), now)));
         }
         return new DayRange(days);
+    }
+
+    /** Free starts of one day from preloaded weekly rules, days off and busy ranges. */
+    private static List<LocalTime> dayStarts(
+            LocalDate day,
+            List<AvailabilityRule> weekly,
+            List<TimeOff> daysOff,
+            List<Busy> busy,
+            int durationMinutes,
+            int stepMinutes,
+            Instant now) {
+        boolean off = daysOff.stream().anyMatch(t -> t.covers(day));
+        List<Window> windows = off
+                ? List.of()
+                : weekly.stream()
+                        .filter(r -> r.getDayOfWeek() == day.getDayOfWeek())
+                        .map(r -> new Window(r.getStartTime(), r.getEndTime()))
+                        .toList();
+        return SlotCalculator.freeStarts(day, windows, durationMinutes, stepMinutes, busy, now, TimeConfig.BAKU);
+    }
+
+    /**
+     * The earliest free start of a provider within {@code lookaheadDays} (today included), for the
+     * catalog's "next free time" badge (#19). Uses the provider's shortest active service: any start
+     * that fits a longer service also fits the shortest one, so this is the earliest bookable time.
+     * Rules, days off and appointments are loaded once; days are computed until the first free one.
+     */
+    public Optional<LocalDateTime> nextFreeStart(ProviderProfile provider, int lookaheadDays) {
+        Optional<Integer> duration = services.findByProviderIdAndActiveTrueOrderByPriceAsc(provider.getId()).stream()
+                .map(ServiceOffering::getDurationMinutes)
+                .min(Integer::compare);
+        if (duration.isEmpty()) {
+            return Optional.empty();
+        }
+        LocalDate today = LocalDate.now(clock);
+        LocalDate last = today.plusDays(Math.min(Math.max(lookaheadDays, 1), HORIZON_DAYS) - 1L);
+        List<AvailabilityRule> weekly = rules.findByProviderIdOrderByDayOfWeekAscStartTimeAsc(provider.getId());
+        if (weekly.isEmpty()) {
+            return Optional.empty();
+        }
+        List<TimeOff> daysOff = timeOff.findOverlapping(provider.getId(), today, last);
+        List<Busy> busy = appointments
+                .findActiveOverlapping(provider.getId(), startOf(today), startOf(last.plusDays(1)))
+                .stream()
+                .map(SlotService::busy)
+                .toList();
+        Instant now = clock.instant();
+        for (LocalDate d = today; !d.isAfter(last); d = d.plusDays(1)) {
+            List<LocalTime> starts = dayStarts(d, weekly, daysOff, busy, duration.get(), provider.getSlotStepMinutes(), now);
+            if (!starts.isEmpty()) {
+                return Optional.of(d.atTime(starts.getFirst()));
+            }
+        }
+        return Optional.empty();
     }
 
     /** The active service, which must belong to the active provider {@code slug}. */
