@@ -131,7 +131,7 @@ Bütün demo hesabların şifrəsi: `Planera123`
 - **Production API:** https://planera-api.onrender.com
 - Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.
 
-Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Render-in pulsuz PostgreSQL-i yaradıldıqdan 30 gün sonra silinir (dashboard xəbərdarlıq edir); daimi baza üçün Neon və ya ödənişli plan: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` dəyişənləri dashboard-da yazılanda `planera-db` əvəzinə o baza işlənir (`jdbc:postgresql://<host>/<db>?sslmode=require`). API boş bağlantıları 2 dəqiqəyə bağlayır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
+Qeydlər: pulsuz plan 15 dəqiqə istifadəsiz qalanda yatır (ilk sorğu ~1 dəq). Bunu gizlətmək üçün `.github/workflows/keep-warm.yml` hər 10 dəqiqədən bir `/actuator/health`-i çağırır (GitHub cron bir neçə dəqiqə gecikə bilər). Brauzerdə sorğu 3 saniyədən uzun çəkəndə "Server oyanır" bildirişi görünür. Server səhifələrinin yüklənmə skeletlərində də eyni mətn 3 saniyədən sonra çıxır. Render-in pulsuz PostgreSQL-i yaradıldıqdan 30 gün sonra silinir (dashboard xəbərdarlıq edir); daimi baza üçün Neon və ya ödənişli plan: `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` dəyişənləri dashboard-da yazılanda `planera-db` əvəzinə o baza işlənir (`jdbc:postgresql://<host>/<db>?sslmode=require`). API boş bağlantıları 2 dəqiqəyə bağlayır. `backend/` xaricindəki dəyişikliklər backend deploy-unu işə salmır.
 
 ## Mobil tətbiq (Capacitor, Android və iOS)
 

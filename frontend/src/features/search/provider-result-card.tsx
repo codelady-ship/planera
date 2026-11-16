@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Clock, MapPin, Star } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
@@ -6,7 +6,8 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { FavoriteButton } from '@/features/favorites/favorite-button'
 import { Link } from '@/i18n/navigation'
 import type { ProviderSummary } from '@/lib/api/types'
-import { formatPrice } from '@/lib/dates'
+import { formatNextSlot } from '@/features/home/format'
+import { formatPrice, todayInBaku } from '@/lib/dates'
 
 /** One search result: avatar, name, rating, price and the next free time. */
 export function ProviderResultCard({
@@ -15,6 +16,7 @@ export function ProviderResultCard({
   provider: ProviderSummary
 }) {
   const t = useTranslations('catalog')
+  const locale = useLocale()
   return (
     <Card className="h-full">
       <CardContent className="flex flex-col gap-3">
@@ -63,7 +65,11 @@ export function ProviderResultCard({
             className="h-auto min-h-6 max-w-full gap-1.5 px-2.5 py-1 text-left whitespace-normal"
           >
             <Clock aria-hidden />
-            <span>{t('nextSlot', { when: provider.nextSlot })}</span>
+            <span>
+              {t('nextSlot', {
+                when: formatNextSlot(provider.nextSlot, todayInBaku(), locale),
+              })}
+            </span>
           </Badge>
         )}
       </CardContent>

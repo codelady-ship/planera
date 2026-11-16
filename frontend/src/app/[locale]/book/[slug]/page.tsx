@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WakingServerHint } from '@/features/common/waking-server'
 import { BookingWizard } from '@/features/booking/booking-wizard'
 import { ApiUnavailable } from '@/features/common/api-unavailable'
 import { SiteFooter } from '@/features/home/site-footer'
@@ -24,7 +25,14 @@ export default function BookPage({
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8">
-        <Suspense fallback={<Skeleton className="h-96 rounded-xl" />}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col gap-3">
+              <WakingServerHint />
+              <Skeleton className="h-96 rounded-xl" />
+            </div>
+          }
+        >
           <Booking params={params} />
         </Suspense>
       </main>

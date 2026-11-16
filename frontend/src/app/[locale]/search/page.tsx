@@ -6,6 +6,7 @@ import { SearchX } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiUnavailable } from '@/features/common/api-unavailable'
+import { WakingServerHint } from '@/features/common/waking-server'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
 import { ProviderResultCard } from '@/features/search/provider-result-card'
@@ -149,6 +150,7 @@ function ResultList({
 function ResultsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <WakingServerHint />
       {Array.from({ length: 6 }, (_, i) => (
         <Skeleton key={i} className="h-56 rounded-xl" />
       ))}

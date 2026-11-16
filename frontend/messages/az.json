@@ -12,7 +12,8 @@
     "sidebarSections": "Panel bölmələri",
     "toggleMenu": "Menyunu aç və ya bağla",
     "dismiss": "İmtina",
-    "menu": "Menyu"
+    "menu": "Menyu",
+    "wakingServer": "Server oyanır, bu bir dəqiqəyə qədər çəkə bilər. Səhifəni bağlamayın."
   },
   "header": {
     "home": "Planera ana səhifə",

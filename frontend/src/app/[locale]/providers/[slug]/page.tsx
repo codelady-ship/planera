@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { WakingServerHint } from '@/features/common/waking-server'
 import { ApiUnavailable } from '@/features/common/api-unavailable'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
@@ -34,7 +35,14 @@ export default function ProviderPage({
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <Suspense fallback={<Skeleton className="h-96 rounded-xl" />}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col gap-3">
+              <WakingServerHint />
+              <Skeleton className="h-96 rounded-xl" />
+            </div>
+          }
+        >
           <Profile params={params} />
         </Suspense>
       </main>

@@ -33,7 +33,8 @@ public class FavoriteService {
         return favorites.findByUserIdOrderByCreatedAtDesc(user(email).getId()).stream()
                 .map(Favorite::getProvider)
                 .filter(ProviderProfile::isActive)
-                .map(ProviderService::summary)
+                // No next free time on favourites: the list stays cheap; search and the home page show it (#19).
+                .map(p -> ProviderService.summary(p, null))
                 .toList();
     }
 

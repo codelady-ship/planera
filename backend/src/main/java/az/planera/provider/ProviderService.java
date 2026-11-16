@@ -15,7 +15,9 @@ import az.planera.provider.ProviderDtos.ProviderDetail;
 import az.planera.provider.ProviderDtos.ProviderSummary;
 import az.planera.provider.ProviderDtos.ServiceView;
 import az.planera.review.ReviewService;
+import az.planera.slot.SlotService;
 import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,25 +29,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProviderService {
 
+    /** How far ahead the catalog looks for a provider's next free time (#19). */
+    static final int NEXT_SLOT_LOOKAHEAD_DAYS = 14;
+
+    /** Local Baku date-time without seconds, e.g. {@code 2026-10-26T10:15} (frontend formatNextSlot). */
+    private static final DateTimeFormatter NEXT_SLOT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
     private final ProviderProfileRepository providers;
     private final ServiceOfferingRepository services;
     private final AvailabilityRuleRepository rules;
     private final ReviewService reviews;
+    private final SlotService slots;
 
     public ProviderService(
             ProviderProfileRepository providers,
             ServiceOfferingRepository services,
             AvailabilityRuleRepository rules,
-            ReviewService reviews) {
+            ReviewService reviews,
+            SlotService slots) {
         this.providers = providers;
         this.services = services;
         this.rules = rules;
         this.reviews = reviews;
+        this.slots = slots;
     }
 
     public PageResponse<ProviderSummary> search(ProviderSearch search) {
         return PageResponse.of(
-                providers.findAll(search.toSpecification(), search.toPageable()), ProviderService::summary);
+                providers.findAll(search.toSpecification(), search.toPageable()), this::summary);
     }
 
     public ProviderDetail detail(String slug) {
@@ -87,7 +98,16 @@ public class ProviderService {
                 .toList();
     }
 
-    static ProviderSummary summary(ProviderProfile p) {
+    /** Catalog card with the next free time computed from the same slot rules as booking. */
+    ProviderSummary summary(ProviderProfile p) {
+        return summary(p, nextSlot(p));
+    }
+
+    String nextSlot(ProviderProfile p) {
+        return slots.nextFreeStart(p, NEXT_SLOT_LOOKAHEAD_DAYS).map(NEXT_SLOT_FORMAT::format).orElse(null);
+    }
+
+    static ProviderSummary summary(ProviderProfile p, String nextSlot) {
         return new ProviderSummary(
                 p.getSlug(),
                 p.getDisplayName(),
@@ -99,7 +119,7 @@ public class ProviderService {
                 p.getRatingCount(),
                 p.getPriceFrom(),
                 initials(p.getDisplayName()),
-                null);
+                nextSlot);
     }
 
     static ServiceView view(ServiceOffering s) {
