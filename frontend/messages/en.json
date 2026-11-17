@@ -53,6 +53,12 @@
     "city": "City",
     "date": "Date",
     "search": "Search",
+    "video": {
+      "label": "A hand with a pen fills in a paper planner: tasks, dates, priorities and a final check mark",
+      "caption": "AI-generated video",
+      "replay": "Replay video",
+      "play": "Play video"
+    },
     "live": {
       "title": "Live reminders, nothing forgotten",
       "reminderTitle": "Live reminder",

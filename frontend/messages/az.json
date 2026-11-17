@@ -53,6 +53,12 @@
     "city": "Şəhər",
     "date": "Tarix",
     "search": "Axtar",
+    "video": {
+      "label": "Qələmli əl kağız gündəliyi doldurur: tapşırıqlar, tarixlər, prioritetlər və son işarə",
+      "caption": "Süni intellektlə yaradılmış video",
+      "replay": "Videonu yenidən oynat",
+      "play": "Videonu oynat"
+    },
     "live": {
       "title": "Canlı bildiriş, heç nəyi unutmayın",
       "reminderTitle": "Canlı xatırlatma",
