@@ -3,7 +3,7 @@ import { CalendarDays, MapPin, NotebookPen, Search } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Link } from '@/i18n/navigation'
-import { HeroPlannerVideo } from './hero-planner-video'
+import { HERO_PLANNER_MEDIA, HeroPlannerVideo } from './hero-planner-video'
 import { cn } from '@/lib/utils'
 
 const CITIES = ['Bakı', 'Sumqayıt', 'Gəncə', 'Lənkəran', 'Şəki']
@@ -12,8 +12,16 @@ const CITIES = ['Bakı', 'Sumqayıt', 'Gəncə', 'Lənkəran', 'Şəki']
 // the hero works without client-side JavaScript.
 export function HeroSearch() {
   const t = useTranslations('home')
+  // Until the clip lands the hero keeps its original single-column layout.
+  const withVideo = HERO_PLANNER_MEDIA.ready
   return (
-    <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pt-12 pb-16 md:pt-20 md:pb-24 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-x-12">
+    <section
+      className={cn(
+        'mx-auto max-w-6xl px-4 pt-12 pb-16 md:pt-20 md:pb-24',
+        withVideo &&
+          'grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-x-12',
+      )}
+    >
       <div className="max-w-2xl">
         <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 text-sm font-medium text-primary ring-1 ring-border">
           <span className="size-2 rounded-full bg-brand-teal" aria-hidden />
@@ -49,12 +57,15 @@ export function HeroSearch() {
       </div>
 
       {/* On phones the search stays right under the copy; the clip follows. */}
-      <HeroPlannerVideo className="order-last lg:order-none" />
+      {withVideo && <HeroPlannerVideo className="order-last lg:order-none" />}
 
       <form
         action="/search"
         role="search"
-        className="grid grid-cols-1 gap-3 rounded-2xl border bg-card p-3 shadow-sm md:grid-cols-[1.4fr_1fr_1fr_auto] lg:col-span-2"
+        className={cn(
+          'grid grid-cols-1 gap-3 rounded-2xl border bg-card p-3 shadow-sm md:grid-cols-[1.4fr_1fr_1fr_auto]',
+          withVideo ? 'lg:col-span-2' : 'mt-8',
+        )}
       >
         <label className="flex items-center gap-2 rounded-lg px-2">
           <Search className="size-4 text-muted-foreground" aria-hidden />

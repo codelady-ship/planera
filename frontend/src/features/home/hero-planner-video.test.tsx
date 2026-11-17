@@ -16,15 +16,10 @@ describe('HeroPlannerVideo', () => {
     vi.restoreAllMocks()
   })
 
-  test('shows the placeholder poster while the clip is not ready', () => {
+  test('renders nothing while the clip is not ready', () => {
     stubReducedMotion(false)
     const { container } = render(<HeroPlannerVideo ready={false} />)
-    const img = screen.getByRole('img', {
-      name: 'Lövhəyə bərkidilmiş kağız gündəlik',
-    })
-    expect(img.getAttribute('src')).toContain('hero-planner-poster.jpg')
-    expect(container.querySelector('video')).toBeNull()
-    expect(screen.queryByText(/Süni intellekt/)).toBeNull()
+    expect(container).toBeEmptyDOMElement()
   })
 
   test('renders a lazy, muted, inline video with the poster first', () => {
@@ -71,7 +66,8 @@ describe('HeroPlannerVideo', () => {
 
   test('supports a vertical 9:16 clip', () => {
     stubReducedMotion(false)
-    render(<HeroPlannerVideo ready={false} aspect="9:16" />)
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
+    render(<HeroPlannerVideo ready aspect="9:16" />)
     expect(screen.getByTestId('hero-planner-video')).toHaveClass(
       'aspect-[9/16]',
     )

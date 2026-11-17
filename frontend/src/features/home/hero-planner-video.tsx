@@ -15,8 +15,8 @@ import { cn } from '@/lib/utils'
 
 /**
  * Hero clip assets. The clip itself is generated separately and dropped into
- * public/media; until then `ready` stays false and the frame shows the
- * placeholder poster only (no request for a missing file, no AI caption).
+ * public/media; until then `ready` stays false and nothing is rendered, so
+ * the hero keeps its previous look (no placeholder ever reaches the site).
  * When the clip arrives: add the files, replace both posters with its first
  * and last frames, and set `ready: true`.
  */
@@ -151,6 +151,8 @@ export function HeroPlannerVideo({
     setEnded(false)
   }
 
+  if (!ready) return null
+
   const ratio = aspect === '9:16' ? 'aspect-[9/16]' : 'aspect-video'
   // Cap the height at 60svh by capping the width for the given ratio.
   const width =
@@ -196,15 +198,15 @@ export function HeroPlannerVideo({
           </video>
         ) : (
           <Image
-            src={ready && reduced ? finalPoster : poster}
-            alt={ready ? t('label') : t('poster')}
+            src={reduced ? finalPoster : poster}
+            alt={t('label')}
             fill
             sizes="(min-width: 1024px) 560px, 100vw"
             className="object-cover"
           />
         )}
 
-        {ready && !failed && reduced && !userStarted && (
+        {!failed && reduced && !userStarted && (
           <Button
             type="button"
             size="icon-lg"
@@ -229,7 +231,7 @@ export function HeroPlannerVideo({
           </Button>
         )}
       </div>
-      {ready && !failed && (
+      {!failed && (
         <figcaption className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
           <Sparkles className="size-3.5" aria-hidden />
           {t('caption')}
