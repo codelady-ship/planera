@@ -8,7 +8,10 @@ import { ApiUnavailable } from '@/features/common/api-unavailable'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
 import { ProviderProfile } from '@/features/provider/provider-profile'
+import type { Locale } from '@/i18n/routing'
 import { getProvider } from '@/lib/api/catalog'
+import type { ProviderDetail } from '@/lib/api/types'
+import { jsonLd, localizedUrl, publicPageMetadata } from '@/lib/site/seo'
 
 export async function generateMetadata({
   params,
@@ -20,12 +23,20 @@ export async function generateMetadata({
     return { title: t('fallbackTitle') }
   }
   const { summary } = provider
-  return {
+  const meta = await getTranslations({ locale, namespace: 'meta' })
+  return publicPageMetadata({
+    locale: locale as Locale,
+    path: `/providers/${encodeURIComponent(slug)}`,
     title: `${summary.name} - ${summary.title}`,
     description:
       provider.bio ??
-      t('metaDescription', { name: summary.name, city: summary.city }),
-  }
+      t('metaDescription', {
+        name: summary.name,
+        title: summary.title,
+        city: summary.city,
+      }),
+    imageAlt: meta('ogImageAlt'),
+  })
 }
 
 export default function ProviderPage({
@@ -61,5 +72,59 @@ async function Profile({
   const provider = await getProvider(slug)
   if (provider === 'unavailable') return <ApiUnavailable />
   if (!provider) notFound()
-  return <ProviderProfile provider={provider} />
+  return (
+    <>
+      <ProviderJsonLd provider={provider} locale={locale} slug={slug} />
+      <ProviderProfile provider={provider} />
+    </>
+  )
+}
+
+/** LocalBusiness built only from what the profile shows: name, city, address, phone, services, rating. */
+function ProviderJsonLd({
+  provider,
+  locale,
+  slug,
+}: {
+  provider: ProviderDetail
+  locale: string
+  slug: string
+}) {
+  const { summary } = provider
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: summary.name,
+    description: provider.bio ?? summary.title,
+    url: localizedUrl(`/providers/${encodeURIComponent(slug)}`, locale),
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: summary.city,
+      addressCountry: 'AZ',
+      ...(provider.address ? { streetAddress: provider.address } : {}),
+    },
+    ...(provider.phone ? { telephone: provider.phone } : {}),
+    ...(summary.reviewCount > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: summary.rating,
+            reviewCount: summary.reviewCount,
+            bestRating: 5,
+          },
+        }
+      : {}),
+    makesOffer: provider.services.map((service) => ({
+      '@type': 'Offer',
+      price: service.price,
+      priceCurrency: 'AZN',
+      itemOffered: { '@type': 'Service', name: service.name },
+    })),
+  }
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: jsonLd(data) }}
+    />
+  )
 }

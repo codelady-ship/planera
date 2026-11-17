@@ -19,8 +19,8 @@ export function UserMenu({ stacked = false }: { stacked?: boolean }) {
   }
 
   const link = stacked
-    ? 'rounded-lg px-3 py-2 hover:bg-muted'
-    : buttonVariants({ variant: 'ghost', size: 'lg' })
+    ? 'flex min-h-11 items-center rounded-lg px-3 hover:bg-muted'
+    : cn(buttonVariants({ variant: 'ghost', size: 'lg' }), 'h-11')
 
   if (!user) {
     return (
@@ -32,7 +32,7 @@ export function UserMenu({ stacked = false }: { stacked?: boolean }) {
           href="/register"
           className={buttonVariants({
             size: 'lg',
-            className: stacked ? 'mt-2 h-10' : undefined,
+            className: stacked ? 'mt-2 h-11' : 'h-11',
           })}
         >
           {t('register')}

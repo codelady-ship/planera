@@ -12,6 +12,7 @@ import { SiteHeader } from '@/features/home/site-header'
 import { ProviderResultCard } from '@/features/search/provider-result-card'
 import { SearchFilters } from '@/features/search/search-filters'
 import { Link } from '@/i18n/navigation'
+import type { Locale } from '@/i18n/routing'
 import {
   SEARCH_KEYS,
   getCategories,
@@ -19,6 +20,7 @@ import {
   type SearchParams,
 } from '@/lib/api/catalog'
 import { ApiUnavailableError } from '@/lib/api/server'
+import { publicPageMetadata } from '@/lib/site/seo'
 import type { Category, Page, ProviderSummary } from '@/lib/api/types'
 
 export async function generateMetadata({
@@ -26,7 +28,14 @@ export async function generateMetadata({
 }: PageProps<'/[locale]/search'>): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'search' })
-  return { title: t('title'), description: t('description') }
+  const meta = await getTranslations({ locale, namespace: 'meta' })
+  return publicPageMetadata({
+    locale: locale as Locale,
+    path: '/search',
+    title: t('title'),
+    description: t('description'),
+    imageAlt: meta('ogImageAlt'),
+  })
 }
 
 export default async function SearchPage({

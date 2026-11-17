@@ -1,7 +1,8 @@
 {
   "meta": {
     "title": "Planera - Vaxtını seç, rahatlığını yaşa",
-    "description": "Bərbər, həkim, müəllim və digər xidmətlər üçün boş saatı seçin və randevunu bir neçə kliklə götürün."
+    "description": "Planera ilə bərbər, həkim, müəllim və digər mütəxəssisləri tapın, yalnız boş saatlar arasından vaxt seçin və randevunu onlayn, bir neçə kliklə götürün.",
+    "ogImageAlt": "Planera loqosu və şüarı: Vaxtını seç, rahatlığını yaşa."
   },
   "common": {
     "back": "Geri",
@@ -130,7 +131,7 @@
   },
   "search": {
     "title": "Mütəxəssis axtarışı",
-    "description": "Kateqoriya, şəhər, qiymət və reytinqə görə mütəxəssis tapın.",
+    "description": "Kateqoriya, şəhər, qiymət və reytinqə görə mütəxəssis tapın, boş saatları müqayisə edin və Planera ilə onlayn randevu götürün.",
     "found": "{count} mütəxəssis tapıldı",
     "empty": "Heç nə tapılmadı",
     "emptyHint": "Filtrləri dəyişin və ya sıfırlayın.",
@@ -155,7 +156,7 @@
   },
   "provider": {
     "fallbackTitle": "Mütəxəssis",
-    "metaDescription": "{name}, {city}. Boş saatı seçin və onlayn randevu götürün.",
+    "metaDescription": "{name} - {title}, {city}. Xidmətlər, qiymətlər, iş qrafiki və rəylər. Boş saatı seçin və Planera ilə onlayn randevu götürün.",
     "services": "Xidmətlər",
     "reviews": "Rəylər",
     "schedule": "İş qrafiki",

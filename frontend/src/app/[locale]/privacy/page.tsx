@@ -3,6 +3,8 @@ import { useTranslations } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SiteFooter } from '@/features/home/site-footer'
 import { SiteHeader } from '@/features/home/site-header'
+import type { Locale } from '@/i18n/routing'
+import { publicPageMetadata } from '@/lib/site/seo'
 
 const CONTACT = 'info@planera.az'
 
@@ -11,7 +13,14 @@ export async function generateMetadata({
 }: PageProps<'/[locale]/privacy'>): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'privacy' })
-  return { title: t('title'), description: t('intro') }
+  const meta = await getTranslations({ locale, namespace: 'meta' })
+  return publicPageMetadata({
+    locale: locale as Locale,
+    path: '/privacy',
+    title: t('title'),
+    description: t('intro'),
+    imageAlt: meta('ogImageAlt'),
+  })
 }
 
 /** Required by the app stores (#67); the footer links here from every page. */

@@ -1,7 +1,8 @@
 {
   "meta": {
     "title": "Planera - Pick your time, enjoy the ease",
-    "description": "Pick a free slot with a barber, doctor, tutor or any other service and book in a few clicks."
+    "description": "Find barbers, doctors, tutors and other professionals with Planera, pick a time from their real free slots and book your appointment online in a few clicks.",
+    "ogImageAlt": "Planera logo and slogan: Pick your time, enjoy the ease."
   },
   "common": {
     "back": "Back",
@@ -130,7 +131,7 @@
   },
   "search": {
     "title": "Find a professional",
-    "description": "Find a professional by category, city, price and rating.",
+    "description": "Find a professional by category, city, price and rating, compare free slots and book an appointment online with Planera.",
     "found": "{count} professionals found",
     "empty": "Nothing found",
     "emptyHint": "Change or reset the filters.",
@@ -155,7 +156,7 @@
   },
   "provider": {
     "fallbackTitle": "Professional",
-    "metaDescription": "{name}, {city}. Pick a free slot and book online.",
+    "metaDescription": "{name} - {title}, {city}. Services, prices, working hours and reviews. Pick a free slot and book online with Planera.",
     "services": "Services",
     "reviews": "Reviews",
     "schedule": "Working hours",

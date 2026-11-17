@@ -92,7 +92,7 @@ export function TopProviders({
         <h2 className="text-2xl font-semibold tracking-tight">{t('top')}</h2>
         <Link
           href="/search?sort=rating"
-          className="text-sm text-muted-foreground hover:text-foreground"
+          className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:text-foreground"
         >
           {t('seeAll')}
         </Link>

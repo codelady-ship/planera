@@ -49,7 +49,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           variant="ghost"
           size="sm"
           className={cn(
-            'px-2 uppercase',
+            'h-11 min-w-11 px-2 uppercase',
             locale === code && 'bg-muted font-semibold',
           )}
           onClick={() => choose(code)}

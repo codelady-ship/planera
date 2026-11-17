@@ -1,0 +1,26 @@
+# Planera
+
+> Planera is an online appointment booking platform and personal diary assistant for Azerbaijan. Customers find a professional (barber, doctor, tutor, consultant and others), choose a service, pick a time only from real free slots and manage the booking in their account. Professionals manage services, working hours and appointments in their own panel. Prices are in AZN, times in Asia/Baku. Interface languages: Azerbaijani (default), English, Russian.
+
+Slogan: "Vaxtını seç, rahatlığını yaşa." (Pick your time, enjoy the ease.)
+
+## Main pages
+
+- [Home (Azerbaijani)](https://planera-az.vercel.app/): search by service, city and date; categories; top rated professionals; how it works
+- [Home (English)](https://planera-az.vercel.app/en)
+- [Home (Russian)](https://planera-az.vercel.app/ru)
+- [Search professionals](https://planera-az.vercel.app/search): filter by category, city, price and rating; supports `?q=`, `category`, `city`, `maxPrice`, `sort`
+- [Privacy policy](https://planera-az.vercel.app/privacy)
+- Provider profiles: `https://planera-az.vercel.app/providers/{slug}` with services, prices, duration, working hours and reviews; English and Russian versions under `/en` and `/ru`
+
+## How booking works
+
+1. Choose a service on the professional's profile.
+2. Choose a date.
+3. Choose a time; only free slots are offered, computed from working hours, breaks, days off and existing appointments.
+4. Confirm. The appointment appears in the customer's account and can be cancelled within the provider's cancellation window.
+
+## Machine-readable
+
+- [Sitemap](https://planera-az.vercel.app/sitemap.xml)
+- [robots.txt](https://planera-az.vercel.app/robots.txt)
