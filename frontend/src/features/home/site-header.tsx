@@ -19,7 +19,11 @@ import { Link } from '@/i18n/navigation'
 export function BrandMark() {
   const t = useTranslations('header')
   return (
-    <Link href="/" className="flex items-center" aria-label={t('home')}>
+    <Link
+      href="/"
+      className="flex min-h-11 items-center"
+      aria-label={t('home')}
+    >
       <Image
         src="/brand/planera-wordmark.png"
         alt="Planera"
@@ -55,7 +59,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-muted-foreground hover:text-foreground"
+              className="inline-flex min-h-11 items-center px-1 text-muted-foreground hover:text-foreground"
             >
               {item.label}
             </Link>
@@ -64,7 +68,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-1 md:flex">
           <LanguageSwitcher />
-          <ThemeToggle />
+          <ThemeToggle className="size-11" />
           <UserMenu />
         </div>
 
@@ -74,7 +78,7 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="size-11 md:hidden"
                 aria-label={t('openMenu')}
               />
             }
@@ -90,7 +94,7 @@ export function SiteHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-lg px-3 py-2 hover:bg-muted"
+                  className="flex min-h-11 items-center rounded-lg px-3 hover:bg-muted"
                 >
                   {item.label}
                 </Link>

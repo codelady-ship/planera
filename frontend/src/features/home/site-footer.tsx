@@ -23,22 +23,28 @@ export function SiteFooter() {
           height={382}
           className="hidden h-12 w-auto dark:block"
         />
-        <nav className="flex flex-wrap gap-4">
-          <Link href="/search" className="hover:text-foreground">
+        <nav className="flex flex-wrap gap-x-4">
+          <Link
+            href="/search"
+            className="inline-flex min-h-11 items-center hover:text-foreground"
+          >
             {t('services')}
           </Link>
           <Link
             href="/register?role=provider"
-            className="hover:text-foreground"
+            className="inline-flex min-h-11 items-center hover:text-foreground"
           >
             {t('join')}
           </Link>
-          <Link href="/privacy" className="hover:text-foreground">
+          <Link
+            href="/privacy"
+            className="inline-flex min-h-11 items-center hover:text-foreground"
+          >
             {t('privacy')}
           </Link>
           <a
             href="https://github.com/codelady-ship/planera"
-            className="hover:text-foreground"
+            className="inline-flex min-h-11 min-w-11 items-center hover:text-foreground"
           >
             GitHub
           </a>

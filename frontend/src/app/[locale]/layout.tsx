@@ -10,6 +10,8 @@ import { InstallBanner } from '@/features/pwa/install-banner'
 import { ServiceWorkerRegistration } from '@/features/pwa/service-worker'
 import { THEME_INIT_SCRIPT } from '@/features/theme/theme'
 import { routing } from '@/i18n/routing'
+import { baseSocial } from '@/lib/site/seo'
+import { SITE_URL } from '@/lib/site/url'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,7 +33,12 @@ export async function generateMetadata({
 }: LayoutProps<'/[locale]'>): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'meta' })
+  const lang = hasLocale(routing.locales, locale)
+    ? locale
+    : routing.defaultLocale
   return {
+    metadataBase: new URL(SITE_URL),
+    ...baseSocial(lang, t('ogImageAlt')),
     title: { default: t('title'), template: '%s | Planera' },
     applicationName: 'Planera',
     description: t('description'),
