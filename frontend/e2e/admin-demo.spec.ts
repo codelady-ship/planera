@@ -4,6 +4,16 @@ import { expect, test, type Page } from '@playwright/test'
 // "Demo mode" strip, writes refused by the API, framing only by the
 // portfolio, and the panel inside the portfolio's cross-site iframe.
 
+// The stub portfolio below is a "public" https page framing the local site;
+// Chromium's Local Network Access check would block that in CI only.
+test.use({
+  launchOptions: {
+    args: [
+      '--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessRespectPreflightResults',
+    ],
+  },
+})
+
 const PORTFOLIO = 'https://antiqa-portfolio.vercel.app'
 const DEMO_STRIP = 'Demo rejimi: dəyişikliklər saxlanmır'
 const SCREENS = 'test-results/screens'
