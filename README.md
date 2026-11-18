@@ -109,6 +109,12 @@ Bütün demo hesabların şifrəsi: `Planera123`
 | Müştəri | musteri@planera.az |
 | Mütəxəssis | elvin-barber@planera.az (və digər `<slug>@planera.az`) |
 
+**Portfolio üçün yalnız baxış admin:** `demo@planera.az` / `demo1234` (giriş səhifəsində "Demo admin kimi bax" düyməsi).
+Bu hesabın tokenində `demo` claim-i var: API onun bütün yazma sorğularını 403 ilə rədd edir, admin randevu
+siyahısında müştəri adı qısaldılır, telefon və qeyd göstərilmir. Kukiləri `SameSite=None; Secure; Partitioned`
+olur ki, portfolionun iframe-ində işləsin; real hesabların kukiləri `SameSite=Lax` qalır. Saytı yalnız özü,
+`https://antiqa-portfolio.vercel.app` və `https://antiqacode.vercel.app` çərçivəyə ala bilər (CSP `frame-ancestors`).
+
 ## Deploy
 
 ### Frontend (Vercel)

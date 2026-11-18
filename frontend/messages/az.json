@@ -97,7 +97,9 @@
     "registerLink": "Qeydiyyat",
     "loginLink": "Daxil olun",
     "failed": "Xəta baş verdi, yenidən cəhd edin.",
-    "offline": "Serverə qoşulmaq olmadı. İnterneti yoxlayın."
+    "offline": "Serverə qoşulmaq olmadı. İnterneti yoxlayın.",
+    "demoAdmin": "Demo admin kimi bax",
+    "demoAdminHint": "Admin paneli yalnız baxış üçün: {email} / {password}"
   },
   "offline": {
     "title": "İnternet bağlantısı yoxdur",
@@ -388,7 +390,8 @@
     "weekChartLabel": "Günlər üzrə randevu sayı",
     "popular": "Ən populyar xidmətlər",
     "noRecent": "Son 30 gündə randevu olmayıb.",
-    "last30": "Son 30 gün"
+    "last30": "Son 30 gün",
+    "demoMode": "Demo rejimi: dəyişikliklər saxlanmır"
   },
   "schedule": {
     "title": "İş qrafiki",

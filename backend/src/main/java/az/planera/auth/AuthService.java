@@ -9,6 +9,7 @@ import az.planera.common.MessageKey;
 import az.planera.common.Messages;
 import az.planera.common.TooManyRequestsException;
 import az.planera.common.UnauthorizedException;
+import az.planera.config.DemoReadOnlyFilter;
 import az.planera.domain.ProviderProfile;
 import az.planera.domain.ProviderProfileRepository;
 import az.planera.domain.RefreshToken;
@@ -160,7 +161,8 @@ public class AuthService {
         String slug = user.getRole() == UserRole.PROVIDER
                 ? providers.findByUserId(user.getId()).map(ProviderProfile::getSlug).orElse(null)
                 : null;
-        return new UserView(user.getId(), user.getEmail(), user.getFullName(), user.getPhone(), user.getRole(), slug);
+        return new UserView(
+                user.getId(), user.getEmail(), user.getFullName(), user.getPhone(), user.getRole(), slug, user.isDemo());
     }
 
     private TokenResponse issue(User user) {
@@ -172,6 +174,10 @@ public class AuthService {
                 .expiresAt(now.plus(ACCESS_TTL))
                 .claim("uid", user.getId())
                 .claim("roles", List.of(user.getRole().name()))
+                // Demo accounts are read-only (DemoReadOnlyFilter); real tokens never carry the claim.
+                .claims(c -> {
+                    if (user.isDemo()) c.put(DemoReadOnlyFilter.CLAIM, true);
+                })
                 .build();
         String access = jwt.encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
                 .getTokenValue();

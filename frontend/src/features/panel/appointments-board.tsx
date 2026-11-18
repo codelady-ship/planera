@@ -141,7 +141,7 @@ function Board({ role }: { role: UserRole }) {
       />
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Tabs value={view} onValueChange={(v) => setView(v as View)}>
-          <TabsList>
+          <TabsList className="group-data-horizontal/tabs:h-11">
             <TabsTrigger value="day">{t('day')}</TabsTrigger>
             <TabsTrigger value="week">{t('week')}</TabsTrigger>
           </TabsList>
@@ -150,17 +150,23 @@ function Board({ role }: { role: UserRole }) {
           <Button
             variant="outline"
             size="icon"
+            className="size-11"
             aria-label={t('previous')}
             onClick={() => setDate(addDays(date, -step))}
           >
             <ChevronLeft aria-hidden />
           </Button>
-          <Button variant="outline" onClick={() => setDate(today)}>
+          <Button
+            variant="outline"
+            className="h-11"
+            onClick={() => setDate(today)}
+          >
             {t('today')}
           </Button>
           <Button
             variant="outline"
             size="icon"
+            className="size-11"
             aria-label={t('next')}
             onClick={() => setDate(addDays(date, step))}
           >
@@ -340,6 +346,7 @@ export function AppointmentDetails({
                     ? 'secondary'
                     : 'default'
               }
+              className="h-11"
               onClick={() => onAction(item, action.status)}
             >
               <action.icon aria-hidden />

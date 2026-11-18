@@ -97,7 +97,9 @@
     "registerLink": "Sign up",
     "loginLink": "Sign in",
     "failed": "Something went wrong, please try again.",
-    "offline": "Could not reach the server. Check your connection."
+    "offline": "Could not reach the server. Check your connection.",
+    "demoAdmin": "View as demo admin",
+    "demoAdminHint": "Read-only admin panel: {email} / {password}"
   },
   "offline": {
     "title": "No internet connection",
@@ -388,7 +390,8 @@
     "weekChartLabel": "Number of appointments per day",
     "popular": "Most popular services",
     "noRecent": "No appointments in the last 30 days.",
-    "last30": "Last 30 days"
+    "last30": "Last 30 days",
+    "demoMode": "Demo mode: changes are not saved"
   },
   "schedule": {
     "title": "Working hours",

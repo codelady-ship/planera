@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import {
   CalendarDays,
   Clock,
+  Eye,
   House,
   LayoutDashboard,
   ListChecks,
@@ -112,12 +113,21 @@ export function PanelShell({ children }: { children: ReactNode }) {
         <PanelSidebar role={user.role} name={user.fullName} />
         <SidebarInset>
           <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger className="-ml-1 size-11" />
             <span className="text-sm text-muted-foreground">
               {t('panelOf', { role: t(ROLE_KEY[user.role]) })}
             </span>
-            <ThemeToggle className="ml-auto" />
+            <ThemeToggle className="ml-auto size-11" />
           </header>
+          {user.demo && (
+            <p
+              role="status"
+              className="flex items-center gap-2 border-b bg-muted px-4 py-2 text-sm text-muted-foreground"
+            >
+              <Eye aria-hidden className="size-4 shrink-0" />
+              {t('demoMode')}
+            </p>
+          )}
           <main className="mx-auto w-full max-w-6xl flex-1 p-4 md:p-6">
             {children}
           </main>
@@ -146,6 +156,7 @@ function PanelSidebar({ role, name }: { role: UserRole; name: string }) {
               {items.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
+                    className="h-11"
                     isActive={pathname === item.href}
                     render={
                       <Link
@@ -170,13 +181,14 @@ function PanelSidebar({ role, name }: { role: UserRole; name: string }) {
         </div>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton render={<Link href="/" />}>
+            <SidebarMenuButton className="h-11" render={<Link href="/" />}>
               <House aria-hidden />
               <span>{t('backToSite')}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
+              className="h-11"
               onClick={async () => {
                 await logout()
                 router.replace('/')

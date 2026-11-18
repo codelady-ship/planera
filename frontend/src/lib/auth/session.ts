@@ -12,6 +12,8 @@ import { requestLocale } from '@/lib/i18n/request-locale'
  */
 export const ACCESS_COOKIE = 'rv_at'
 export const REFRESH_COOKIE = 'rv_rt'
+/** Marks a session of the public read-only demo account (portfolio admin demo). */
+export const DEMO_COOKIE = 'rv_demo'
 
 const REFRESH_MAX_AGE = 14 * 24 * 60 * 60
 
@@ -26,20 +28,52 @@ function base() {
   }
 }
 
+/**
+ * The public demo admin is shown inside the portfolio's iframe, a
+ * cross-site context where SameSite=Lax cookies are never sent. Only its
+ * cookies are SameSite=None (Secure, Partitioned per top-level site, so they
+ * also work where third-party cookies are blocked). The API refuses every
+ * write from a demo token, so a cross-site request can change nothing; real
+ * accounts keep SameSite=Lax.
+ */
+function demoBase() {
+  return {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none' as const,
+    partitioned: true,
+    path: '/',
+  }
+}
+
 export function storeTokens(store: CookieStore, tokens: TokenResponse) {
+  const demo = tokens.user.demo === true
+  const options = demo ? demoBase() : base()
   // Expire the access cookie a little early so a request never carries a
   // token that dies on the way.
   store.set(ACCESS_COOKIE, tokens.accessToken, {
-    ...base(),
+    ...options,
     maxAge: Math.max(tokens.expiresIn - 30, 30),
   })
   store.set(REFRESH_COOKIE, tokens.refreshToken, {
-    ...base(),
+    ...options,
     maxAge: REFRESH_MAX_AGE,
   })
+  if (demo) {
+    store.set(DEMO_COOKIE, '1', { ...options, maxAge: REFRESH_MAX_AGE })
+  } else if (store.has(DEMO_COOKIE)) {
+    store.set(DEMO_COOKIE, '', { ...demoBase(), maxAge: 0 })
+  }
 }
 
 export function clearTokens(store: CookieStore) {
+  if (store.has(DEMO_COOKIE)) {
+    // A partitioned cookie is only removed by one with the same attributes.
+    for (const name of [ACCESS_COOKIE, REFRESH_COOKIE, DEMO_COOKIE]) {
+      store.set(name, '', { ...demoBase(), maxAge: 0 })
+    }
+    return
+  }
   store.delete(ACCESS_COOKIE)
   store.delete(REFRESH_COOKIE)
 }

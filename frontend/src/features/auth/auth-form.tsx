@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
-import { LoaderCircle } from 'lucide-react'
+import { Eye, LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +13,15 @@ import type { Problem, SessionUser } from '@/lib/api/types'
 import { setSessionUser } from './use-session'
 
 type Mode = 'login' | 'register'
+
+/**
+ * Public read-only demo admin (portfolio admin demo). The password is public
+ * by design: the API refuses every change made with this account.
+ */
+export const DEMO_ADMIN = {
+  email: 'demo@planera.az',
+  password: 'demo1234',
+} as const
 
 type Field = {
   name: string
@@ -65,11 +74,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const data = Object.fromEntries(new FormData(event.currentTarget))
+    if (data.phone === '') delete data.phone
+    await send(data)
+  }
+
+  async function send(data: Record<string, unknown>) {
     setBusy(true)
     setErrors({})
     setMessage(null)
-    const data = Object.fromEntries(new FormData(event.currentTarget))
-    if (data.phone === '') delete data.phone
     try {
       const response = await fetch(`/api/auth/${mode}`, {
         method: 'POST',
@@ -141,6 +154,25 @@ export function AuthForm({ mode }: { mode: Mode }) {
         {busy && <LoaderCircle className="animate-spin" aria-hidden />}
         {mode === 'login' ? t('login') : t('createAccount')}
       </Button>
+
+      {mode === 'login' && (
+        <div className="flex flex-col gap-2 border-t pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="h-11"
+            disabled={busy}
+            onClick={() => void send({ ...DEMO_ADMIN })}
+          >
+            <Eye aria-hidden />
+            {t('demoAdmin')}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            {t('demoAdminHint', DEMO_ADMIN)}
+          </p>
+        </div>
+      )}
 
       <p className="text-center text-sm text-muted-foreground">
         {other.text}{' '}

@@ -20,7 +20,14 @@ public final class AuthDtos {
 
     public record RefreshRequest(@NotBlank String refreshToken) {}
 
-    public record UserView(Long id, String email, String fullName, String phone, UserRole role, String providerSlug) {}
+    /** {@code demo}: a public read-only demo account (the panel shows a "changes are not saved" note). */
+    public record UserView(
+            Long id, String email, String fullName, String phone, UserRole role, String providerSlug, boolean demo) {
+
+        public UserView(Long id, String email, String fullName, String phone, UserRole role, String providerSlug) {
+            this(id, email, fullName, phone, role, providerSlug, false);
+        }
+    }
 
     /**
      * Tokens go to the Next.js server (BFF), which keeps them in httpOnly
