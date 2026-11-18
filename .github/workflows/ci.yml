@@ -162,6 +162,14 @@ jobs:
       - name: Playwright
         working-directory: frontend
         run: npm run e2e
+      - name: Demo admin screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-demo-screenshots
+          path: frontend/test-results/screens
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Logs and report
         if: failure()
         uses: actions/upload-artifact@v4
