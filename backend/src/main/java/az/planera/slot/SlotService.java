@@ -1,5 +1,6 @@
 package az.planera.slot;
 
+import az.planera.config.DemoSafe;
 import az.planera.common.Messages;
 import az.planera.common.NotFoundException;
 import az.planera.config.TimeConfig;
@@ -70,8 +71,10 @@ public class SlotService {
         this.clock = clock;
     }
 
+    @DemoSafe("Free times only.")
     public record SlotsView(LocalDate date, Long serviceId, int durationMinutes, List<String> slots) {}
 
+    @DemoSafe("Free dates only.")
     public record AvailableDatesView(YearMonth month, Long serviceId, List<LocalDate> dates) {}
 
     public SlotsView slots(String slug, Long serviceId, LocalDate date) {

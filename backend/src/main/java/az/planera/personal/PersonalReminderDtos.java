@@ -1,5 +1,6 @@
 package az.planera.personal;
 
+import az.planera.config.DemoSafe;
 import az.planera.domain.PersonalReminder.Source;
 import az.planera.domain.PersonalReminder.Status;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ public final class PersonalReminderDtos {
     private PersonalReminderDtos() {}
 
     /** Date and time are Baku local, like appointments. */
+    @DemoSafe("The caller's own notes.")
     public record ReminderView(
             Long id,
             String title,
@@ -45,6 +47,7 @@ public final class PersonalReminderDtos {
             Status status) {}
 
     /** One line of the diary: an appointment or a personal note, by time. */
+    @DemoSafe("The caller's own diary.")
     public record AgendaItem(
             String type,
             Long id,

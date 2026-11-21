@@ -39,9 +39,78 @@ test('the demo admin reads the panel but cannot change anything', async ({
   expect((await me.json()).fullName).toBe('Demo Admin')
 
   const cookies = await page.context().cookies()
-  const refresh = cookies.find((c) => c.name === 'rv_rt')
+  const refresh = cookies.find((c) => c.name === 'rv_demo_rt')
   expect(refresh?.sameSite).toBe('None')
   expect(refresh?.secure).toBe(true)
+  // The demo never touches the cookie names of real accounts.
+  expect(cookies.some((c) => c.name === 'rv_rt' || c.name === 'rv_at')).toBe(
+    false,
+  )
+})
+
+// A real admin who tries the demo button and then logs out must not stay
+// signed in behind it: the demo login ends the real session (cookies and
+// refresh token), and logout clears and revokes whatever is left.
+test('real login, demo login, logout: nobody stays signed in', async ({
+  page,
+  request,
+}) => {
+  const api = process.env.E2E_API_URL ?? 'http://localhost:8080'
+  const sessionCookies = async () =>
+    (await page.context().cookies()).filter((c) =>
+      ['rv_at', 'rv_rt', 'rv_demo_at', 'rv_demo_rt'].includes(c.name),
+    )
+  const signedInAs = () =>
+    page.evaluate(async () => {
+      const response = await fetch('/api/auth/session', { cache: 'no-store' })
+      return ((await response.json()).user?.email as string) ?? null
+    })
+
+  await page.goto('/login')
+  const status = await page.evaluate(async () => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'admin@planera.az',
+        password: 'Planera123',
+      }),
+    })
+    return response.status
+  })
+  expect(status).toBe(200)
+  expect(await signedInAs()).toBe('admin@planera.az')
+  const real = await sessionCookies()
+  expect(real.map((c) => c.name).sort()).toEqual(['rv_at', 'rv_rt'])
+  // A real session never gets the relaxed cookie.
+  for (const cookie of real) expect(cookie.sameSite).toBe('Lax')
+  const realRefresh = real.find((c) => c.name === 'rv_rt')!.value
+
+  await page.goto('/login')
+  await page.getByRole('button', { name: 'Demo admin kimi bax' }).click()
+  await expect(page.getByText(DEMO_STRIP)).toBeVisible()
+  expect(await signedInAs()).toBe('demo@planera.az')
+  const demo = await sessionCookies()
+  expect(demo.map((c) => c.name).sort()).toEqual(['rv_demo_at', 'rv_demo_rt'])
+  for (const cookie of demo) expect(cookie.sameSite).toBe('None')
+
+  const loggedOut = await page.evaluate(async () => {
+    const response = await fetch('/api/auth/logout', { method: 'POST' })
+    return response.status
+  })
+  expect(loggedOut).toBe(204)
+  expect(await sessionCookies()).toEqual([])
+  expect(await signedInAs()).toBeNull()
+  await page.goto('/panel')
+  await expect(page).toHaveURL(/\/login\?next=%2Fpanel/)
+
+  // The real refresh token is dead in the API, not only forgotten by the
+  // browser. (The demo one is not replayed here: the API answers a replayed
+  // token by ending every session of that account, other tests' included.)
+  const refreshed = await request.post(`${api}/api/auth/refresh`, {
+    data: { refreshToken: realRefresh },
+  })
+  expect(refreshed.status()).toBe(401)
 })
 
 test('only the site and the portfolio may frame the pages', async ({

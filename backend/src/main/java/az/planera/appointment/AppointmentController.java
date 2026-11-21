@@ -10,7 +10,6 @@ import az.planera.appointment.AppointmentDtos.Scope;
 import az.planera.appointment.AppointmentDtos.StatusRequest;
 import az.planera.common.BusinessRuleException;
 import az.planera.common.Messages;
-import az.planera.config.DemoReadOnlyFilter;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -71,12 +70,10 @@ public class AppointmentController {
     @GetMapping("/api/admin/appointments")
     @PreAuthorize("hasRole('ADMIN')")
     public List<ProviderAppointmentView> all(
-            Authentication auth,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        List<ProviderAppointmentView> list = appointments.forProvider(null, from, to);
-        // The public demo admin sees the calendar, not who the customers are.
-        return DemoReadOnlyFilter.isDemo(auth) ? list.stream().map(ProviderAppointmentView::anonymized).toList() : list;
+        // A public demo admin gets this list anonymized by DemoResponseAdvice, like every other answer.
+        return appointments.forProvider(null, from, to);
     }
 
     @PatchMapping("/api/admin/appointments/{id}/status")

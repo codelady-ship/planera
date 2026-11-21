@@ -1,5 +1,6 @@
 package az.planera.availability;
 
+import az.planera.config.DemoSafe;
 import az.planera.provider.ProviderDtos.DaySchedule;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -30,5 +31,6 @@ public final class AvailabilityDtos {
 
     public record TimeOffView(Long id, LocalDate startsOn, LocalDate endsOn, String reason) {}
 
+    @DemoSafe("A provider's working hours and days off, no customers.")
     public record AvailabilityView(int slotStepMinutes, List<DaySchedule> weekly, List<TimeOffView> timeOff) {}
 }

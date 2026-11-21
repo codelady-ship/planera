@@ -1,5 +1,6 @@
 package az.planera.stats;
 
+import az.planera.config.DemoSafe;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +14,7 @@ public final class StatsDtos {
     public record ServiceCount(String name, long count) {}
 
     /** Revenue is in AZN; the cancellation rate is a percentage of this week's appointments. */
+    @DemoSafe("Counts and sums, no customers.")
     public record StatsView(
             LocalDate today,
             LocalDate weekStart,
