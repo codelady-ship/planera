@@ -1,5 +1,6 @@
 package az.planera.provider;
 
+import az.planera.config.DemoSafe;
 import az.planera.review.ReviewDtos.ReviewView;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -17,6 +18,7 @@ public final class ProviderDtos {
     private ProviderDtos() {}
 
     /** One card in the catalog. {@code nextSlot}: earliest free start in the next 14 days (Baku time, {@code yyyy-MM-ddTHH:mm}) or null (#19). */
+    @DemoSafe("Public catalog.")
     public record ProviderSummary(
             String slug,
             String name,
@@ -30,6 +32,7 @@ public final class ProviderDtos {
             String initials,
             String nextSlot) {}
 
+    @DemoSafe("Public catalog.")
     public record ServiceView(
             Long id, String name, String description, BigDecimal price, int durationMinutes) {}
 
@@ -39,6 +42,7 @@ public final class ProviderDtos {
     public record DaySchedule(int day, List<Interval> intervals) {}
 
     /** {@code reviews} holds the newest ones (#44); the full list is paged at /reviews. */
+    @DemoSafe("Public catalog.")
     public record ProviderDetail(
             ProviderSummary summary,
             String bio,

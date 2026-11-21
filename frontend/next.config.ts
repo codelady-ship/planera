@@ -1,6 +1,13 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 
+/** Who may show Planera in a frame: CSP frame-ancestors (no X-Frame-Options). */
+const FRAME_ANCESTORS = [
+  "'self'",
+  'https://antiqa-portfolio.vercel.app',
+  'https://antiqacode.vercel.app',
+]
+
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
@@ -8,6 +15,17 @@ const nextConfig: NextConfig = {
   // The service worker must never be served from a stale cache (#54).
   async headers() {
     return [
+      // Only the site itself and the owner's portfolio may frame the pages
+      // (the portfolio shows the read-only demo admin in an iframe).
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: `frame-ancestors ${FRAME_ANCESTORS.join(' ')}`,
+          },
+        ],
+      },
       {
         source: '/sw.js',
         headers: [

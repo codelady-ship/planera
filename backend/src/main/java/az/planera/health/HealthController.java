@@ -1,5 +1,6 @@
 package az.planera.health;
 
+import az.planera.config.DemoSafe;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,5 +23,6 @@ public class HealthController {
         return new HealthResponse("UP", "planera-api", OffsetDateTime.now(clock));
     }
 
+    @DemoSafe("Service status only.")
     public record HealthResponse(String status, String service, OffsetDateTime time) {}
 }

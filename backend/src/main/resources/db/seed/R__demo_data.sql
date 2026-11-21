@@ -87,3 +87,14 @@ end $$;
 create extension if not exists pgcrypto;
 update users set password_hash = crypt('Planera123', gen_salt('bf', 10))
 where password_hash is null and email like '%@planera.az';
+
+-- Public read-only demo admin (portfolio "Admin" tab): demo@planera.az / demo1234.
+-- The password is public by design; demo = true makes the API refuse every
+-- write from this account, so visitors can look around but change nothing.
+-- The address is on the project's own domain; if it already exists it is reset
+-- to this read-only demo account.
+insert into users (email, full_name, role, demo, password_hash)
+values ('demo@planera.az', 'Demo Admin', 'ADMIN', true, crypt('demo1234', gen_salt('bf', 10)))
+on conflict (email) do update
+    set full_name = excluded.full_name, role = excluded.role, demo = true,
+        password_hash = excluded.password_hash;

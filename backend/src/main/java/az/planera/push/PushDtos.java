@@ -1,5 +1,6 @@
 package az.planera.push;
 
+import az.planera.config.DemoSafe;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,9 +19,11 @@ public final class PushDtos {
             @NotNull @Valid Keys keys,
             @Size(max = 200) String device) {}
 
+    @DemoSafe("The caller's own devices.")
     public record SubscriptionView(Long id, String device, Instant createdAt) {}
 
     /** The VAPID public key, base64url, for {@code pushManager.subscribe}. */
+    @DemoSafe("A public key.")
     public record PublicKeyView(String publicKey) {}
 
     /** How many of the user's devices accepted a message. */

@@ -1,5 +1,6 @@
 package az.planera.category;
 
+import az.planera.config.DemoSafe;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -9,6 +10,7 @@ public final class CategoryDtos {
 
     private CategoryDtos() {}
 
+    @DemoSafe("Public catalog.")
     public record CategoryView(String slug, String name, String description, long providerCount) {}
 
     public record CategoryRequest(

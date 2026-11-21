@@ -23,6 +23,7 @@ class DemoSeedIntegrationTest {
     @Autowired ProviderProfileRepository providers;
     @Autowired ServiceOfferingRepository services;
     @Autowired AvailabilityRuleRepository rules;
+    @Autowired UserRepository users;
 
     @Test
     void loadsCategoriesProvidersServicesAndSchedules() {
@@ -35,5 +36,11 @@ class DemoSeedIntegrationTest {
         assertThat(services.findByProviderIdAndActiveTrueOrderByPriceAsc(barber.getId())).hasSize(3);
         assertThat(rules.findByProviderIdOrderByDayOfWeekAscStartTimeAsc(barber.getId())).hasSize(11);
         assertThat(providers.count()).isEqualTo(8);
+
+        // Public read-only demo admin for the portfolio (password is public: demo1234).
+        User demo = users.findByEmailIgnoreCase("demo@planera.az").orElseThrow();
+        assertThat(demo.getRole()).isEqualTo(UserRole.ADMIN);
+        assertThat(demo.isDemo()).isTrue();
+        assertThat(users.findByEmailIgnoreCase("admin@planera.az").orElseThrow().isDemo()).isFalse();
     }
 }

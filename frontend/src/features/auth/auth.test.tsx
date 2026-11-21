@@ -41,6 +41,35 @@ describe('AuthForm', () => {
     )
   })
 
+  it('signs in as the read-only demo admin with one click', async () => {
+    window.history.replaceState(null, '', '/login')
+    const fetchMock = vi.fn(async () =>
+      Response.json({
+        user: { id: 3, fullName: 'Demo Admin', role: 'ADMIN', demo: true },
+      }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    render(<AuthForm mode="login" />)
+
+    expect(
+      screen.getByText(
+        'Admin paneli yalnız baxış üçün: demo@planera.az / demo1234',
+      ),
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Demo admin kimi bax' }))
+
+    await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/panel'))
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/auth/login',
+      expect.objectContaining({
+        body: JSON.stringify({
+          email: 'demo@planera.az',
+          password: 'demo1234',
+        }),
+      }),
+    )
+  })
+
   it('shows the API field errors next to the fields', async () => {
     vi.stubGlobal(
       'fetch',

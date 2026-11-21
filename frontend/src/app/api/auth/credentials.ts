@@ -32,6 +32,6 @@ export async function exchange(
     return Response.json(body, { status: response.status })
   }
   const tokens = body as TokenResponse
-  storeTokens(await cookies(), tokens)
+  await storeTokens(await cookies(), tokens)
   return Response.json({ user: tokens.user }, { status: response.status })
 }

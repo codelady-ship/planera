@@ -69,6 +69,20 @@ class JwtSecurityTest {
         return token(email, role, Instant.now().plusSeconds(600));
     }
 
+    /** A token of the public read-only demo account (portfolio admin demo). */
+    private String demo(String email, String role) {
+        Instant expiresAt = Instant.now().plusSeconds(600);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(email)
+                .issuedAt(expiresAt.minusSeconds(900))
+                .expiresAt(expiresAt)
+                .claim("roles", List.of(role))
+                .claim("demo", true)
+                .build();
+        return "Bearer " + encoder.encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
+                .getTokenValue();
+    }
+
     @Test
     void validTokenReachesTheProfile() {
         given(auth.view("musteri@planera.az"))
@@ -169,5 +183,39 @@ class JwtSecurityTest {
                 .bodyJson()
                 .extractingPath("$.errors.email")
                 .isEqualTo("E-poçt düzgün deyil");
+    }
+
+    @Test
+    void demoAccountReadsButNeverWrites() {
+        given(auth.view("demo@planera.az"))
+                .willReturn(new UserView(3L, "demo@planera.az", "Demo Admin", null, UserRole.ADMIN, null, true));
+        String demo = demo("demo@planera.az", "ADMIN");
+
+        assertThat(mvc.get().uri("/api/me").header(HttpHeaders.AUTHORIZATION, demo))
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.demo")
+                .isEqualTo(true);
+        assertThat(mvc.patch().uri("/api/me")
+                        .header(HttpHeaders.AUTHORIZATION, demo)
+                        .header(HttpHeaders.ACCEPT_LANGUAGE, "en")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fullName\":\"Hacked\"}"))
+                .hasStatus(HttpStatus.FORBIDDEN)
+                .bodyJson()
+                .extractingPath("$.detail")
+                .isEqualTo("Demo mode: changes are not saved. This account is read-only.");
+        Mockito.verify(auth, Mockito.never()).updateProfile(any(), any(), any());
+    }
+
+    @Test
+    void realAccountsKeepTheirWrites() {
+        given(auth.updateProfile("musteri@planera.az", "Aynur", null))
+                .willReturn(new UserView(2L, "musteri@planera.az", "Aynur", null, UserRole.CUSTOMER, null));
+        assertThat(mvc.patch().uri("/api/me")
+                        .header(HttpHeaders.AUTHORIZATION, valid("musteri@planera.az", "CUSTOMER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fullName\":\"Aynur\"}"))
+                .hasStatusOk();
     }
 }

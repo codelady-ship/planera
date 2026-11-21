@@ -72,6 +72,7 @@ public class AppointmentController {
     public List<ProviderAppointmentView> all(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        // A public demo admin gets this list anonymized by DemoResponseAdvice, like every other answer.
         return appointments.forProvider(null, from, to);
     }
 

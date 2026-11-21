@@ -1,5 +1,6 @@
 package az.planera.review;
 
+import az.planera.config.DemoSafe;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -10,6 +11,7 @@ public final class ReviewDtos {
     private ReviewDtos() {}
 
     /** A customer's review as shown on the provider page; the name is shortened to "Aynur Q.". */
+    @DemoSafe("Reviews are public on the provider page.")
     public record ReviewView(Long id, int rating, String comment, String customerName, Instant createdAt) {}
 
     public record CreateRequest(

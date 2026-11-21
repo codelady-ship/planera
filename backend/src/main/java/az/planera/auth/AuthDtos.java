@@ -1,5 +1,6 @@
 package az.planera.auth;
 
+import az.planera.config.DemoSafe;
 import az.planera.domain.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,7 +21,15 @@ public final class AuthDtos {
 
     public record RefreshRequest(@NotBlank String refreshToken) {}
 
-    public record UserView(Long id, String email, String fullName, String phone, UserRole role, String providerSlug) {}
+    /** {@code demo}: a public read-only demo account (the panel shows a "changes are not saved" note). */
+    @DemoSafe("The caller's own profile.")
+    public record UserView(
+            Long id, String email, String fullName, String phone, UserRole role, String providerSlug, boolean demo) {
+
+        public UserView(Long id, String email, String fullName, String phone, UserRole role, String providerSlug) {
+            this(id, email, fullName, phone, role, providerSlug, false);
+        }
+    }
 
     /**
      * Tokens go to the Next.js server (BFF), which keeps them in httpOnly

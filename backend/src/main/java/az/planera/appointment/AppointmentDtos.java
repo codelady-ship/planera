@@ -1,5 +1,6 @@
 package az.planera.appointment;
 
+import az.planera.config.DemoMaskable;
 import az.planera.domain.AppointmentStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -51,8 +52,41 @@ public final class AppointmentDtos {
             String note,
             boolean cancellable,
             /** Completed and not reviewed yet (#44). */
-            boolean reviewable) {}
+            boolean reviewable)
+            implements DemoMaskable<AppointmentView> {
+
+        /** Demo accounts never read what a customer wrote: on every endpoint, see DemoResponseAdvice. */
+        @Override
+        public AppointmentView forDemo() {
+            return withoutNote();
+        }
+
+        /** The same appointment without the customer's free-text note. */
+        public AppointmentView withoutNote() {
+            return new AppointmentView(id, code, providerSlug, providerName, serviceId, serviceName, date, time,
+                    durationMinutes, startsAt, endsAt, status, price, null, cancellable, reviewable);
+        }
+    }
 
     /** What a provider sees: the appointment plus who booked it. */
-    public record ProviderAppointmentView(AppointmentView appointment, String customerName, String customerPhone) {}
+    public record ProviderAppointmentView(AppointmentView appointment, String customerName, String customerPhone)
+            implements DemoMaskable<ProviderAppointmentView> {
+
+        @Override
+        public ProviderAppointmentView forDemo() {
+            return anonymized();
+        }
+
+        /**
+         * What a public demo account sees: first name and last initial, no phone
+         * and no note, so real customers are never shown to demo visitors.
+         */
+        public ProviderAppointmentView anonymized() {
+            String[] parts = customerName == null ? new String[0] : customerName.strip().split("\\s+");
+            String name = parts.length == 0 || parts[0].isEmpty() ? "-"
+                    : parts.length == 1 ? parts[0]
+                    : parts[0] + " " + parts[parts.length - 1].charAt(0) + ".";
+            return new ProviderAppointmentView(appointment.withoutNote(), name, null);
+        }
+    }
 }

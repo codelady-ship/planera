@@ -38,6 +38,10 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String locale = "az";
 
+    /** Public read-only demo account (portfolio admin demo): every write is refused. */
+    @Column(nullable = false)
+    private boolean demo;
+
     protected User() {}
 
     public User(String email, String fullName, UserRole role) {
@@ -56,6 +60,7 @@ public class User extends BaseEntity {
     public void setPhone(String phone) { this.phone = phone; }
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }
+    public boolean isDemo() { return demo; }
 
     /** Largest offset first; empty when the user turned reminders off. */
     public List<Integer> getReminderOffsets() {

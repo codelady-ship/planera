@@ -19,6 +19,8 @@ export interface SessionUser {
   phone: string | null
   role: UserRole
   providerSlug: string | null
+  /** The public read-only demo account (portfolio admin demo). */
+  demo?: boolean
 }
 
 export interface TokenResponse {
