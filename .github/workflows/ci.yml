@@ -110,6 +110,12 @@ jobs:
   e2e:
     name: End-to-end (Playwright)
     runs-on: ubuntu-latest
+    # Throwaway values for this job's own database: the API creates the real
+    # admin from them at startup and the tests sign in with it. Not used
+    # anywhere else; production values live only in the Render dashboard.
+    env:
+      E2E_ADMIN_EMAIL: e2e-admin@example.test
+      E2E_ADMIN_PASSWORD: e2e-only-admin-password
     services:
       postgres:
         image: postgres:16-alpine
@@ -136,6 +142,8 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: demo
           JWT_SECRET: e2e-only-secret-that-is-at-least-32-bytes-long
+          ADMIN_EMAIL: ${{ env.E2E_ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ env.E2E_ADMIN_PASSWORD }}
         run: |
           ./gradlew bootJar --no-daemon -q
           nohup java -jar $(ls build/libs/*.jar | grep -v plain) > api.log 2>&1 &

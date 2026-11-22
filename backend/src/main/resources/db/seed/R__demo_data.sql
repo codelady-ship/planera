@@ -98,3 +98,14 @@ values ('demo@planera.az', 'Demo Admin', 'ADMIN', true, crypt('demo1234', gen_sa
 on conflict (email) do update
     set full_name = excluded.full_name, role = excluded.role, demo = true,
         password_hash = excluded.password_hash;
+
+-- The admin account listed in the README (admin@planera.az / "Planera123") is
+-- public as well, so it is a read-only demo admin too: the address and the
+-- password stay as they were, but the API refuses every write from it and
+-- anonymizes customers in what it reads. Its name and phone go back to the
+-- seed values (anyone could change them while the account was writable).
+-- The real, writable admin is not in this file: it comes from ADMIN_EMAIL /
+-- ADMIN_PASSWORD at startup (AdminAccountInitializer).
+update users
+   set demo = true, full_name = 'Planera Admin', phone = null
+ where email = 'admin@planera.az';
