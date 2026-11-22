@@ -1,8 +1,10 @@
 # Render Blueprint (#49, #48): backend API (Docker), Key Value (Redis) and
 # PostgreSQL. Everything the API needs is wired here, so a new Blueprint
-# deploys without typing any connection details. The one secret that must
-# not live in the repository, the Web Push private key, is entered in the
-# dashboard (sync: false); until then the API uses a random pair per start.
+# deploys without typing any connection details. The secrets that must not
+# live in the repository are entered in the dashboard (sync: false): the Web
+# Push private key (until then the API uses a random pair per start) and the
+# real admin's ADMIN_EMAIL / ADMIN_PASSWORD (until then there is no writable
+# admin: the accounts in the README are public and read-only).
 databases:
   - name: planera-db
     plan: free
@@ -58,6 +60,12 @@ services:
         sync: false
       - key: VAPID_SUBJECT
         value: mailto:info@planera.az
+      # The real, writable admin: created or updated at startup when both are
+      # set in the dashboard. Never write the values here.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
       - key: REDIS_URL
         fromService:
           type: keyvalue

@@ -39,6 +39,11 @@ spring:
 planera:
   jwt:
     secret: ${JWT_SECRET:} # at least 32 bytes in production; empty = random key per start
+  admin:
+    # The real, writable admin: created or updated at startup only when both are set
+    # (AdminAccountInitializer). The accounts listed in the README are public and read-only.
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
   cors:
     # Comma-separated; empty = no cross-origin browser calls (the site uses its own /api/backend gateway).
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}

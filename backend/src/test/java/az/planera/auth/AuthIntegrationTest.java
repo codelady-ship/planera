@@ -70,6 +70,23 @@ class AuthIntegrationTest {
         assertThat(tokens.user().role()).isEqualTo(UserRole.CUSTOMER);
     }
 
+    /** The README admin keeps its address and public password, but its token is a read-only demo token. */
+    @Test
+    void theReadmeAdminStillLogsInButAsAReadOnlyDemo() {
+        TokenResponse tokens = auth.login(new LoginRequest("admin@planera.az", "Planera123"));
+
+        Jwt jwt = decoder.decode(tokens.accessToken());
+        assertThat(jwt.getClaimAsStringList("roles")).containsExactly("ADMIN");
+        assertThat(jwt.getClaimAsBoolean("demo")).isTrue();
+        assertThat(tokens.user().demo()).isTrue();
+        // A refreshed token is a demo token as well.
+        assertThat(decoder.decode(auth.refresh(tokens.refreshToken()).accessToken()).getClaimAsBoolean("demo"))
+                .isTrue();
+        // Real accounts never carry the claim.
+        Jwt customer = decoder.decode(auth.login(new LoginRequest("musteri@planera.az", "Planera123")).accessToken());
+        assertThat(customer.hasClaim("demo")).isFalse();
+    }
+
     @Test
     void providerLoginCarriesItsSlug() {
         assertThat(auth.login(new LoginRequest("elvin-barber@planera.az", "Planera123")).user().providerSlug())

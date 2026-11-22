@@ -41,6 +41,13 @@ class DemoSeedIntegrationTest {
         User demo = users.findByEmailIgnoreCase("demo@planera.az").orElseThrow();
         assertThat(demo.getRole()).isEqualTo(UserRole.ADMIN);
         assertThat(demo.isDemo()).isTrue();
-        assertThat(users.findByEmailIgnoreCase("admin@planera.az").orElseThrow().isDemo()).isFalse();
+        // The admin in the README is public too: still an admin, but read-only.
+        User readmeAdmin = users.findByEmailIgnoreCase("admin@planera.az").orElseThrow();
+        assertThat(readmeAdmin.getRole()).isEqualTo(UserRole.ADMIN);
+        assertThat(readmeAdmin.isDemo()).isTrue();
+        // No writable admin comes from the repository; the other demo logins are not touched.
+        assertThat(users.findAll().stream().filter(u -> u.getRole() == UserRole.ADMIN && !u.isDemo())).isEmpty();
+        assertThat(users.findByEmailIgnoreCase("musteri@planera.az").orElseThrow().isDemo()).isFalse();
+        assertThat(users.findByEmailIgnoreCase("elvin-barber@planera.az").orElseThrow().isDemo()).isFalse();
     }
 }

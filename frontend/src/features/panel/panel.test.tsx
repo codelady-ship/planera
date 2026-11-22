@@ -131,6 +131,33 @@ describe('PanelShell', () => {
       screen.queryByRole('link', { name: 'Xidmətlər' }),
     ).not.toBeInTheDocument()
   })
+
+  // The admin in the README is public, so the API marks it demo (read-only).
+  it('tells the public README admin that the panel is read-only', () => {
+    setSessionUser({
+      ...user('ADMIN'),
+      email: 'admin@planera.az',
+      fullName: 'Planera Admin',
+      demo: true,
+    })
+    render(<PanelShell>məzmun</PanelShell>)
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Demo rejimi: dəyişikliklər saxlanmır',
+    )
+    expect(screen.getByText('məzmun')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Randevular' })).toBeInTheDocument()
+  })
+
+  it('shows no demo note to a real admin', () => {
+    setSessionUser({ ...user('ADMIN'), demo: false })
+    render(<PanelShell>məzmun</PanelShell>)
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Demo rejimi: dəyişikliklər saxlanmır'),
+    ).not.toBeInTheDocument()
+  })
 })
 
 describe('AppointmentsBoard', () => {
@@ -182,6 +209,30 @@ describe('AppointmentsBoard', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Bu keçidə icazə yoxdur',
     )
+    expect(within(card).getByText('Təsdiqlənib')).toBeInTheDocument()
+  })
+
+  it('shows the API message when the read-only demo admin tries a change', async () => {
+    setSessionUser({ ...user('ADMIN'), email: 'admin@planera.az', demo: true })
+    const detail =
+      'Demo rejimi: dəyişikliklər saxlanmır. Bu hesab yalnız baxış üçündür.'
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) =>
+        init?.method === 'PATCH'
+          ? Response.json(
+              { status: 403, title: 'Forbidden', detail },
+              { status: 403 },
+            )
+          : Response.json([ITEM]),
+      ),
+    )
+    render(<AppointmentsBoard />)
+
+    const card = (await screen.findByText(/Aynur Qasımova/)).closest('li')!
+    fireEvent.click(within(card).getByRole('button', { name: 'Tamamlandı' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(detail)
     expect(within(card).getByText('Təsdiqlənib')).toBeInTheDocument()
   })
 })

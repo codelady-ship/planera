@@ -105,12 +105,19 @@ Bütün demo hesabların şifrəsi: `Planera123`
 
 | Rol | E-poçt |
 |---|---|
-| Admin | admin@planera.az |
+| Admin (yalnız baxış) | admin@planera.az |
 | Müştəri | musteri@planera.az |
 | Mütəxəssis | elvin-barber@planera.az (və digər `<slug>@planera.az`) |
 
+**Admin demo hesabı yalnız baxış üçündür.** `admin@planera.az` şifrəsi açıq olduğu üçün demo hesabdır (`users.demo = true`):
+daxil olur, panelin bütün bölmələrini və siyahılarını görür, amma heç nəyi dəyişə bilmir. API onun hər yazma sorğusunu
+(randevu statusu, kateqoriya, xidmət, iş qrafiki, istirahət günü, öz adı / telefonu / dili və s.) 403 və
+"Demo rejimi: dəyişikliklər saxlanmır" mesajı ilə rədd edir; müştərilərin adı qısaldılır, telefonu və qeydi göstərilmir.
+Yoxlama serverdədir (`DemoReadOnlyFilter`), təkcə interfeysdə gizlədilmir. Əsl (dəyişiklik edə bilən) admin repoda yoxdur:
+API açılanda `ADMIN_EMAIL` / `ADMIN_PASSWORD` mühit dəyişənlərindən yaradılır (bax: Deploy).
+
 **Portfolio üçün yalnız baxış admin:** `demo@planera.az` / `demo1234` (giriş səhifəsində "Demo admin kimi bax" düyməsi).
-Bu hesabın tokenində `demo` claim-i var: API onun bütün yazma sorğularını 403 ilə rədd edir. Oxuma cavabları
+Demo hesabların tokenində `demo` claim-i var: API onların bütün yazma sorğularını 403 ilə rədd edir. Oxuma cavabları
 bir yerdə, `DemoResponseAdvice`-də anonimləşdirilir: hər endpoint-də müştəri adı qısaldılır, telefon və qeyd
 göstərilmir; cavab tipi `@DemoSafe` və ya `DemoMaskable` deyilsə, demo hesab 403 alır (yeni endpoint maskanı
 unuda bilməz). Demo kukiləri ayrı adla (`rv_demo_at` / `rv_demo_rt`) və `SameSite=None; Secure; Partitioned`
@@ -136,7 +143,8 @@ iki növ kukini silir və refresh tokenləri API-də ləğv edir. Saytı yalnız
 2. https://render.com/deploy?repo=https://github.com/codelady-ship/planera -> Blueprint adı `planera` -> Deploy Blueprint. Pulsuz planda bir Key Value və bir PostgreSQL ola bilər; köhnə `planera-redis` / `planera-db` qalıbsa əvvəl silin.
 3. E-poçt bildirişləri (#43) `RESEND_API_KEY` yazılanda göndərilir (https://resend.com, pulsuz plan), `MAIL_FROM` göndərən ünvandır (standart `Planera <onboarding@resend.dev>`, öz domeniniz təsdiqlənəndə dəyişin), `SITE_URL` məktubdakı linklərdir. Açar yoxdursa məktublar yalnız loga yazılır.
 4. Web Push üçün yalnız `VAPID_PRIVATE_KEY` dashboard-da yazılır (public açar `render.yaml`-dadır, eyni cütün gizli yarısı: `npx web-push generate-vapid-keys`). Boş qalsa API hər açılışda təsadüfi cüt yaradır və köhnə abunəliklər işləmir.
-5. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
+5. Əsl admin: dashboard-da (`planera-api` -> Environment) `ADMIN_EMAIL` və `ADMIN_PASSWORD` yazılır. Hər ikisi varsa, API açılanda bu ünvanla admin hesabı yaradır (artıq varsa şifrəsini bu dəyərə gətirir və köhnə sessiyalarını bağlayır); biri və ya hər ikisi boşdursa heç bir hesab yaradılmır və dəyişiklik edə bilən admin olmur. Şifrə 8-72 simvoldur və açıq demo şifrələrindən biri ola bilməz; ünvan demo hesabların (`admin@planera.az`, `demo@planera.az`) və ya bir mütəxəssisin ünvanı ola bilməz. Dəyərlər yalnız Render-də saxlanır: repoya, README-yə və loglara yazılmır.
+6. Yoxlama: `https://<servis>.onrender.com/api/health`. İlk açılışda Flyway cədvəlləri və demo datanı yaradır.
 
 - **Production API:** https://planera-api.onrender.com
 - Vercel-də `API_URL` bu ünvana baxır; brauzer API-yə birbaşa yox, saytın `/api/backend` keçidi ilə müraciət edir.

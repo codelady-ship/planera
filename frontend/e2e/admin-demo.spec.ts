@@ -14,6 +14,17 @@ test.use({
   },
 })
 
+// A real (not demo) account for the "real session" checks. CI starts the API
+// with ADMIN_EMAIL / ADMIN_PASSWORD and passes the same throwaway values here,
+// so this is the admin created from the environment; without them the demo
+// customer stands in (a real account too). The admin in the README is not
+// one any more: it is a read-only demo admin.
+const REAL = {
+  email: process.env.E2E_ADMIN_EMAIL ?? 'musteri@planera.az',
+  password: process.env.E2E_ADMIN_PASSWORD ?? 'Planera123',
+}
+const README_ADMIN = { email: 'admin@planera.az', password: 'Planera123' }
+
 const PORTFOLIO = 'https://antiqa-portfolio.vercel.app'
 const DEMO_STRIP = 'Demo rejimi: dəyişikliklər saxlanmır'
 const SCREENS = 'test-results/screens'
@@ -67,19 +78,16 @@ test('real login, demo login, logout: nobody stays signed in', async ({
     })
 
   await page.goto('/login')
-  const status = await page.evaluate(async () => {
+  const status = await page.evaluate(async (account) => {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: 'admin@planera.az',
-        password: 'Planera123',
-      }),
+      body: JSON.stringify(account),
     })
     return response.status
-  })
+  }, REAL)
   expect(status).toBe(200)
-  expect(await signedInAs()).toBe('admin@planera.az')
+  expect(await signedInAs()).toBe(REAL.email)
   const real = await sessionCookies()
   expect(real.map((c) => c.name).sort()).toEqual(['rv_at', 'rv_rt'])
   // A real session never gets the relaxed cookie.
@@ -111,6 +119,86 @@ test('real login, demo login, logout: nobody stays signed in', async ({
     data: { refreshToken: realRefresh },
   })
   expect(refreshed.status()).toBe(401)
+})
+
+// The admin account printed in the README is public, so it is a read-only
+// demo admin as well: it signs in like any account, sees the panel with the
+// demo note, and the API refuses its changes.
+test('the README admin signs in but is read-only', async ({ page }) => {
+  await page.goto('/login')
+  const status = await page.evaluate(async (account) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(account),
+    })
+    return response.status
+  }, README_ADMIN)
+  expect(status).toBe(200)
+  await page.goto('/panel')
+  await expect(page.getByText(DEMO_STRIP)).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ümumi baxış' })).toBeVisible()
+
+  const me = await (await page.request.get('/api/backend/me')).json()
+  expect(me).toMatchObject({
+    email: README_ADMIN.email,
+    role: 'ADMIN',
+    demo: true,
+  })
+
+  // An admin action and the account's own profile: both refused by the API.
+  const category = await page.request.post('/api/backend/admin/categories', {
+    data: { slug: 'visitor', name: 'Added by a visitor', sortOrder: 9 },
+  })
+  expect(category.status()).toBe(403)
+  expect((await category.json()).detail).toContain('Demo rejimi')
+  const profile = await page.request.patch('/api/backend/me', {
+    data: { fullName: 'Changed by a visitor' },
+  })
+  expect(profile.status()).toBe(403)
+  const categories = await (
+    await page.request.get('/api/backend/categories')
+  ).json()
+  expect(categories.some((c: { slug: string }) => c.slug === 'visitor')).toBe(
+    false,
+  )
+  const after = await (await page.request.get('/api/backend/me')).json()
+  expect(after.fullName).toBe('Planera Admin')
+
+  // It is a demo session: never the cookie names of real accounts.
+  const names = (await page.context().cookies()).map((c) => c.name)
+  expect(names).toContain('rv_demo_rt')
+  expect(names).not.toContain('rv_rt')
+})
+
+// Only with the variables (CI): the admin created at startup from
+// ADMIN_EMAIL / ADMIN_PASSWORD is a real, writable admin.
+test('the admin from the environment is a real admin', async ({ page }) => {
+  test.skip(
+    !process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD,
+    'needs the API started with ADMIN_EMAIL / ADMIN_PASSWORD',
+  )
+  await page.goto('/login')
+  const status = await page.evaluate(async (account) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(account),
+    })
+    return response.status
+  }, REAL)
+  expect(status).toBe(200)
+  await page.goto('/panel')
+  await expect(page.getByRole('heading', { name: 'Ümumi baxış' })).toBeVisible()
+  await expect(page.getByText(DEMO_STRIP)).toHaveCount(0)
+
+  const me = await (await page.request.get('/api/backend/me')).json()
+  expect(me).toMatchObject({ email: REAL.email, role: 'ADMIN', demo: false })
+  // A write goes through (its own display name, set to what it already is).
+  const saved = await page.request.patch('/api/backend/me', {
+    data: { fullName: me.fullName },
+  })
+  expect(saved.status()).toBe(200)
 })
 
 test('only the site and the portfolio may frame the pages', async ({
