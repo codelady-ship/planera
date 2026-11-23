@@ -14,7 +14,8 @@ const LAST_DAY = 31
  * variable; every movement is a CSS calc() of it, so React never re-renders
  * while scrolling. With prefers-reduced-motion the scene stays still. The
  * scene starts below the 65px sticky header so the tear-off page is never
- * hidden behind it.
+ * hidden behind it. Below the md breakpoint there is no room beside the hero
+ * text, so the scene is not shown at all (#144: it overlapped the text at 390px).
  */
 export function ScrollScene() {
   const root = useRef<HTMLDivElement>(null)
@@ -55,7 +56,7 @@ export function ScrollScene() {
       ref={root}
       data-testid="scroll-scene"
       aria-hidden
-      className="scroll-scene pointer-events-none fixed inset-x-0 top-[65px] bottom-0 -z-10 overflow-hidden"
+      className="scroll-scene pointer-events-none fixed inset-x-0 top-[65px] bottom-0 -z-10 hidden overflow-hidden md:block"
     >
       <svg
         viewBox="0 0 800 600"

@@ -36,6 +36,13 @@ describe('ScrollScene', () => {
     )
   })
 
+  test('is not shown on phones, where it would sit behind the hero text (#144)', () => {
+    render(<ScrollScene />)
+    const scene = screen.getByTestId('scroll-scene')
+    expect(scene).toHaveClass('hidden')
+    expect(scene).toHaveClass('md:block')
+  })
+
   test('writes scroll progress and advances the day number', () => {
     render(<ScrollScene />)
     const scene = screen.getByTestId('scroll-scene')
