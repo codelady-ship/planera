@@ -8,6 +8,14 @@ import { defineRouting } from 'next-intl/routing'
 /** The middleware remembers the last language here; the API gateway reads it (#94). */
 export const LOCALE_COOKIE = 'rv_locale'
 
+/**
+ * The same choice for Planera shown in a frame on another site (#144, the
+ * portfolio): there the browser drops the SameSite=Lax cookie above, so an
+ * explicit /az, /en, /ru or ?lang= is also kept in a partitioned cookie and
+ * read only when the main one is missing.
+ */
+export const FRAME_LOCALE_COOKIE = 'rv_locale_frame'
+
 export const routing = defineRouting({
   locales: ['az', 'en', 'ru'],
   defaultLocale: 'az',

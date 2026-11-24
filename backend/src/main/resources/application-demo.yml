@@ -2,3 +2,8 @@
 spring:
   flyway:
     locations: classpath:db/migration,classpath:db/seed
+
+planera:
+  demo:
+    # Keep demo appointments around today so the demo admin dashboard is never empty (#144).
+    activity: true
