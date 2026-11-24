@@ -36,13 +36,19 @@ describe('ScrollScene', () => {
     )
   })
 
-  test('stays on phones, in the bottom part of the screen under the hero text (#144)', () => {
+  test('phones get a small calendar and clock at the top right; md and up the full scene (#144)', () => {
     render(<ScrollScene />)
     const scene = screen.getByTestId('scroll-scene')
     expect(scene).not.toHaveClass('hidden')
-    const drawing = scene.querySelector('svg')!
-    // Phones: a smaller box at the bottom; md and up: the full height as before.
-    expect(drawing).toHaveClass('bottom-0', 'h-[40%]', 'md:top-0', 'md:h-full')
+    const [full, phone] = scene.querySelectorAll('svg')
+    expect(full).toHaveClass('hidden', 'md:block', 'inset-0', 'h-full')
+    expect(phone).toBe(screen.getByTestId('scroll-scene-phone'))
+    expect(phone).toHaveClass('md:hidden', 'top-1', 'right-2')
+    // Calendar (with its check marks) and clock (with both hands), no tear-off page.
+    expect(phone.querySelectorAll('.scene-check')).toHaveLength(9)
+    expect(phone.querySelector('.scene-hour')).not.toBeNull()
+    expect(phone.querySelector('.scene-minute')).not.toBeNull()
+    expect(phone.querySelector('text')).toBeNull()
   })
 
   test('writes scroll progress and advances the day number', () => {

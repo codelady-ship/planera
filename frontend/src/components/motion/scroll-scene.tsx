@@ -15,8 +15,8 @@ const LAST_DAY = 31
  * while scrolling. With prefers-reduced-motion the scene stays still. The
  * scene starts below the 65px sticky header so the tear-off page is never
  * hidden behind it. Below the md breakpoint there is no room beside the hero
- * text, so the drawing sits smaller in the bottom part of the screen, under
- * the hero text and buttons (#144: it overlapped the text at 390px).
+ * text (#144: it overlapped the text at 390px), so phones get a small calendar
+ * and clock at the top right, beside the badge and above the headline.
  */
 export function ScrollScene() {
   const root = useRef<HTMLDivElement>(null)
@@ -62,108 +62,10 @@ export function ScrollScene() {
       <svg
         viewBox="0 0 800 600"
         preserveAspectRatio="xMaxYMid meet"
-        className="scene-drift absolute inset-x-0 bottom-0 h-[40%] w-full md:top-0 md:h-full"
+        className="scene-drift absolute inset-0 hidden h-full w-full md:block"
       >
-        {/* Calendar */}
-        <g
-          transform="translate(255 150) scale(0.94)"
-          className="opacity-[0.22] md:opacity-35"
-        >
-          <rect width="360" height="300" rx="18" fill="var(--brand-white)" />
-          <rect width="360" height="64" rx="18" fill="var(--brand-navy)" />
-          <rect y="40" width="360" height="24" fill="var(--brand-navy)" />
-          {[70, 110, 250, 290].map((x) => (
-            <rect
-              key={x}
-              x={x - 6}
-              y="-22"
-              width="12"
-              height="44"
-              rx="6"
-              fill="var(--brand-ink)"
-            />
-          ))}
-          {Array.from({ length: CELLS }, (_, i) => {
-            const x = 30 + (i % 6) * 52
-            const y = 90 + Math.floor(i / 6) * 50
-            const order = CHECKED.indexOf(i)
-            return (
-              <g key={i} transform={`translate(${x} ${y})`}>
-                <rect width="36" height="34" rx="6" fill="#c3cddd" />
-                {order >= 0 && (
-                  <g
-                    className="scene-check"
-                    style={
-                      {
-                        '--i': order,
-                        '--n': CHECKED.length,
-                      } as React.CSSProperties
-                    }
-                  >
-                    <circle
-                      cx="18"
-                      cy="17"
-                      r="13"
-                      fill="var(--brand-teal-dark)"
-                    />
-                    <path
-                      d="M11 17.5l5 5 9-10"
-                      fill="none"
-                      stroke="var(--brand-white)"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </g>
-                )}
-              </g>
-            )
-          })}
-        </g>
-
-        {/* Clock */}
-        <g
-          transform="translate(655 445) scale(0.9)"
-          className="opacity-25 md:opacity-45"
-        >
-          <circle r="96" fill="var(--brand-white)" />
-          <circle
-            r="96"
-            fill="none"
-            stroke="var(--brand-blue)"
-            strokeWidth="12"
-          />
-          {Array.from({ length: 12 }, (_, i) => (
-            <circle
-              key={i}
-              cx={Math.sin((i * Math.PI) / 6) * 72}
-              cy={-Math.cos((i * Math.PI) / 6) * 72}
-              r={i % 3 === 0 ? 6 : 3.5}
-              fill="var(--brand-navy)"
-            />
-          ))}
-          <line
-            className="scene-hour"
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="-44"
-            stroke="var(--brand-navy)"
-            strokeWidth="9"
-            strokeLinecap="round"
-          />
-          <line
-            className="scene-minute"
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="-68"
-            stroke="var(--brand-navy)"
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-          <circle r="9" fill="var(--brand-teal)" />
-        </g>
+        <Calendar className="opacity-35" />
+        <Clock className="opacity-45" />
 
         {/* Tear-off page */}
         <g
@@ -186,6 +88,110 @@ export function ScrollScene() {
           </text>
         </g>
       </svg>
+
+      {/* Phones: a small calendar and clock at the top right, beside the badge and
+          above the headline, where the hero leaves free space (#144). */}
+      <svg
+        data-testid="scroll-scene-phone"
+        viewBox="250 105 500 432"
+        className="absolute top-1 right-2 h-16 w-[74px] md:hidden"
+      >
+        <Calendar className="opacity-35" />
+        <Clock className="opacity-45" />
+      </svg>
     </div>
+  )
+}
+
+/** The calendar whose cells fill with check marks as the page scrolls. */
+function Calendar({ className }: { className: string }) {
+  return (
+    <g transform="translate(255 150) scale(0.94)" className={className}>
+      <rect width="360" height="300" rx="18" fill="var(--brand-white)" />
+      <rect width="360" height="64" rx="18" fill="var(--brand-navy)" />
+      <rect y="40" width="360" height="24" fill="var(--brand-navy)" />
+      {[70, 110, 250, 290].map((x) => (
+        <rect
+          key={x}
+          x={x - 6}
+          y="-22"
+          width="12"
+          height="44"
+          rx="6"
+          fill="var(--brand-ink)"
+        />
+      ))}
+      {Array.from({ length: CELLS }, (_, i) => {
+        const x = 30 + (i % 6) * 52
+        const y = 90 + Math.floor(i / 6) * 50
+        const order = CHECKED.indexOf(i)
+        return (
+          <g key={i} transform={`translate(${x} ${y})`}>
+            <rect width="36" height="34" rx="6" fill="#c3cddd" />
+            {order >= 0 && (
+              <g
+                className="scene-check"
+                style={
+                  {
+                    '--i': order,
+                    '--n': CHECKED.length,
+                  } as React.CSSProperties
+                }
+              >
+                <circle cx="18" cy="17" r="13" fill="var(--brand-teal-dark)" />
+                <path
+                  d="M11 17.5l5 5 9-10"
+                  fill="none"
+                  stroke="var(--brand-white)"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            )}
+          </g>
+        )
+      })}
+    </g>
+  )
+}
+
+/** The clock whose hands turn as the page scrolls. */
+function Clock({ className }: { className: string }) {
+  return (
+    <g transform="translate(655 445) scale(0.9)" className={className}>
+      <circle r="96" fill="var(--brand-white)" />
+      <circle r="96" fill="none" stroke="var(--brand-blue)" strokeWidth="12" />
+      {Array.from({ length: 12 }, (_, i) => (
+        <circle
+          key={i}
+          cx={Math.sin((i * Math.PI) / 6) * 72}
+          cy={-Math.cos((i * Math.PI) / 6) * 72}
+          r={i % 3 === 0 ? 6 : 3.5}
+          fill="var(--brand-navy)"
+        />
+      ))}
+      <line
+        className="scene-hour"
+        x1="0"
+        y1="0"
+        x2="0"
+        y2="-44"
+        stroke="var(--brand-navy)"
+        strokeWidth="9"
+        strokeLinecap="round"
+      />
+      <line
+        className="scene-minute"
+        x1="0"
+        y1="0"
+        x2="0"
+        y2="-68"
+        stroke="var(--brand-navy)"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <circle r="9" fill="var(--brand-teal)" />
+    </g>
   )
 }
