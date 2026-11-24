@@ -15,7 +15,8 @@ const LAST_DAY = 31
  * while scrolling. With prefers-reduced-motion the scene stays still. The
  * scene starts below the 65px sticky header so the tear-off page is never
  * hidden behind it. Below the md breakpoint there is no room beside the hero
- * text, so the scene is not shown at all (#144: it overlapped the text at 390px).
+ * text, so the drawing sits smaller in the bottom part of the screen, under
+ * the hero text and buttons (#144: it overlapped the text at 390px).
  */
 export function ScrollScene() {
   const root = useRef<HTMLDivElement>(null)
@@ -56,12 +57,12 @@ export function ScrollScene() {
       ref={root}
       data-testid="scroll-scene"
       aria-hidden
-      className="scroll-scene pointer-events-none fixed inset-x-0 top-[65px] bottom-0 -z-10 hidden overflow-hidden md:block"
+      className="scroll-scene pointer-events-none fixed inset-x-0 top-[65px] bottom-0 -z-10 overflow-hidden"
     >
       <svg
         viewBox="0 0 800 600"
         preserveAspectRatio="xMaxYMid meet"
-        className="scene-drift absolute inset-0 h-full w-full"
+        className="scene-drift absolute inset-x-0 bottom-0 h-[40%] w-full md:top-0 md:h-full"
       >
         {/* Calendar */}
         <g

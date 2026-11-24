@@ -36,11 +36,13 @@ describe('ScrollScene', () => {
     )
   })
 
-  test('is not shown on phones, where it would sit behind the hero text (#144)', () => {
+  test('stays on phones, in the bottom part of the screen under the hero text (#144)', () => {
     render(<ScrollScene />)
     const scene = screen.getByTestId('scroll-scene')
-    expect(scene).toHaveClass('hidden')
-    expect(scene).toHaveClass('md:block')
+    expect(scene).not.toHaveClass('hidden')
+    const drawing = scene.querySelector('svg')!
+    // Phones: a smaller box at the bottom; md and up: the full height as before.
+    expect(drawing).toHaveClass('bottom-0', 'h-[40%]', 'md:top-0', 'md:h-full')
   })
 
   test('writes scroll progress and advances the day number', () => {
